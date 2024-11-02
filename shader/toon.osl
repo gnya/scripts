@@ -137,7 +137,6 @@ shader toon(
 
     if (UseShadow & shadow(L, ShadowCutoff)) {
         d = 0.0;
-        h = 0.0;
     }
     
     float r = 0.0; // reflection
