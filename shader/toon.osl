@@ -155,11 +155,11 @@ shader toon(
     color c = BaseColor;
     float t = Transparency;
     
-    if (h > HighlightThreshold) {
+    if (d <= ShadowThreshold) {
+        c = ShadowColor;
+    } else if (h > HighlightThreshold) {
         c = HighlightColor;
         t = HighlightTransparency;
-    } else if (d <= ShadowThreshold) {
-        c = ShadowColor;
     }
 
     Toon = mix(c, MirrorColor, r) * emission();
