@@ -84,6 +84,8 @@ shader toon(
     [[ string widget = "boolean" ]],
     int UseMirror = 0
     [[ string widget = "boolean" ]],
+    int UseTransparentCulling = 1
+    [[ string widget = "boolean" ]],
     float HighlightThreshold = 0.9,
     float HighlightMap = 0.0,
     float ShadowThreshold = 0.1,
@@ -95,10 +97,19 @@ shader toon(
     color BaseColor = color(0.5),
     color ShadowColor = color(0.1),
     color MirrorColor = color(0.3),
+    float HighlightTransparency = 1.0,
     float Transparency = 1.0,
+
+    /* 
+     * This is a hack to work around the problem that some
+     * attributes cannot be retrieved by getattribute in scripts
+     * unless they are explicitly used in the Cycles node.
+     */
+    float _ = 0.0, // Attribute nodes should be connected here.
+
     output closure color Toon = transparent()
 ) {
-    if (Transparency == 0.0) {
+    if (Transparency == 0.0 & !UseHighlight) {
         exit();
     }
 
@@ -111,7 +122,10 @@ shader toon(
         h += HighlightMap; // apply highlight map
     }
     
-    float d = ShadeMap; // diffuse
+    color attr_shadow = color(1.0);
+    getattribute("Shadow", attr_shadow);
+
+    float d = min(ShadeMap, attr_shadow.r); // diffuse
 
     if (UseShade & UseHalfLambert) {
         d *= (0.5 * dot(L, N) + 0.5) * l_str;
@@ -139,22 +153,27 @@ shader toon(
     }
 
     color c = BaseColor;
+    float t = Transparency;
     
     if (h > HighlightThreshold) {
         c = HighlightColor;
+        t = HighlightTransparency;
     } else if (d <= ShadowThreshold) {
         c = ShadowColor;
     }
 
     Toon = mix(c, MirrorColor, r) * emission();
         
-    if (Transparency == 1.0) {
+    if (t == 1.0) {
         exit();
     }
     
-    int transparent_depth = 0;
-    getattribute("path:transparent_depth", transparent_depth);
+    if (UseTransparentCulling) {
+        int t_depth = 0;
+        getattribute("path:transparent_depth", t_depth);
+
+        t *= t_depth == 0;
+    }
     
-    float t = Transparency * (transparent_depth == 0);
     Toon = mix(transparent(), Toon, t);
 }
