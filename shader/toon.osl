@@ -84,6 +84,8 @@ shader toon(
     [[ string widget = "boolean" ]],
     int UseMirror = 0
     [[ string widget = "boolean" ]],
+    int UseAO = 0
+    [[ string widget = "boolean" ]],
     int UseTransparentCulling = 1
     [[ string widget = "boolean" ]],
     float HighlightThreshold = 0.9,
@@ -93,6 +95,8 @@ shader toon(
     float ShadeMap = 1.0,
     float MirrorFactor = 0.5,
     float MirrorDistance = 100.0,
+    float BaseAOFactor = 0.85,
+    float ShadowAOFactor = 0.1,
     color HighlightColor = color(1.0),
     color BaseColor = color(0.5),
     color ShadowColor = color(0.1),
@@ -151,11 +155,29 @@ shader toon(
         r = pow(clamp(r, 0.0, 1.0), 2.0) * MirrorFactor;
     }
 
-    color c = BaseColor;
+    float ao = 1.0;
+    float base_ao = 1.0;
+    float shadow_ao = 0.0;
+
+    if (UseAO) {
+        ao = texture("@ao",
+                     128, // samples
+                     1.0, // distance
+                     N[0], N[1], N[2], // normal
+                     0, // inside
+                     "sblur",
+                     0, // only local
+                     "tblur",
+                     0);
+        base_ao = 1.0 - BaseAOFactor * (1.0 - ao);
+        shadow_ao = ShadowAOFactor * ao;
+    }
+
+    color c = mix(ShadowColor, BaseColor, base_ao);
     float t = Transparency;
     
     if (d <= ShadowThreshold) {
-        c = ShadowColor;
+        c = mix(ShadowColor, BaseColor, shadow_ao);
     } else if (h > HighlightThreshold) {
         c = HighlightColor;
         t = HighlightTransparency;
