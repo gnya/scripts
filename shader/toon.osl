@@ -95,6 +95,7 @@ shader toon(
     float ShadeMap = 1.0,
     float MirrorFactor = 0.5,
     float MirrorDistance = 100.0,
+    int AOSamples = 8,
     float BaseAOFactor = 0.85,
     float ShadowAOFactor = 0.1,
     color HighlightColor = color(1.0),
@@ -161,7 +162,7 @@ shader toon(
 
     if (UseAO) {
         ao = texture("@ao",
-                     128, // samples
+                     AOSamples, // samples
                      1.0, // distance
                      N[0], N[1], N[2], // normal
                      0, // inside
