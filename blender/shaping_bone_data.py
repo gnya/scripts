@@ -164,7 +164,9 @@ def rule5(armature, bone, constraint, fix):
             info.append(constraint.subtarget)
 
         if hasattr(constraint, 'influence') and constraint.influence < 1.0:
-            if not has_driver(armature, bone, constraint, 'influence'):                
+            if not has_driver(armature, bone, constraint, 'influence'):
+                digit = 0
+
                 if constraint.influence > 0.0:
                     digit = math.floor(math.log10(constraint.influence))
 
