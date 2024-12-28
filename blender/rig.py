@@ -24,6 +24,8 @@ def ik_fk_bone_names(group, lr):
 
     if group not in FIRST_BONE_NAME.keys():
         return {}
+    if lr not in ['L', 'R']:
+        return {}
 
     first = FIRST_BONE_NAME[group]
     second = SECOND_BONE_NAME[group]
