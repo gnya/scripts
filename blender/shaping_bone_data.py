@@ -30,6 +30,7 @@ def rule2(bone, constraint, fix):
         'DAMPED_TRACK',
         'IK',
         'LIMIT_LOCATION',
+        'LIMIT_SCALE',
         'LIMIT_ROTATION',
         'STRETCH_TO'
     ]
@@ -66,6 +67,7 @@ def rule3(bone, constraint, fix):
         'COPY_TRANSFORMS',
         'LIMIT_DISTANCE',
         'LIMIT_LOCATION',
+        'LIMIT_SCALE',
         'LIMIT_ROTATION',
         'TRANSFORM'
     ]
@@ -107,6 +109,7 @@ def rule4(bone, constraint, fix):
 
     ignore_types = [
         'LIMIT_LOCATION',
+        'LIMIT_SCALE',
         'LIMIT_ROTATION'
     ]
 
@@ -146,6 +149,7 @@ def rule5(armature, bone, constraint, fix):
         'IK': 'IK',
         'LIMIT_DISTANCE': 'Limit Distance',
         'LIMIT_LOCATION': 'Limit Location',
+        'LIMIT_SCALE': 'Limit Scale',
         'LIMIT_ROTATION': 'Limit Rotation',
         'STRETCH_TO': 'Stretch To',
         'TRANSFORM': 'Transformation'
