@@ -386,15 +386,124 @@ def is_symmetrical(a, b, properties, symmetrical_properties):
         if v_a != v_b:
             if type(v_a) is float:
                 if abs(v_a - v_b) > 1.0e-6:
-                    return False, f'{a.name} -> {abs(v_a - v_b)}'
+                    return False, f'{a.name} -> {p}'
             else:
-                return False, f'{a.name} -> {p} = {v_a}'
+                return False, f'{a.name} -> {p}'
 
     for p in symmetrical_properties:
         if getattr(a, p) != switch_lr(getattr(b, p)):
-            return False, f'{a.name} -> {p} = {getattr(a, p)}'
+            return False, f'{a.name} -> {p}'
 
     return True, ''
+
+
+def is_symmetrical_transform_constraint(a, b):
+    to_loc = a.map_to == 'LOCATION'
+    to_rot = a.map_to == 'ROTATION'
+    from_loc = a.map_from == 'LOCATION'
+    from_rot = a.map_from == 'ROTATION'
+
+    # check "from" properties
+    if a.from_max_x != -b.from_min_x:
+        return False, 'from_max_x'
+    if a.from_min_x != -b.from_max_x:
+        return False, 'from_min_x'
+    if a.from_max_y != -b.from_min_y:
+        return False, 'from_max_y'
+    if a.from_min_y != -b.from_max_y:
+        return False, 'from_min_y'
+    if a.from_max_z != -b.from_min_z:
+        return False, 'from_max_z'
+    if a.from_min_z != -b.from_max_z:
+        return False, 'from_min_z'
+
+    if a.target_space == a.owner_space or a.target_space == 'LOCAL':
+        # check "to" properties (only when useing local space, considering other case is too complicated)
+        a_to_max_x = -a.to_max_x if to_loc \
+            else (a.to_max_x_rot if to_rot else a.to_max_x_scale)
+        a_to_max_y = a.to_max_y if to_loc \
+            else (-a.to_max_y_rot if to_rot else a.to_max_y_scale)
+        a_to_max_z = a.to_max_z if to_loc \
+            else (-a.to_max_z_rot if to_rot else a.to_max_z_scale)
+
+        a_to_min_x = -a.to_min_x if to_loc \
+            else (a.to_min_x_rot if to_rot else a.to_min_x_scale)
+        a_to_min_y = a.to_min_y if to_loc \
+            else (-a.to_min_y_rot if to_rot else a.to_min_y_scale)
+        a_to_min_z = a.to_min_z if to_loc \
+            else (-a.to_min_z_rot if to_rot else a.to_min_z_scale)
+
+        if (a.map_to_x_from == 'X' and from_loc) \
+           or ((a.map_to_x_from == 'Y' or a.map_to_x_from == 'Z') and from_rot):
+            a_to_max_x, a_to_min_x = a_to_min_x, a_to_max_x
+
+        if (a.map_to_y_from == 'X' and from_loc) \
+           or ((a.map_to_y_from == 'Y' or a.map_to_y_from == 'Z') and from_rot):
+            a_to_max_y, a_to_min_y = a_to_min_y, a_to_max_y
+
+        if (a.map_to_z_from == 'X' and from_loc) \
+           or ((a.map_to_z_from == 'Y' or a.map_to_z_from == 'Z') and from_rot):
+            a_to_max_z, a_to_min_z = a_to_min_z, a_to_max_z
+
+        b_to_max_x = b.to_max_x if to_loc \
+            else (b.to_max_x_rot if to_rot else b.to_max_x_scale)
+        b_to_max_y = b.to_max_y if to_loc \
+            else (b.to_max_y_rot if to_rot else b.to_max_y_scale)
+        b_to_max_z = b.to_max_z if to_loc \
+            else (b.to_max_z_rot if to_rot else b.to_max_z_scale)
+
+        b_to_min_x = b.to_min_x if to_loc \
+            else (b.to_min_x_rot if to_rot else b.to_min_x_scale)
+        b_to_min_y = b.to_min_y if to_loc \
+            else (b.to_min_y_rot if to_rot else b.to_min_y_scale)
+        b_to_min_z = b.to_min_z if to_loc \
+            else (b.to_min_z_rot if to_rot else b.to_min_z_scale)
+
+        if a_to_max_x != b_to_max_x:
+            return False, 'to_max_x/to_max_x_rot/to_max_x_scale'
+        if a_to_min_x != b_to_min_x:
+            return False, 'to_min_x/to_min_x_rot/to_min_x_scale'
+        if a_to_max_y != b_to_max_y:
+            return False, 'to_max_y/to_max_y_rot/to_max_y_scale'
+        if a_to_min_y != b_to_min_y:
+            return False, 'to_min_y/to_min_y_rot/to_min_y_scale'
+        if a_to_max_z != b_to_max_z:
+            return False, 'to_max_z/to_max_z_rot/to_max_z_scale'
+        if a_to_min_z != b_to_min_z:
+            return False, 'to_min_z/to_min_z_rot/to_min_z_scale'
+
+    properties = [
+        'from_max_x_rot', 'from_max_x_scale',
+        'from_max_y', 'from_max_y_scale',
+        'from_max_z', 'from_max_z_scale',
+        'from_min_x_rot', 'from_min_x_scale',
+        'from_min_y', 'from_min_y_scale',
+        'from_min_z', 'from_min_z_scale',
+        'from_rotation_mode', 'map_from', 'map_to', 'target',
+        'map_to_x_from', 'map_to_y_from', 'map_to_z_from',
+        'mix_mode', 'mix_mode_rot', 'mix_mode_scale',
+        'to_euler_order', 'use_motion_extrapolate'
+    ]
+
+    if not to_loc:
+        properties += [
+            'to_max_x', 'to_max_y', 'to_max_z',
+            'to_min_x', 'to_min_y', 'to_min_z'
+        ]
+
+    if not to_rot:
+        properties += [
+            'to_max_x_rot', 'to_max_y_rot', 'to_max_z_rot',
+            'to_min_x_rot', 'to_min_y_rot', 'to_min_z_rot'
+        ]
+
+    if to_loc or to_rot:
+        properties += [
+            'to_max_x_scale', 'to_max_y_scale', 'to_max_z_scale',
+            'to_min_x_scale', 'to_min_y_scale', 'to_min_z_scale'
+        ]
+
+    return is_symmetrical(a, b, properties, ['subtarget'])
 
 
 def is_symmetrical_constraint(a, b):
@@ -462,9 +571,14 @@ def is_symmetrical_constraint(a, b):
                 'use_min_x', 'use_min_y', 'use_min_z', 'use_transform_limit'
             ], [])
         case 'LIMIT_ROTATION':
+            if a.max_y != -b.min_y or a.min_y != -b.max_y:
+                return False, 'min_y/max_y'
+
+            if a.max_z != -b.min_z or a.min_z != -b.max_z:
+                return False, 'min_z/max_z'
+
             return is_symmetrical(a, b, [
-                'euler_order', 'max_x', 'max_y', 'max_z',
-                'min_x', 'min_y', 'min_z', 'use_transform_limit',
+                'euler_order', 'max_x', 'min_x', 'use_transform_limit',
                 'use_limit_x', 'use_limit_y', 'use_limit_z'
             ], [])
         case 'SHRINKWRAP':
@@ -480,23 +594,7 @@ def is_symmetrical_constraint(a, b):
                 'use_bulge_max', 'use_bulge_min', 'volume'
             ], ['subtarget'])
         case 'TRANSFORM':
-            return is_symmetrical(a, b, [
-                'from_max_x', 'from_max_x_rot', 'from_max_x_scale',
-                'from_max_y', 'from_max_y_rot', 'from_max_y_scale',
-                'from_max_z', 'from_max_z_rot', 'from_max_z_scale',
-                'from_min_x', 'from_min_x_rot', 'from_min_x_scale',
-                'from_min_y', 'from_min_y_rot', 'from_min_y_scale',
-                'from_min_z', 'from_min_z_rot', 'from_min_z_scale',
-                'from_rotation_mode', 'map_from', 'map_to', 'target',
-                'map_to_x_from', 'map_to_y_from', 'map_to_z_from',
-                'mix_mode', 'mix_mode_rot', 'mix_mode_scale',
-                'to_max_x', 'to_max_x_rot', 'to_max_x_scale',
-                'to_max_y', 'to_max_y_rot', 'to_max_y_scale',
-                'to_max_z', 'to_max_z_rot', 'to_max_z_scale',
-                'to_min_x', 'to_min_x_rot', 'to_min_x_scale',
-                'to_min_y', 'to_min_y_rot', 'to_min_y_scale',
-                'to_euler_order', 'use_motion_extrapolate'
-            ], ['subtarget'])
+            return is_symmetrical_transform_constraint(a, b)
 
     return False, f'Not Supported: {a.type}'
 
@@ -519,6 +617,29 @@ def rule11(bone, mirror_bone):
     return True
 
 
+# Rule12: Check not used customeshapes
+def rule12(armatures):
+    used_customshapes = set()
+
+    for a in armatures:
+        for b in a.pose.bones:
+            if b.custom_shape:
+                used_customshapes.add(b.custom_shape.name)
+
+    exist_customshapes = set()
+
+    for o in bpy.data.objects:
+        m = re.match(r'^[^_.]*_CUSTOMSHAPE.*$', o.name)
+
+        if m:
+            exist_customshapes.add(o.name)
+
+    not_used_customshapes = exist_customshapes - used_customshapes
+
+    if not_used_customshapes:
+        print(f'Rule12: There are custom shapes that didn\'t used: {not_used_customshapes}')
+
+
 if __name__ == '__main__':
     fix = True
     armatures = []
@@ -526,6 +647,8 @@ if __name__ == '__main__':
     for o in bpy.context.selected_objects:
         if o.type == 'ARMATURE':
             armatures.append(o)
+
+    rule12(armatures)
 
     for a in armatures:
         for b in a.data.bones:
