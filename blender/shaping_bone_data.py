@@ -17,7 +17,7 @@ def rule1(bone, fix):
     return True
 
 
-# Rule2: Target must have subtarget and use "Pose Space" instead of "World Space"
+# Rule2: Armature target must have subtarget and use "Pose Space" instead of "World Space"
 def rule2(bone, constraint, fix):
     notice_types = [
         'COPY_LOCATION',
@@ -25,6 +25,7 @@ def rule2(bone, constraint, fix):
         'COPY_SCALE',
         'COPY_TRANSFORMS',
         'LIMIT_DISTANCE',
+        'TRACK_TO',
         'TRANSFORM'
     ]
 
@@ -40,6 +41,9 @@ def rule2(bone, constraint, fix):
     ]
 
     if constraint.type in notice_types:
+        if constraint.target.type != 'ARMATURE':
+            return True
+
         if not constraint.subtarget:
             print(f'Rule2: {bone.name}: Target must have target bone as subtarget to use "Pose Space": {constraint.name}')
 
@@ -74,6 +78,7 @@ def rule3(bone, constraint, fix):
         'LIMIT_LOCATION',
         'LIMIT_SCALE',
         'LIMIT_ROTATION',
+        'TRACK_TO',
         'TRANSFORM'
     ]
 
@@ -101,7 +106,7 @@ def rule3(bone, constraint, fix):
     return True
 
 
-# Rule4: Target must have subtarget
+# Rule4: Armature target must have subtarget
 def rule4(bone, constraint):
     notice_types = [
         'COPY_LOCATION',
@@ -113,6 +118,7 @@ def rule4(bone, constraint):
         'IK',
         'LIMIT_DISTANCE',
         'STRETCH_TO',
+        'TRACK_TO',
         'TRANSFORM'
     ]
 
@@ -124,6 +130,9 @@ def rule4(bone, constraint):
     ]
 
     if constraint.type in notice_types:
+        if constraint.target.type != 'ARMATURE':
+            return True
+
         if not constraint.subtarget:
             print(f'Rule4: {bone.name}: Target must have target bone as subtarget: {constraint.name}')
 
@@ -162,6 +171,7 @@ def rule5(armature, bone, constraint, fix):
         'LIMIT_ROTATION': 'Limit Rotation',
         'SHRINKWRAP': 'Shrinkwrap',
         'STRETCH_TO': 'Stretch To',
+        'TRACK_TO': 'Track To',
         'TRANSFORM': 'Transformation'
     }
 
@@ -345,13 +355,14 @@ def is_symmetrical_driver_variable(a, b):
 
 # Rule10: Check bone driver is symmetrical
 def rule10(driver, drivers):
+    index = driver.array_index
     path = driver.data_path
     m = re.match(r'pose\.bones\["([^\]]*)"\]', path)
 
     if m:
         bone_name = m.group(1)
         mirror_path = switch_lr(path)
-        mirror_driver = drivers.find(mirror_path)
+        mirror_driver = drivers.find(mirror_path, index=index)
 
         if not mirror_driver:
             print(f'Rule10: {bone_name}: There is no driver to by symmetrical with "{path}"')
@@ -593,6 +604,11 @@ def is_symmetrical_constraint(a, b):
                 'keep_axis', 'rest_length', 'target', 'use_bbone_shape',
                 'use_bulge_max', 'use_bulge_min', 'volume'
             ], ['subtarget'])
+        case 'TRACK_TO':
+            return is_symmetrical(a, b, [
+                'head_tail', 'target', 'track_axis', 'up_axis',
+                'use_bbone_shape', 'use_target_z'
+            ], ['subtarget'])
         case 'TRANSFORM':
             return is_symmetrical_transform_constraint(a, b)
 
@@ -640,6 +656,86 @@ def rule12(armatures):
         print(f'Rule12: There are custom shapes that didn\'t used: {not_used_customshapes}')
 
 
+# Rule13: Check bone parent is symmetrical
+def rule13(bone, mirror_bone):
+    if not bone.parent:
+        return True
+
+    if not mirror_bone.parent or bone.parent.name != switch_lr(mirror_bone.parent.name):
+        print(f'Rule13: {bone.name}: Bone parent is not symmetrical')
+
+        return False
+
+    return True
+
+
+# Rule14: Modifier's name rule
+def rule14(obj, modifier, fix):
+    modifier_names = {
+        'MIRROR': 'Mirror',
+        'SOLIDIFY': 'Solidify',
+        'SURFACE_DEFORM': 'Surface Deform',
+        'MASK': 'Mask',
+        'DATA_TRANSFER': 'Data Transfer',
+        'CAST': 'Cast',
+        'LATTICE': 'Lattice',
+        'SUBSURF': 'Subdivision',
+        'HOOK': 'Hook',
+        'ARMATURE': 'Armature',
+        'NODES': 'Geometry Nodes'
+    }
+
+    if modifier.type in modifier_names.keys():
+        name = modifier_names[modifier.type]
+        info = []
+
+        if hasattr(modifier, 'object'):
+            info.append(modifier.object.name)
+
+        if hasattr(modifier, 'target'):
+            info.append(modifier.target.name)
+
+        if hasattr(modifier, 'subtarget'):
+            info.append(modifier.subtarget)
+
+        if modifier.type == 'MASK' and hasattr(modifier, 'vertex_group'):
+            info.append(modifier.vertex_group)
+
+        if modifier.type == 'NODES':
+            name = modifier.node_group.name
+
+            keys = []
+            items = []
+
+            for i in modifier.node_group.inputs[1:]:
+                keys.append(i.name.lower())
+
+            for k, v in modifier.items():
+                if re.match(r'^Input_\d*$', k):
+                    items.append(v)
+
+            for k, v in zip(keys, items):
+                if k == 'target':
+                    info.append(v.name)
+
+        suffix = ', '.join(info)
+
+        if suffix:
+            name += f' ({suffix})'
+
+        if name != modifier.name:
+            print(f'Rule14: {obj.name}: Suggested modifier name change: {modifier.name} -> {name}')
+
+            if fix:
+                modifier.name = name
+    else:
+        print(f'WARNING(Rule14): {obj.name}: Non supported modifier type: {modifier.type}')
+
+        return False
+
+    return True
+
+
 if __name__ == '__main__':
     fix = True
     armatures = []
@@ -660,6 +756,7 @@ if __name__ == '__main__':
             sb = a.pose.bones.get(switch_lr(b.name))
             rule9(b, sb)
             rule11(b, sb)
+            rule13(b, sb)
 
             for c in b.constraints:
                 rule2(b, c, fix)
@@ -673,3 +770,7 @@ if __name__ == '__main__':
 
             for d in drivers:
                 rule10(d, drivers)
+
+        for c in a.children_recursive:
+            for m in c.modifiers:
+                rule14(c, m, fix)
