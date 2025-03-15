@@ -1,10 +1,3 @@
-float default_shadow(float shade_map) {
-    color attr_shadow = color(1.0);
-    getattribute("Shadow", attr_shadow);
-
-    return min(shade_map, attr_shadow.r);
-}
-
 /*
  * This function calculates the amount by which the ray start
  * point is moved along the geometry normal. This is based on
@@ -41,9 +34,9 @@ vector ray_offset(vector L, float cutoff, float eps0, float eps1) {
  * This function checks whether lights from the direction of
  * a given light source reaches the point of current interest.
  */
-int shadow (vector L, float cutoff) {
+int shadow(vector L, float cutoff, float eps) {
     vector offset = ray_offset(L, cutoff, 5.0e-4, 1.0e-5);
-    vector pos = P + offset;
+    vector pos = P + offset + Ng * eps; // TODO check this
     
     float this_obj_id = 0.0;
     getattribute("object:index", this_obj_id);
@@ -52,12 +45,10 @@ int shadow (vector L, float cutoff) {
         return trace(pos, L);
     }
     
-    vector norm = Ng;
-    
     int max_loop = 50;
     int count = 0;
-    float eps = 1.0e-4;
     float hit_obj_id = 0.0;
+    vector ng = Ng;
     
     for (; count < max_loop & trace(pos, L); count++) {
         getmessage("trace", "object:index", hit_obj_id);
@@ -67,8 +58,9 @@ int shadow (vector L, float cutoff) {
         }
         
         getmessage("trace", "P", pos);
-        getmessage("trace", "Ng", norm);
-        pos -= eps * norm;
+        // If the ray hits a backface, it returns the inverse normal.
+        getmessage("trace", "Ng", ng);
+        pos -= ng * eps;
     }
     
     if (count == max_loop) {
@@ -78,17 +70,27 @@ int shadow (vector L, float cutoff) {
     return 0;
 }
 
-float mirror(float distance, float factor) {
+/*
+ * This function calculates how reflective other objects appear
+ * at the current point of interest.
+ */
+float mirror(float distance, float factor, float cutoff, float eps) {
     float r = 0.0;
+    vector dir = reflect(-I, N);
 
-    if (trace(P, reflect(-I, N))) {
-        float p_dist = 0.0; // distance from rendering point
-        float s_dist = 0.0; // distance from rendering surface
-        getmessage("trace", "hitdist", p_dist);
-        s_dist = dot(I, N) * p_dist;
+    if (trace(P + Ng * eps, dir)) {
+        vector n = 0.0;
+        getmessage("trace", "N", n);
 
-        r = (distance - s_dist) / distance;
-        r = pow(clamp(r, 0.0, 1.0), 2.0) * factor;
+        if (abs(dot(dir, n)) > cutoff) {
+            float p_dist = 0.0; // distance from rendering point
+            float s_dist = 0.0; // distance from rendering surface
+            getmessage("trace", "hitdist", p_dist);
+            s_dist = dot(I, N) * p_dist;
+
+            r = (distance - s_dist) / distance;
+            r = pow(clamp(r, 0.0, 1.0), 2.0) * factor;
+        }
     }
 
     return r;
@@ -121,23 +123,14 @@ shader toon(
     color HighlightColor = color(1.0),
     color BaseColor = color(0.5),
     color ShadowColor = color(0.1),
-    color MirrorColor = color(0.3),
     float HighlightTransparency = 1.0,
     float Transparency = 1.0,
-
-    /* 
-     * This is a hack to work around the problem that some
-     * attributes cannot be retrieved by getattribute in scripts
-     * unless they are explicitly used in the Cycles node.
-     */
-    float _ = 0.0, // Attribute nodes should be connected here.
-
     output closure color Toon = transparent()
 ) {
     float l_str = length(LightStrength) / M_PI;
     vector L = normalize(LightStrength);
 
-    float d = default_shadow(ShadeMap); // diffuse
+    float d = ShadeMap; // diffuse
 
     if (UseShade) {
         if (UseHalfLambert) {
@@ -147,7 +140,7 @@ shader toon(
         }
     }
 
-    if (UseShadow & shadow(L, ShadowCutoff)) {
+    if (UseShadow & shadow(L, ShadowCutoff, 1.0e-4)) {
         d = 0.0;
     }
     
@@ -169,7 +162,7 @@ shader toon(
     float r = 0.0; // reflection
 
     if (UseMirror) {
-        r = mirror(MirrorDistance, MirrorFactor);
+        r = mirror(MirrorDistance, MirrorFactor, 0.05, 1.0e-4);
     }
 
     float t = 1.0; // transparency
@@ -190,6 +183,6 @@ shader toon(
         }
     }
 
-    Toon = mix(c, MirrorColor, r) * emission();
+    Toon = mix(c * emission(), reflection(N), r);
     Toon = mix(transparent(), Toon, t);
 }
