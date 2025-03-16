@@ -102,32 +102,47 @@ float mirror(float distance, float factor, float eps) {
 shader toon(
     vector LightStrength = vector(0.0, 0.0, 1.0)
     [[ string widget = "null" ]],
+    color BaseColor = color(0.5),
+
+    /*
+     * Highlight
+     */
     int UseHighlight = 0
     [[ string widget = "boolean" ]],
+    float HighlightThreshold = 0.9,
+    float HighlightMap = 0.0,
+    color HighlightColor = color(1.0),
+
+    /*
+     * Shade/Shadow
+     */
     int UseShade = 1
-    [[ string widget = "boolean" ]],
-    int UseHalfLambert = 0
     [[ string widget = "boolean" ]],
     int UseShadow = 1
     [[ string widget = "boolean" ]],
+    float ShadowThreshold = 0.1,
+    float ShadowCutoff = 0.05,
+    float ShadeMap = 1.0,
+    color ShadowColor = color(0.1),
+
+    /*
+     * Mirror
+     */
     int UseMirror = 0
     [[ string widget = "boolean" ]],
+    float MirrorFactor = 0.5,
+    float MirrorDistance = 100.0,
+
+    /*
+     * Transparency
+     */
     int UseTransparent = 0
     [[ string widget = "boolean" ]],
     int UseTransparentCulling = 1
     [[ string widget = "boolean" ]],
-    float HighlightThreshold = 0.9,
-    float HighlightMap = 0.0,
-    float ShadowThreshold = 0.1,
-    float ShadowCutoff = 0.05,
-    float ShadeMap = 1.0,
-    float MirrorFactor = 0.5,
-    float MirrorDistance = 100.0,
-    color HighlightColor = color(1.0),
-    color BaseColor = color(0.5),
-    color ShadowColor = color(0.1),
-    float HighlightTransparency = 1.0,
     float Transparency = 1.0,
+    float HighlightTransparency = 1.0,
+
     output closure color Toon = transparent()
 ) {
     float l_str = length(LightStrength) / M_PI;
@@ -136,11 +151,7 @@ shader toon(
     float d = ShadeMap; // diffuse
 
     if (UseShade) {
-        if (UseHalfLambert) {
-            d *= (0.5 * dot(L, N) + 0.5) * l_str;
-        } else {
-            d *= max(0.0, dot(L, N)) * l_str;
-        }
+        d *= max(0.0, dot(L, N)) * l_str;
     }
 
     if (UseShadow & shadow(L, ShadowCutoff, 1.0e-4)) {
@@ -149,12 +160,18 @@ shader toon(
     
     float h = 0.0; // highlight
 
-    if (UseHighlight) {
+    if (UseHighlight & d > ShadowThreshold) {
         h = dot(-I, reflect(L, N));
         h += HighlightMap; // apply highlight map
     }
 
-    color c = BaseColor;
+    float r = 0.0; // reflection
+
+    if (UseMirror) {
+        r = mirror(MirrorDistance, MirrorFactor, 2.0e-4);
+    }
+
+    color c = BaseColor; // color
     
     if (d <= ShadowThreshold) {
         c = ShadowColor;
@@ -162,19 +179,12 @@ shader toon(
         c = HighlightColor;
     }
 
-    float r = 0.0; // reflection
-
-    if (UseMirror) {
-        r = mirror(MirrorDistance, MirrorFactor, 1.0e-4);
-    }
-
     float t = 1.0; // transparency
 
     if (UseTransparent) {
         t = Transparency;
 
-        if (d <= ShadowThreshold) {
-        } else if (h > HighlightThreshold) {
+        if (h > HighlightThreshold) {
             t = HighlightTransparency;
         }
 
