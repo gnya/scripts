@@ -7,7 +7,7 @@
  */
 vector ray_offset(vector L, float cutoff, float eps0, float eps1) {
     if (cutoff == 0.0) {
-        return vector(0.0);
+        return 0.0;
     }
 
     float NL = dot(N, L);
@@ -36,7 +36,7 @@ vector ray_offset(vector L, float cutoff, float eps0, float eps1) {
  */
 int shadow(vector L, float cutoff, float eps) {
     vector offset = ray_offset(L, cutoff, 5.0e-4, 1.0e-5);
-    vector pos = P + offset + Ng * eps; // TODO check this
+    vector pos = P + offset;
     
     float this_obj_id = 0.0;
     getattribute("object:index", this_obj_id);
@@ -72,25 +72,28 @@ int shadow(vector L, float cutoff, float eps) {
 
 /*
  * This function calculates how reflective other objects appear
- * at the current point of interest.
+ * at the point of current interest.
  */
-float mirror(float distance, float factor, float cutoff, float eps) {
-    float r = 0.0;
+float mirror(float distance, float factor, float eps) {
     vector dir = reflect(-I, N);
+    float nd = dot(Ng, dir);
 
-    if (trace(P + Ng * eps, dir)) {
-        vector n = 0.0;
-        getmessage("trace", "N", n);
+    if (nd < 0.0) {
+        return 0.0;
+    }
 
-        if (abs(dot(dir, n)) > cutoff) {
-            float p_dist = 0.0; // distance from rendering point
-            float s_dist = 0.0; // distance from rendering surface
-            getmessage("trace", "hitdist", p_dist);
-            s_dist = dot(I, N) * p_dist;
+    float r = 0.0;
+    vector offset = 1.0 / (nd + eps) * dir * eps;
+    vector pos = P + offset;
 
-            r = (distance - s_dist) / distance;
-            r = pow(clamp(r, 0.0, 1.0), 2.0) * factor;
-        }
+    if (trace(pos, dir)) {
+        float p_dist = 0.0; // distance from rendering point
+        float s_dist = 0.0; // distance from rendering surface
+        getmessage("trace", "hitdist", p_dist);
+        s_dist = dot(I, N) * p_dist;
+
+        r = (distance - s_dist) / distance;
+        r = pow(clamp(r, 0.0, 1.0), 2.0) * factor;
     }
 
     return r;
@@ -162,7 +165,7 @@ shader toon(
     float r = 0.0; // reflection
 
     if (UseMirror) {
-        r = mirror(MirrorDistance, MirrorFactor, 0.05, 1.0e-4);
+        r = mirror(MirrorDistance, MirrorFactor, 1.0e-4);
     }
 
     float t = 1.0; // transparency
