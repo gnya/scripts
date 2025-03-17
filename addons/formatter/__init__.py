@@ -4,7 +4,7 @@ from . import rules
 bl_info = {
     'name': 'Formatter',
     'author': 'gnya',
-    'version': (0, 1, 0),
+    'version': (0, 1, 1),
     'blender': (3, 6, 0),
     'description':
         'Change the names, properties, and data structures in the '
@@ -48,10 +48,9 @@ class VIEW3D_PT_format_project(bpy.types.Panel):
     bl_category = 'Item'
     bl_order = 1
 
-    def draw(self, context):
+    def draw(self, _):
         layout = self.layout
-        layout.label(text='Formatter')
-        layout.operator('view3d.format_project', icon='SNAP_ON')
+        layout.operator('view3d.format_project', icon='BRUSH_DATA')
 
 
 def register():

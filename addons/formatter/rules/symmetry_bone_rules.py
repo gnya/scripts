@@ -19,7 +19,7 @@ class SymmetryBoneConstraintRule(SymmetryBoneRule):
     @classmethod
     def fix_symmetry_bone(cls, _, bone, symmetry_bone):
         if len(bone.constraints) != len(symmetry_bone.constraints):
-            print(f'WARNING: "{bone.constraints}" doesn\'t have pair constraint')
+            print(f'WARNING: "{bone.name}" doesn\'t have pair constraints')
 
             return False
 
@@ -27,7 +27,7 @@ class SymmetryBoneConstraintRule(SymmetryBoneRule):
             is_mirror, s = utils.is_symmetrical_constraint(a_c, b_c)
 
             if not is_mirror:
-                print(f'WARNING: "{bone.constraints}" is not symmetrical: {s}')
+                print(f'WARNING: "{a_c.name}" is not symmetrical: {s}')
 
                 return False
 

@@ -21,13 +21,13 @@ def is_symmetrical(a, b, properties, symmetrical_properties):
         if v_a != v_b:
             if type(v_a) is float:
                 if abs(v_a - v_b) > 1.0e-6:
-                    return False, f'{a.name} -> {p}'
+                    return False, p
             else:
-                return False, f'{a.name} -> {p}'
+                return False, p
 
     for p in symmetrical_properties:
         if getattr(a, p) != switch_lr(getattr(b, p)):
-            return False, f'{a.name} -> {p}'
+            return False, p
 
     return True, ''
 
