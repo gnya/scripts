@@ -655,6 +655,10 @@ def rule12(armatures):
     if not_used_customshapes:
         print(f'Rule12: There are custom shapes that didn\'t used: {not_used_customshapes}')
 
+        return False
+
+    return True
+
 
 # Rule13: Check bone parent is symmetrical
 def rule13(bone, mirror_bone):
@@ -736,6 +740,51 @@ def rule14(obj, modifier, fix):
     return True
 
 
+def reset_properties(data, properties, defaults):
+    info = []
+
+    for p in properties:
+        prop = data.rna_type.properties[p]
+        value = getattr(data, p)
+        default = defaults[p] if p in defaults else prop.default
+
+        if value != default:
+            info.append(f'{p}({value} != {default})')
+            setattr(data, p, default)
+
+    if info:
+        return False, ', '.join(info)
+
+    return True, ''
+
+
+# Rule15: Check IK properties in bones that is't in IK chain
+def rule15(bone):
+    if not bone.is_in_ik_chain:
+        is_default, s = reset_properties(bone, [
+            'ik_linear_weight', 'ik_max_x', 'ik_max_y', 'ik_max_z',
+            'ik_min_x', 'ik_min_y', 'ik_min_z', 'ik_rotation_weight',
+            'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',
+            'ik_stretch', 'use_ik_rotation_control', 'use_ik_linear_control',
+            'use_ik_limit_x', 'use_ik_limit_y', 'use_ik_limit_z',
+            'lock_ik_x', 'lock_ik_y', 'lock_ik_z'
+        ], {
+            'ik_max_x': 3.1415927410125732,
+            'ik_max_y': 3.1415927410125732,
+            'ik_max_z': 3.1415927410125732,
+            'ik_min_x': -3.1415927410125732,
+            'ik_min_y': -3.1415927410125732,
+            'ik_min_z': -3.1415927410125732
+        })
+
+        if not is_default:
+            print(f'Rule15: {bone.name}: Use default value: {s}')
+
+            return False
+
+    return True
+
+
 if __name__ == '__main__':
     fix = True
     armatures = []
@@ -753,6 +802,7 @@ if __name__ == '__main__':
 
         for b in a.pose.bones:
             rule8(b, fix)
+            rule15(b)
             sb = a.pose.bones.get(switch_lr(b.name))
             rule9(b, sb)
             rule11(b, sb)
