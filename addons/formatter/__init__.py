@@ -20,9 +20,8 @@ class VIEW3D_OT_format_project(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, _):
-        print('')
+        print('Formatter')
         rules.DefBoneNameRule.fix()
-        rules.BBoneNameRule.fix()
         rules.BoneTransformLockRule.fix()
         rules.BoneIKPropsRule.fix()
         rules.SymmetryBoneNameRule.fix()

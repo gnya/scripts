@@ -4,10 +4,6 @@ from . import utils
 
 class Rule():
     @classmethod
-    def description(cls):
-        raise Exception('Not Implemented')
-
-    @classmethod
     def fix(cls):
         raise Exception('Not Implemented')
 

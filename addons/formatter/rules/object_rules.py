@@ -7,9 +7,7 @@ from .rules import ObjectRule
 class UnusedCustomShapeRules(ObjectRule):
     @classmethod
     def fix_object(cls, obj):
-        m = re.match(r'^[^_.]*_CUSTOMSHAPE.*$', obj.name)
-
-        if not m:
+        if not re.match(r'^[^_.]*_CUSTOMSHAPE.*$', obj.name):
             return True
 
         for o in bpy.data.objects:

@@ -27,43 +27,43 @@ class ConstraintNameRule(ConstraintRule):
             'TRANSFORM': 'Transformation'
         }
 
-        if constraint.type in constraint_names.keys():
-            name = constraint_names[constraint.type]
-            info = []
-
-            m = re.match(r'.*(\s\(|,\s)(X|Y|Z|FK|IK),?.*\)', constraint.name)
-
-            if m:
-                info.append(m.group(2))
-
-            if hasattr(constraint, 'target') and constraint.target:
-                if constraint.id_data.name != constraint.target.name:
-                    info.append(constraint.target.name)
-
-            if hasattr(constraint, 'subtarget') and constraint.subtarget:
-                info.append(constraint.subtarget)
-
-            if hasattr(constraint, 'influence') and constraint.influence < 1.0:
-                if not utils.has_driver(constraint, 'influence'):
-                    digit = 0
-
-                    if constraint.influence > 0.0:
-                        digit = math.floor(math.log10(constraint.influence))
-
-                    info.append(f'{constraint.influence:.{-digit}f}')
-
-            suffix = ', '.join(info)
-
-            if suffix:
-                name += f' ({suffix})'
-
-            if name != constraint.name:
-                print(f'Rename "{constraint.name}" to "{name}"')
-                constraint.name = name
-
-                return False
-        else:
+        if constraint.type not in constraint_names.keys():
             print(f'WARNING: "{constraint.type}" is not supported')
+
+            return False
+
+        name = constraint_names[constraint.type]
+        info = []
+
+        m = re.match(r'.*(\s\(|,\s)(X|Y|Z|FK|IK),?.*\)', constraint.name)
+
+        if m:
+            info.append(m.group(2))
+
+        if hasattr(constraint, 'target') and constraint.target:
+            if constraint.id_data.name != constraint.target.name:
+                info.append(constraint.target.name)
+
+        if hasattr(constraint, 'subtarget') and constraint.subtarget:
+            info.append(constraint.subtarget)
+
+        if hasattr(constraint, 'influence') and constraint.influence < 1.0:
+            if not utils.has_driver(constraint, 'influence'):
+                digit = 0
+
+                if constraint.influence > 0.0:
+                    digit = math.floor(math.log10(constraint.influence))
+
+                info.append(f'{constraint.influence:.{-digit}f}')
+
+        suffix = ', '.join(info)
+
+        if suffix:
+            name += f' ({suffix})'
+
+        if name != constraint.name:
+            print(f'Rename "{constraint.name}" to "{name}"')
+            constraint.name = name
 
             return False
 

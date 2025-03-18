@@ -9,34 +9,35 @@ class SymmetryBoneDriverRule(BoneDriverRule):
     def fix_bone_driver(cls, driver, **kwargs):
         index = driver.array_index
         path = driver.data_path
-        m = re.match(r'pose\.bones\["([^\]]*)"\]', path)
 
-        if m:
-            drivers = kwargs['drivers']
-            pair_path = utils.switch_lr(path)
-            pair_driver = drivers.find(pair_path, index=index)
+        if not re.match(r'pose\.bones\["([^\]]*)"\]', path):
+            return True
 
-            if not pair_driver:
-                print(f'WARNING: "{path}" doesn\'t have pair driver')
+        drivers = kwargs['drivers']
+        pair_path = utils.switch_lr(path)
+        pair_driver = drivers.find(pair_path, index=index)
+
+        if not pair_driver:
+            print(f'WARNING: "{path}" doesn\'t have pair driver')
+
+            return False
+
+        variables = driver.driver.variables
+        pair_variables = pair_driver.driver.variables
+
+        for v in variables:
+            pair_v = pair_variables.get(utils.switch_lr(v.name))
+
+            if not pair_v:
+                print(f'WARNING: "{path}" doesn\'t have pair variable')
 
                 return False
 
-            variables = driver.driver.variables
-            pair_variables = pair_driver.driver.variables
+            is_pair, s = utils.is_symmetrical_driver_variable(v, pair_v)
 
-            for v in variables:
-                pair_v = pair_variables.get(utils.switch_lr(v.name))
+            if not is_pair:
+                print(f'WARNING: "{path}" doesn\'t have pair variable: {s}')
 
-                if not pair_v:
-                    print(f'WARNING: "{path}" doesn\'t have pair variable')
-
-                    return False
-
-                is_pair, s = utils.is_symmetrical_driver_variable(v, pair_v)
-
-                if not is_pair:
-                    print(f'WARNING: "{path}" doesn\'t have pair variable: {s}')
-
-                    return False
+                return False
 
         return True

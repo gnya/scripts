@@ -1,7 +1,4 @@
-from bpy_types import bpy_types
-
-
-def compare_array(p0, p1):
+def _compare_array(p0, p1):
     for v0, v1 in zip(p0, p1):
         if v0 != v1:
             return False
@@ -26,7 +23,7 @@ def reset_properties(data, properties, defaults):
         else:
             default = defaults.get(p, prop.default_array)
 
-            if not compare_array(value, default):
+            if not _compare_array(value, default):
                 info.append(f'{p}')
                 setattr(data, p, default)
 
