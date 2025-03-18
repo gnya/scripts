@@ -3,9 +3,9 @@ import re
 
 def _switch_lr_callback(m):
     lr = m.group(2)
-    mirror_lr = 'L' if lr == 'R' else 'R'
+    pair_lr = 'L' if lr == 'R' else 'R'
 
-    return f'{m.group(1)}{mirror_lr}{m.group(3)}'
+    return f'{m.group(1)}{pair_lr}{m.group(3)}'
 
 
 def switch_lr(name):
@@ -71,15 +71,15 @@ def is_symmetrical_transform_constraint(a, b):
             else (-a.to_min_z_rot if to_rot else a.to_min_z_scale)
 
         if (a.map_to_x_from == 'X' and from_loc) \
-           or ((a.map_to_x_from == 'Y' or a.map_to_x_from == 'Z') and from_rot):
+                or ((a.map_to_x_from in ['Y', 'Z']) and from_rot):
             a_to_max_x, a_to_min_x = a_to_min_x, a_to_max_x
 
         if (a.map_to_y_from == 'X' and from_loc) \
-           or ((a.map_to_y_from == 'Y' or a.map_to_y_from == 'Z') and from_rot):
+                or ((a.map_to_y_from == ['Y', 'Z']) and from_rot):
             a_to_max_y, a_to_min_y = a_to_min_y, a_to_max_y
 
         if (a.map_to_z_from == 'X' and from_loc) \
-           or ((a.map_to_z_from == 'Y' or a.map_to_z_from == 'Z') and from_rot):
+                or ((a.map_to_z_from == ['Y', 'Z']) and from_rot):
             a_to_max_z, a_to_min_z = a_to_min_z, a_to_max_z
 
         b_to_max_x = b.to_max_x if to_loc \
@@ -249,10 +249,10 @@ def symmetrical_bone(bone, bones):
     m = re.match(r'.*\.([LR]).*', bone.name)
 
     if m:
-        mirror_name = switch_lr(bone.name)
-        mirror_bone = bones.get(mirror_name)
+        pair_name = switch_lr(bone.name)
+        pair_bone = bones.get(pair_name)
 
-        return mirror_bone, True
+        return pair_bone, True
 
     return None, False
 

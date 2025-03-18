@@ -1,5 +1,4 @@
 from .data_bone_rules import DefBoneNameRule
-from .data_bone_rules import BBoneNameRule
 
 from .pose_bone_rules import BoneTransformLockRule
 from .pose_bone_rules import BoneIKPropsRule
@@ -8,14 +7,31 @@ from .symmetry_bone_rules import SymmetryBoneNameRule
 from .symmetry_bone_rules import SymmetryBoneConstraintRule
 from .symmetry_bone_rules import SymmetryBoneParentRule
 
-from .bone_constraint_rules import BoneConstraintTangetSpaceRule
-from .bone_constraint_rules import BoneConstraintOwnerSpaceRule
-from .bone_constraint_rules import BoneConstraintSubtangentRule
-from .bone_constraint_rules import BoneConstraintNameRule
-from .bone_constraint_rules import BoneConstraintPanelRule
+from .constraint_rules import ConstraintTangetSpaceRule
+from .constraint_rules import ConstraintOwnerSpaceRule
+from .constraint_rules import ConstraintNameRule
+from .constraint_rules import ConstraintPanelRule
 
-from .armatures_rules import UnusedCustomShapeRules
+from .object_rules import UnusedCustomShapeRules
 
 from .bone_driver_rules import SymmetryBoneDriverRule
 
 from .modifier_rules import ModifierNameRule
+from .modifier_rules import ModifierPanelRule
+
+__all__ = [
+    DefBoneNameRule,
+    BoneTransformLockRule,
+    BoneIKPropsRule,
+    SymmetryBoneNameRule,
+    SymmetryBoneConstraintRule,
+    SymmetryBoneParentRule,
+    ConstraintTangetSpaceRule,
+    ConstraintOwnerSpaceRule,
+    ConstraintNameRule,
+    ConstraintPanelRule,
+    UnusedCustomShapeRules,
+    SymmetryBoneDriverRule,
+    ModifierNameRule,
+    ModifierPanelRule
+]

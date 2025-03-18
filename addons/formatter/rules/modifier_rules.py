@@ -5,7 +5,7 @@ from .rules import ModifierRule
 # Modifier's name rule
 class ModifierNameRule(ModifierRule):
     @classmethod
-    def fix_modifier(cls, obj, modifier):
+    def fix_modifier(cls, modifier, **kwargs):
         modifier_names = {
             'MIRROR': 'Mirror',
             'SOLIDIFY': 'Solidify',
@@ -63,6 +63,18 @@ class ModifierNameRule(ModifierRule):
                 modifier.name = name
         else:
             print(f'WARNING: "{modifier.type}" is not supported')
+
+            return False
+
+        return True
+
+
+class ModifierPanelRule(ModifierRule):
+    @classmethod
+    def fix_modifier(cls, modifier, **kwargs):
+        if modifier.show_expanded:
+            print(f'Shrink "{modifier.name}" constraint panel')
+            modifier.show_expanded = False
 
             return False
 

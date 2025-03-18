@@ -3,42 +3,10 @@ from . import utils
 from .rules import PoseBoneRule
 
 
-# Do not lock properties except at "CTR" bone
-class BoneTransformLockRule(PoseBoneRule):
-    @classmethod
-    def fix_pose_bone(cls, armature, bone):
-        if not re.match('CTR_.*', bone.name):
-            if any(bone.lock_location):
-                print(f'Unlock "{bone.name}" location')
-                bone.lock_location = (False, False, False)
-
-                return False
-
-            if any(bone.lock_rotation):
-                print(f'Unlock "{bone.name}" rotation')
-                bone.lock_rotation = (False, False, False)
-
-                return False
-
-            if bone.lock_rotation_w:
-                print(f'Unlock "{bone.name}" rotation_w')
-                bone.lock_rotation_w = False
-
-                return False
-
-            if any(bone.lock_scale):
-                print(f'Unlock "{bone.name}" scale')
-                bone.lock_scale = (False, False, False)
-
-                return False
-
-        return True
-
-
 # Check IK properties in bones that is't in IK chain
 class BoneIKPropsRule(PoseBoneRule):
     @classmethod
-    def fix_pose_bone(cls, _, bone):
+    def fix_pose_bone(cls, bone, **kwargs):
         if not bone.is_in_ik_chain:
             is_default, s = utils.reset_properties(bone, [
                 'ik_linear_weight', 'ik_max_x', 'ik_max_y', 'ik_max_z',
@@ -58,6 +26,26 @@ class BoneIKPropsRule(PoseBoneRule):
 
             if not is_default:
                 print(f'Reset "{bone.name}" IK properties: {s}')
+
+                return False
+
+        return True
+
+
+# Do not lock properties except at "CTR" bone
+class BoneTransformLockRule(PoseBoneRule):
+    @classmethod
+    def fix_pose_bone(cls, bone, **kwargs):
+        if not re.match('CTR_.*', bone.name):
+            is_default, s = utils.reset_properties(bone, [
+                'lock_location', 'lock_rotation',
+                'lock_rotations_4d', 'lock_rotation_w', 'lock_scale'
+            ], {
+                'lock_rotations_4d': True
+            })
+
+            if not is_default:
+                print(f'Reset "{bone.name}" Transform locks: {s}')
 
                 return False
 

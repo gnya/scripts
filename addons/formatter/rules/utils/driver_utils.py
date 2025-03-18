@@ -1,8 +1,8 @@
-def has_driver(armature, bone, constraint, prop_name):
-    path = f'pose.bones["{bone.name}"]'\
-        f'.constraints["{constraint.name}"].{prop_name}'
+def has_driver(constraint, property):
+    data = constraint.id_data.animation_data
+    path = constraint.path_from_id(property)
 
-    for d in armature.animation_data.drivers:
+    for d in data.drivers:
         if d.data_path == path:
             return True
 

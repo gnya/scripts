@@ -28,14 +28,14 @@ class VIEW3D_OT_format_project(bpy.types.Operator):
         rules.SymmetryBoneNameRule.fix()
         rules.SymmetryBoneConstraintRule.fix()
         rules.SymmetryBoneParentRule.fix()
-        rules.BoneConstraintTangetSpaceRule.fix()
-        rules.BoneConstraintOwnerSpaceRule.fix()
-        rules.BoneConstraintSubtangentRule.fix()
-        rules.BoneConstraintNameRule.fix()
-        rules.BoneConstraintPanelRule.fix()
+        rules.ConstraintTangetSpaceRule.fix()
+        rules.ConstraintOwnerSpaceRule.fix()
+        rules.ConstraintNameRule.fix()
+        rules.ConstraintPanelRule.fix()
         rules.UnusedCustomShapeRules.fix()
         rules.SymmetryBoneDriverRule.fix()
         rules.ModifierNameRule.fix()
+        rules.ModifierPanelRule.fix()
 
         return {'FINISHED'}
 
