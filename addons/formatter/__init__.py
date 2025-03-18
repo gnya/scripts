@@ -4,7 +4,7 @@ from . import rules
 bl_info = {
     'name': 'Formatter',
     'author': 'gnya',
-    'version': (0, 1, 1),
+    'version': (0, 1, 2),
     'blender': (3, 6, 0),
     'description':
         'Change the names, properties, and data structures in the '

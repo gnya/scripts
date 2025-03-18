@@ -27,15 +27,19 @@ def _is_symmetrical(a, b, properties, symmetrical_properties):
     for p in properties:
         v_a, v_b = getattr(a, p), getattr(b, p)
 
-        if v_a != v_b:
-            if type(v_a) is float:
-                if abs(v_a - v_b) > 1.0e-6:
-                    return False, p
-            else:
+        if type(v_a) is float:
+            if abs(v_a - v_b) > 1.0e-6:
                 return False, p
+        elif v_a != v_b:
+            return False, p
 
     for p in symmetrical_properties:
-        if getattr(a, p) != switch_lr(getattr(b, p)):
+        v_a, v_b = getattr(a, p), getattr(b, p)
+
+        if hasattr(v_a, 'name'):
+            if v_a.name != switch_lr(v_b.name):
+                return False, p
+        elif v_a != switch_lr(v_b):
             return False, p
 
     return True, ''
@@ -51,13 +55,14 @@ def is_symmetrical_driver_variable(a, b):
     info = []
 
     for (a_t, b_t) in zip(a.targets, b.targets):
-        _, s = _is_symmetrical(a_t, b_t, [
+        is_pair, s = _is_symmetrical(a_t, b_t, [
             'rotation_mode', 'transform_space', 'transform_type'
         ], [
-            'bone_target', 'data_path', 'id_name'
+            'bone_target', 'data_path', 'id'
         ])
 
-        info.append(s)
+        if not is_pair:
+            info.append(s)
 
     return not info, ', '.join(info)
 
@@ -105,11 +110,11 @@ def is_symmetrical_transform_constraint(a, b):
             a_to_max_x, a_to_min_x = a_to_min_x, a_to_max_x
 
         if (a.map_to_y_from == 'X' and from_loc) \
-                or ((a.map_to_y_from == ['Y', 'Z']) and from_rot):
+                or ((a.map_to_y_from in ['Y', 'Z']) and from_rot):
             a_to_max_y, a_to_min_y = a_to_min_y, a_to_max_y
 
         if (a.map_to_z_from == 'X' and from_loc) \
-                or ((a.map_to_z_from == ['Y', 'Z']) and from_rot):
+                or ((a.map_to_z_from in ['Y', 'Z']) and from_rot):
             a_to_max_z, a_to_min_z = a_to_min_z, a_to_max_z
 
         b_to_max_x = b.to_max_x if to_loc \
