@@ -28,17 +28,18 @@ class ModifierNameRule(ModifierRule):
         name = modifier_names[modifier.type]
         info = []
 
-        if hasattr(modifier, 'object'):
+        if hasattr(modifier, 'object') and modifier.object:
             info.append(modifier.object.name)
 
-        if hasattr(modifier, 'target'):
+        if hasattr(modifier, 'target') and modifier.target:
             info.append(modifier.target.name)
 
-        if hasattr(modifier, 'subtarget'):
+        if hasattr(modifier, 'subtarget') and modifier.subtarget:
             info.append(modifier.subtarget)
 
-        if modifier.type == 'MASK' and hasattr(modifier, 'vertex_group'):
-            info.append(modifier.vertex_group)
+        if modifier.type == 'MASK':
+            if hasattr(modifier, 'vertex_group') and modifier.vertex_group:
+                info.append(modifier.vertex_group)
 
         if modifier.type == 'NODES':
             name = modifier.node_group.name
@@ -54,7 +55,7 @@ class ModifierNameRule(ModifierRule):
                     items.append(v)
 
             for k, v in zip(keys, items):
-                if k == 'target':
+                if k == 'target' and v:
                     info.append(v.name)
 
         suffix = ', '.join(info)

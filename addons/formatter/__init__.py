@@ -4,7 +4,7 @@ from . import rules
 bl_info = {
     'name': 'Formatter',
     'author': 'gnya',
-    'version': (0, 1, 2),
+    'version': (0, 1, 3),
     'blender': (3, 6, 0),
     'description':
         'Change the names, properties, and data structures in the '
@@ -21,6 +21,7 @@ class VIEW3D_OT_format_project(bpy.types.Operator):
 
     def execute(self, _):
         print('Formatter')
+        rules.ToonScenePropertiesRule.fix()
         rules.DefBoneNameRule.fix()
         rules.BoneTransformLockRule.fix()
         rules.BoneIKPropsRule.fix()
@@ -31,7 +32,7 @@ class VIEW3D_OT_format_project(bpy.types.Operator):
         rules.ConstraintOwnerSpaceRule.fix()
         rules.ConstraintNameRule.fix()
         rules.ConstraintPanelRule.fix()
-        rules.UnusedCustomShapeRules.fix()
+        rules.UnusedCustomShapeRule.fix()
         rules.SymmetryBoneDriverRule.fix()
         rules.ModifierNameRule.fix()
         rules.ModifierPanelRule.fix()

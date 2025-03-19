@@ -10,23 +10,31 @@ class BoneIKPropsRule(PoseBoneRule):
         if bone.is_in_ik_chain:
             return True
 
-        is_default, s = utils.reset_properties(bone, [
-            'ik_linear_weight', 'ik_max_x', 'ik_max_y', 'ik_max_z',
-            'ik_min_x', 'ik_min_y', 'ik_min_z', 'ik_rotation_weight',
-            'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',
-            'ik_stretch', 'use_ik_rotation_control', 'use_ik_linear_control',
-            'use_ik_limit_x', 'use_ik_limit_y', 'use_ik_limit_z',
-            'lock_ik_x', 'lock_ik_y', 'lock_ik_z'
-        ], {
+        resetted = utils.reset_properties(bone, {
+            'ik_linear_weight': None,
             'ik_max_x': 3.1415927410125732,
             'ik_max_y': 3.1415927410125732,
             'ik_max_z': 3.1415927410125732,
             'ik_min_x': -3.1415927410125732,
             'ik_min_y': -3.1415927410125732,
-            'ik_min_z': -3.1415927410125732
+            'ik_min_z': -3.1415927410125732,
+            'ik_rotation_weight': None,
+            'ik_stiffness_x': None,
+            'ik_stiffness_y': None,
+            'ik_stiffness_z': None,
+            'ik_stretch': None,
+            'use_ik_rotation_control': None,
+            'use_ik_linear_control': None,
+            'use_ik_limit_x': None,
+            'use_ik_limit_y': None,
+            'use_ik_limit_z': None,
+            'lock_ik_x': None,
+            'lock_ik_y': None,
+            'lock_ik_z': None
         })
 
-        if not is_default:
+        if resetted:
+            s = ', '.join(resetted)
             print(f'Reset "{bone.name}" IK properties: {s}')
 
             return False
@@ -41,14 +49,16 @@ class BoneTransformLockRule(PoseBoneRule):
         if re.match('CTR_.*', bone.name):
             return True
 
-        is_default, s = utils.reset_properties(bone, [
-            'lock_location', 'lock_rotation',
-            'lock_rotations_4d', 'lock_rotation_w', 'lock_scale'
-        ], {
-            'lock_rotations_4d': True
+        resetted = utils.reset_properties(bone, {
+            'lock_location': None,
+            'lock_rotation': None,
+            'lock_rotations_4d': True,
+            'lock_rotation_w': None,
+            'lock_scale': None
         })
 
-        if not is_default:
+        if resetted:
+            s = ', '.join(resetted)
             print(f'Reset "{bone.name}" Transform locks: {s}')
 
             return False

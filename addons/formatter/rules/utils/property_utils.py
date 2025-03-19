@@ -1,33 +1,33 @@
-def _compare_array(p0, p1):
-    for v0, v1 in zip(p0, p1):
-        if v0 != v1:
-            return False
+def reset_property(data, property, default=None):
+    nesting = property.split('.', 1)
+
+    if len(nesting) > 1:
+        d = getattr(data, nesting[0])
+
+        return reset_property(d, nesting[1], default)
+
+    p = data.rna_type.properties[property]
+    is_array = getattr(p, 'is_array', False)
+
+    value = getattr(data, property)
+    value = list(value) if is_array else value
+
+    if default is None:
+        default = list(p.default_array) if is_array else p.default
+
+    if value != default:
+        setattr(data, property, default)
+
+        return False
 
     return True
 
 
-def reset_properties(data, properties, defaults):
-    info = []
+def reset_properties(data, properties):
+    resetted = []
 
-    for p in properties:
-        value = getattr(data, p)
-        prop = data.rna_type.properties[p]
-        default = defaults.get(p, prop.default)
+    for p, default in properties.items():
+        if not reset_property(data, p, default=default):
+            resetted.append(p)
 
-        if not prop.is_array:
-            default = defaults.get(p, prop.default)
-
-            if value != default:
-                info.append(f'{p}({value} != {default})')
-                setattr(data, p, default)
-        else:
-            default = defaults.get(p, prop.default_array)
-
-            if not _compare_array(value, default):
-                info.append(f'{p}')
-                setattr(data, p, default)
-
-    if info:
-        return False, ', '.join(info)
-
-    return True, ''
+    return resetted

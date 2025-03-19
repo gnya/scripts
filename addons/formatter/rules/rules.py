@@ -4,21 +4,37 @@ from . import utils
 
 class Rule():
     @classmethod
-    def fix(cls):
+    def fix(cls, **kwargs):
         raise Exception('Not Implemented')
 
 
 class ObjectRule(Rule):
     @classmethod
-    def fix_object(cls, obj):
+    def fix_object(cls, obj, **kwargs):
         raise Exception('Not Implemented')
 
     @classmethod
-    def fix(cls):
+    def fix(cls, **kwargs):
         result = True
 
         for o in bpy.data.objects:
-            if not cls.fix_object(o):
+            if not cls.fix_object(o, **kwargs):
+                result = False
+
+        return result
+
+
+class ScenePropertiesRule(Rule):
+    @classmethod
+    def fix_scene_properties(cls, scene, **kwargs):
+        raise Exception('Not Implemented')
+
+    @classmethod
+    def fix(cls, **kwargs):
+        result = True
+
+        for s in bpy.data.scenes:
+            if not cls.fix_scene_properties(s, **kwargs):
                 result = False
 
         return result
@@ -26,13 +42,13 @@ class ObjectRule(Rule):
 
 class ArmatureRule(ObjectRule):
     @classmethod
-    def fix_armature(cls, armature):
+    def fix_armature(cls, armature, **kwargs):
         raise Exception('Not Implemented')
 
     @classmethod
-    def fix_object(cls, obj):
+    def fix_object(cls, obj, **kwargs):
         if obj.type == 'ARMATURE':
-            return cls.fix_armature(obj)
+            return cls.fix_armature(obj, **kwargs)
 
         return True
 
@@ -43,11 +59,31 @@ class ModifierRule(ObjectRule):
         raise Exception('Not Implemented')
 
     @classmethod
-    def fix_object(cls, obj):
+    def fix_object(cls, obj, **kwargs):
         result = True
 
         for m in obj.modifiers:
-            if not cls.fix_modifier(m, obj=obj):
+            if not cls.fix_modifier(m, obj=obj, **kwargs):
+                result = False
+
+        return result
+
+
+class BoneDriverRule(ArmatureRule):
+    @classmethod
+    def fix_bone_driver(cls, driver, **kwargs):
+        raise Exception('Not Implemented')
+
+    @classmethod
+    def fix_armature(cls, armature, **kwargs):
+        if not armature.animation_data:
+            return True
+
+        result = True
+        drivers = armature.animation_data.drivers
+
+        for d in drivers:
+            if not cls.fix_bone_driver(d, drivers=drivers, **kwargs):
                 result = False
 
         return result
@@ -59,11 +95,11 @@ class DataBoneRule(ArmatureRule):
         raise Exception('Not Implemented')
 
     @classmethod
-    def fix_armature(cls, armature):
+    def fix_armature(cls, armature, **kwargs):
         result = True
 
         for b in armature.data.bones:
-            if not cls.fix_data_bone(b, armature=armature):
+            if not cls.fix_data_bone(b, armature=armature, **kwargs):
                 result = False
 
         return result
@@ -75,11 +111,11 @@ class PoseBoneRule(ArmatureRule):
         raise Exception('Not Implemented')
 
     @classmethod
-    def fix_armature(cls, armature):
+    def fix_armature(cls, armature, **kwargs):
         result = True
 
         for b in armature.pose.bones:
-            if not cls.fix_pose_bone(b, armature=armature):
+            if not cls.fix_pose_bone(b, armature=armature, **kwargs):
                 result = False
 
         return result
@@ -136,26 +172,6 @@ class ConstraintRule(PoseBoneRule):
 
         for c in obj.constraints:
             if not cls.fix_constraint(c, obj=obj):
-                result = False
-
-        return result
-
-
-class BoneDriverRule(ArmatureRule):
-    @classmethod
-    def fix_bone_driver(cls, driver, **kwargs):
-        raise Exception('Not Implemented')
-
-    @classmethod
-    def fix_armature(cls, armature):
-        if not armature.animation_data:
-            return True
-
-        result = True
-        drivers = armature.animation_data.drivers
-
-        for d in drivers:
-            if not cls.fix_bone_driver(d, drivers=drivers):
                 result = False
 
         return result
