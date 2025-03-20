@@ -2,6 +2,28 @@ import bpy
 from . import utils
 
 
+class Report():
+    def __init__(self, logs, errors):
+        self.logs = logs
+        self.errors = errors
+
+    def add(self, report):
+        self.logs.extend(report.logs)
+        self.errors.extend(report.errors)
+
+    @staticmethod
+    def nothing():
+        return Report([], [])
+
+    @staticmethod
+    def log(log):
+        return Report([log], [])
+
+    @staticmethod
+    def error(error):
+        return Report([], [error])
+
+
 class Rule():
     @classmethod
     def fix(cls, **kwargs):
@@ -15,13 +37,12 @@ class ObjectRule(Rule):
 
     @classmethod
     def fix(cls, **kwargs):
-        result = True
+        r = Report.nothing()
 
         for o in bpy.data.objects:
-            if not cls.fix_object(o, **kwargs):
-                result = False
+            r.add(cls.fix_object(o, **kwargs))
 
-        return result
+        return r
 
 
 class ScenePropertiesRule(Rule):
@@ -31,13 +52,12 @@ class ScenePropertiesRule(Rule):
 
     @classmethod
     def fix(cls, **kwargs):
-        result = True
+        r = Report.nothing()
 
         for s in bpy.data.scenes:
-            if not cls.fix_scene_properties(s, **kwargs):
-                result = False
+            r.add(cls.fix_scene_properties(s, **kwargs))
 
-        return result
+        return r
 
 
 class ArmatureRule(ObjectRule):
@@ -50,7 +70,7 @@ class ArmatureRule(ObjectRule):
         if obj.type == 'ARMATURE':
             return cls.fix_armature(obj, **kwargs)
 
-        return True
+        return Report.nothing()
 
 
 class ModifierRule(ObjectRule):
@@ -60,13 +80,12 @@ class ModifierRule(ObjectRule):
 
     @classmethod
     def fix_object(cls, obj, **kwargs):
-        result = True
+        r = Report.nothing()
 
         for m in obj.modifiers:
-            if not cls.fix_modifier(m, obj=obj, **kwargs):
-                result = False
+            r.add(cls.fix_modifier(m, obj=obj, **kwargs))
 
-        return result
+        return r
 
 
 class BoneDriverRule(ArmatureRule):
@@ -77,16 +96,15 @@ class BoneDriverRule(ArmatureRule):
     @classmethod
     def fix_armature(cls, armature, **kwargs):
         if not armature.animation_data:
-            return True
+            return Report.nothing()
 
-        result = True
+        r = Report.nothing()
         drivers = armature.animation_data.drivers
 
         for d in drivers:
-            if not cls.fix_bone_driver(d, drivers=drivers, **kwargs):
-                result = False
+            r.add(cls.fix_bone_driver(d, drivers=drivers, **kwargs))
 
-        return result
+        return r
 
 
 class DataBoneRule(ArmatureRule):
@@ -96,13 +114,12 @@ class DataBoneRule(ArmatureRule):
 
     @classmethod
     def fix_armature(cls, armature, **kwargs):
-        result = True
+        r = Report.nothing()
 
         for b in armature.data.bones:
-            if not cls.fix_data_bone(b, armature=armature, **kwargs):
-                result = False
+            r.add(cls.fix_data_bone(b, armature=armature, **kwargs))
 
-        return result
+        return r
 
 
 class PoseBoneRule(ArmatureRule):
@@ -112,13 +129,12 @@ class PoseBoneRule(ArmatureRule):
 
     @classmethod
     def fix_armature(cls, armature, **kwargs):
-        result = True
+        r = Report.nothing()
 
         for b in armature.pose.bones:
-            if not cls.fix_pose_bone(b, armature=armature, **kwargs):
-                result = False
+            r.add(cls.fix_pose_bone(b, armature=armature, **kwargs))
 
-        return result
+        return r
 
 
 class SymmetryBoneRule(PoseBoneRule):
@@ -142,13 +158,12 @@ class BoneConstraintRule(PoseBoneRule):
 
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):
-        result = True
+        r = Report.nothing()
 
         for c in bone.constraints:
-            if not cls.fix_bone_constraint(c, bone=bone, **kwargs):
-                result = False
+            r.add(cls.fix_bone_constraint(c, bone=bone, **kwargs))
 
-        return result
+        return r
 
 
 class ConstraintRule(PoseBoneRule):
@@ -158,20 +173,18 @@ class ConstraintRule(PoseBoneRule):
 
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):
-        result = True
+        r = Report.nothing()
 
         for c in bone.constraints:
-            if not cls.fix_constraint(c, bone=bone, **kwargs):
-                result = False
+            r.add(cls.fix_constraint(c, bone=bone, **kwargs))
 
-        return result
+        return r
 
     @classmethod
-    def fix_object(cls, obj):
-        result = super(PoseBoneRule, cls).fix_object(obj)
+    def fix_object(cls, obj, **kwargs):
+        r = super(PoseBoneRule, cls).fix_object(obj, **kwargs)
 
         for c in obj.constraints:
-            if not cls.fix_constraint(c, obj=obj):
-                result = False
+            r.add(cls.fix_constraint(c, obj=obj, **kwargs))
 
-        return result
+        return r

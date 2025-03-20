@@ -4,7 +4,7 @@ from . import rules
 bl_info = {
     'name': 'Formatter',
     'author': 'gnya',
-    'version': (0, 1, 4),
+    'version': (0, 2, 0),
     'blender': (3, 6, 0),
     'description':
         'Change the names, properties, and data structures in the '
@@ -13,30 +13,37 @@ bl_info = {
 }
 
 
+class FixLogInfo(bpy.types.PropertyGroup):
+    text: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+
+
+class FixErrorInfo(bpy.types.PropertyGroup):
+    text: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+
+
 class VIEW3D_OT_format_project(bpy.types.Operator):
     bl_idname = 'view3d.format_project'
     bl_label = 'Format'
     bl_description = 'Format this project data'
     bl_options = {'UNDO'}
 
-    def execute(self, _):
-        print('Formatter')
-        rules.ToonScenePropertiesRule.fix()
-        rules.DefBoneNameRule.fix()
-        rules.BoneTransformLockRule.fix()
-        rules.BoneIKPropsRule.fix()
-        rules.SymmetryBoneNameRule.fix()
-        rules.SymmetryBoneConstraintRule.fix()
-        rules.SymmetryBoneParentRule.fix()
-        rules.ConstraintTangetSpaceRule.fix()
-        rules.ConstraintOwnerSpaceRule.fix()
-        rules.ConstraintNameRule.fix()
-        rules.ConstraintPanelRule.fix()
-        rules.UnusedCustomShapeRule.fix()
-        rules.SymmetryBoneDriverRule.fix()
-        rules.ModifierNameRule.fix()
-        rules.ModifierPanelRule.fix()
-        rules.SubSurfUVSmoothRule.fix()
+    def execute(self, context):
+        logs = context.scene.latest_formatter_fix_logs
+        errors = context.scene.latest_formatter_fix_errors
+
+        logs.clear()
+        errors.clear()
+
+        for rule in rules.__all__:
+            r = rule.fix()
+
+            for log in r.logs:
+                item = logs.add()
+                item.text = log
+
+            for error in r.errors:
+                item = errors.add()
+                item.text = error
 
         return {'FINISHED'}
 
@@ -49,17 +56,53 @@ class VIEW3D_PT_format_project(bpy.types.Panel):
     bl_category = 'Item'
     bl_order = 1
 
-    def draw(self, _):
+    def draw(self, context):
         layout = self.layout
         layout.operator('view3d.format_project', icon='BRUSH_DATA')
 
+        logs = context.scene.latest_formatter_fix_logs
+        errors = context.scene.latest_formatter_fix_errors
+
+        if len(logs):
+            layout.separator()
+            layout.label(text='Log', icon='INFO')
+
+            log_box = layout.box().column(align=True)
+
+            for log in logs:
+                log_box.label(text=f'{log.text}')
+
+        if len(errors):
+            layout.separator()
+            layout.label(text='Error', icon='ERROR')
+
+            error_log = layout.box().column(align=True)
+            error_log.alert = True
+
+            for error in errors:
+                error_log.label(text=f'{error.text}')
+
 
 def register():
+    bpy.utils.register_class(FixLogInfo)
+    bpy.utils.register_class(FixErrorInfo)
+
+    bpy.types.Scene.latest_formatter_fix_logs = \
+        bpy.props.CollectionProperty(type=FixLogInfo)
+    bpy.types.Scene.latest_formatter_fix_errors = \
+        bpy.props.CollectionProperty(type=FixErrorInfo)
+
     bpy.utils.register_class(VIEW3D_OT_format_project)
     bpy.utils.register_class(VIEW3D_PT_format_project)
 
 
 def unregister():
+    bpy.utils.unregister_class(FixLogInfo)
+    bpy.utils.unregister_class(FixErrorInfo)
+
+    del bpy.types.Scene.latest_formatter_fix_logs
+    del bpy.types.Scene.latest_formatter_fix_errors
+
     bpy.utils.unregister_class(VIEW3D_OT_format_project)
     bpy.utils.unregister_class(VIEW3D_PT_format_project)
 

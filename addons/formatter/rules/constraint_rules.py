@@ -1,7 +1,7 @@
 import re
 import math
 from . import utils
-from .rules import ConstraintRule
+from .rules import Report, ConstraintRule
 
 
 # Constraint's name rule
@@ -28,9 +28,7 @@ class ConstraintNameRule(ConstraintRule):
         }
 
         if constraint.type not in constraint_names.keys():
-            print(f'WARNING: "{constraint.type}" is not supported')
-
-            return False
+            return Report.error(f'"{constraint.type}" is not supported')
 
         name = constraint_names[constraint.type]
         info = []
@@ -62,11 +60,9 @@ class ConstraintNameRule(ConstraintRule):
             name += f' ({suffix})'
 
         if utils.reset_property(constraint, 'name', name):
-            print(f'Rename to "{name}"')
+            return Report.log(f'Rename to "{name}"')
 
-            return False
-
-        return True
+        return Report.nothing()
 
 
 # Constraint's panel must be shrinked
@@ -74,11 +70,9 @@ class ConstraintPanelRule(ConstraintRule):
     @classmethod
     def fix_constraint(cls, constraint, **kwargs):
         if utils.reset_property(constraint, 'show_expanded', False):
-            print(f'Shrink "{constraint.name}" constraint panel')
+            return Report.log(f'Shrink "{constraint.name}" constraint panel')
 
-            return False
-
-        return True
+        return Report.nothing()
 
 
 # When use bone as subtarget, target space shouldn't use world space
@@ -97,25 +91,22 @@ class ConstraintTangetSpaceRule(ConstraintRule):
 
         if constraint.type in notice_types:
             if constraint.id_data.type != 'ARMATURE':
-                return True
+                return Report.nothing()
 
             if constraint.target.type != 'ARMATURE':
-                return True
+                return Report.nothing()
 
             if not constraint.subtarget:
-                return True
+                return Report.nothing()
 
             if constraint.target_space == 'WORLD':
-                print(f'Change "{constraint.name}" target_space to POSE')
                 constraint.target_space = 'POSE'
 
-                return False
+                return Report.log(f'Change "{constraint.name}" target_space to POSE')
         elif constraint.type not in ignore_types:
-            print(f'WARNING: "{constraint.type}" is not supported')
+            return Report.error(f'"{constraint.type}" is not supported')
 
-            return False
-
-        return True
+        return Report.nothing()
 
 
 # When use bone constraint, its owner space shouldn't use world space
@@ -135,16 +126,13 @@ class ConstraintOwnerSpaceRule(ConstraintRule):
 
         if constraint.type in notice_types:
             if constraint.id_data.type != 'ARMATURE':
-                return True
+                return Report.nothing()
 
             if constraint.owner_space == 'WORLD':
-                print(f'Change "{constraint.name}" owner_space to POSE')
                 constraint.owner_space = 'POSE'
 
-                return False
+                return Report.log(f'Change "{constraint.name}" owner_space to POSE')
         elif constraint.type not in ignore_types:
-            print(f'WARNING: "{constraint.type}" is not supported')
+            return Report.error(f'"{constraint.type}" is not supported')
 
-            return False
-
-        return True
+        return Report.nothing()

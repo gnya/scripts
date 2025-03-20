@@ -1,6 +1,6 @@
 import re
 from . import utils
-from .rules import BoneDriverRule
+from .rules import Report, BoneDriverRule
 
 
 # Check bone driver is symmetrical
@@ -11,16 +11,14 @@ class SymmetryBoneDriverRule(BoneDriverRule):
         path = driver.data_path
 
         if not re.match(r'pose\.bones\["([^\]]*)"\]', path):
-            return True
+            return Report.nothing()
 
         drivers = kwargs['drivers']
         pair_path = utils.switch_lr(path)
         pair_driver = drivers.find(pair_path, index=index)
 
         if not pair_driver:
-            print(f'WARNING: "{path}" doesn\'t have pair driver')
-
-            return False
+            return Report.error(f'"{path}" doesn\'t have pair driver')
 
         variables = driver.driver.variables
         pair_variables = pair_driver.driver.variables
@@ -29,15 +27,11 @@ class SymmetryBoneDriverRule(BoneDriverRule):
             pair_v = pair_variables.get(utils.switch_lr(v.name))
 
             if not pair_v:
-                print(f'WARNING: "{path}" doesn\'t have pair variable')
-
-                return False
+                return Report.error(f'"{path}" doesn\'t have pair variable')
 
             is_pair, s = utils.is_symmetrical_driver_variable(v, pair_v)
 
             if not is_pair:
-                print(f'WARNING: "{path}" doesn\'t have pair variable: {s}')
+                return Report.error(f'"{path}" doesn\'t have pair variable: {s}')
 
-                return False
-
-        return True
+        return Report.nothing()

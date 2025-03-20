@@ -1,5 +1,5 @@
 from . import utils
-from .rules import ScenePropertiesRule
+from .rules import Report, ScenePropertiesRule
 
 
 class ToonScenePropertiesRule(ScenePropertiesRule):
@@ -34,6 +34,9 @@ class ToonScenePropertiesRule(ScenePropertiesRule):
             'render.dither_intensity': 0.0,
         })
 
-        print(resetted)
+        if resetted:
+            s = ', '.join(resetted)
 
-        return True
+            return Report.log(f'Change scene properties: {s}')
+
+        return Report.nothing()

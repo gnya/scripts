@@ -1,6 +1,6 @@
 import re
 from . import utils
-from .rules import ModifierRule
+from .rules import Report, ModifierRule
 
 
 # Modifier's name rule
@@ -22,9 +22,7 @@ class ModifierNameRule(ModifierRule):
         }
 
         if modifier.type not in modifier_names.keys():
-            print(f'WARNING: "{modifier.type}" is not supported')
-
-            return False
+            return Report.error(f'"{modifier.type}" is not supported')
 
         name = modifier_names[modifier.type]
         info = []
@@ -65,22 +63,18 @@ class ModifierNameRule(ModifierRule):
             name += f' ({suffix})'
 
         if utils.reset_property(modifier, 'name', name):
-            print(f'Rename to "{name}"')
+            return Report.log(f'Rename to "{name}"')
 
-            return False
-
-        return True
+        return Report.nothing()
 
 
 class ModifierPanelRule(ModifierRule):
     @classmethod
     def fix_modifier(cls, modifier, **kwargs):
         if utils.reset_property(modifier, 'show_expanded', False):
-            print(f'Shrink "{modifier.name}" constraint panel')
+            return Report.log(f'Shrink "{modifier.name}" constraint panel')
 
-            return False
-
-        return True
+        return Report.nothing()
 
 
 class SubSurfUVSmoothRule(ModifierRule):
@@ -88,8 +82,6 @@ class SubSurfUVSmoothRule(ModifierRule):
     def fix_modifier(cls, modifier, **kwargs):
         if modifier.type == 'SUBSURF':
             if utils.reset_property(modifier, 'uv_smooth', 'PRESERVE_CORNERS'):
-                print(f'Change {modifier.name} uv_smooth to PRESERVE_CORNERS')
+                return Report.log(f'Change {modifier.name} uv_smooth to PRESERVE_CORNERS')
 
-                return False
-
-        return True
+        return Report.nothing()

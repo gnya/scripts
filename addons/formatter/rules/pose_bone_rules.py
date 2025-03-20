@@ -1,6 +1,6 @@
 import re
 from . import utils
-from .rules import PoseBoneRule
+from .rules import Report, PoseBoneRule
 
 
 # Check IK properties in bones that is't in IK chain
@@ -8,7 +8,7 @@ class BoneIKPropsRule(PoseBoneRule):
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):
         if bone.is_in_ik_chain:
-            return True
+            return Report.nothing()
 
         resetted = utils.reset_properties(bone, {
             'ik_linear_weight': None,
@@ -35,11 +35,10 @@ class BoneIKPropsRule(PoseBoneRule):
 
         if resetted:
             s = ', '.join(resetted)
-            print(f'Reset "{bone.name}" IK properties: {s}')
 
-            return False
+            return Report.log(f'Reset "{bone.name}" IK properties: {s}')
 
-        return True
+        return Report.nothing()
 
 
 # Do not lock properties except at "CTR" bone
@@ -47,7 +46,7 @@ class BoneTransformLockRule(PoseBoneRule):
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):
         if re.match('CTR_.*', bone.name):
-            return True
+            return Report.nothing()
 
         resetted = utils.reset_properties(bone, {
             'lock_location': None,
@@ -59,8 +58,7 @@ class BoneTransformLockRule(PoseBoneRule):
 
         if resetted:
             s = ', '.join(resetted)
-            print(f'Reset "{bone.name}" Transform locks: {s}')
 
-            return False
+            return Report.log(f'Reset "{bone.name}" Transform locks: {s}')
 
-        return True
+        return Report.nothing()
