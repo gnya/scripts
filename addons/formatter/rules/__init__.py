@@ -20,6 +20,7 @@ from .bone_driver_rules import SymmetryBoneDriverRule
 
 from .modifier_rules import ModifierNameRule
 from .modifier_rules import ModifierPanelRule
+from .modifier_rules import SubSurfUVSmoothRule
 
 __all__ = [
     ToonScenePropertiesRule,
@@ -36,5 +37,6 @@ __all__ = [
     UnusedCustomShapeRule,
     SymmetryBoneDriverRule,
     ModifierNameRule,
-    ModifierPanelRule
+    ModifierPanelRule,
+    SubSurfUVSmoothRule
 ]

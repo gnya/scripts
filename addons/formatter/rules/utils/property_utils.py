@@ -18,16 +18,16 @@ def reset_property(data, property, default=None):
     if value != default:
         setattr(data, property, default)
 
-        return False
+        return True
 
-    return True
+    return False
 
 
 def reset_properties(data, properties):
     resetted = []
 
     for p, default in properties.items():
-        if not reset_property(data, p, default=default):
+        if reset_property(data, p, default):
             resetted.append(p)
 
     return resetted

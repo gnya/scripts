@@ -61,9 +61,8 @@ class ConstraintNameRule(ConstraintRule):
         if suffix:
             name += f' ({suffix})'
 
-        if name != constraint.name:
-            print(f'Rename "{constraint.name}" to "{name}"')
-            constraint.name = name
+        if utils.reset_property(constraint, 'name', name):
+            print(f'Rename to "{name}"')
 
             return False
 
@@ -74,9 +73,8 @@ class ConstraintNameRule(ConstraintRule):
 class ConstraintPanelRule(ConstraintRule):
     @classmethod
     def fix_constraint(cls, constraint, **kwargs):
-        if constraint.show_expanded:
+        if utils.reset_property(constraint, 'show_expanded', False):
             print(f'Shrink "{constraint.name}" constraint panel')
-            constraint.show_expanded = False
 
             return False
 

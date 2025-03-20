@@ -4,7 +4,7 @@ from . import rules
 bl_info = {
     'name': 'Formatter',
     'author': 'gnya',
-    'version': (0, 1, 3),
+    'version': (0, 1, 4),
     'blender': (3, 6, 0),
     'description':
         'Change the names, properties, and data structures in the '
@@ -36,6 +36,7 @@ class VIEW3D_OT_format_project(bpy.types.Operator):
         rules.SymmetryBoneDriverRule.fix()
         rules.ModifierNameRule.fix()
         rules.ModifierPanelRule.fix()
+        rules.SubSurfUVSmoothRule.fix()
 
         return {'FINISHED'}
 

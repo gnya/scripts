@@ -1,4 +1,5 @@
 import re
+from . import utils
 from .rules import ModifierRule
 
 
@@ -63,9 +64,8 @@ class ModifierNameRule(ModifierRule):
         if suffix:
             name += f' ({suffix})'
 
-        if name != modifier.name:
-            print(f'Rename "{modifier.name}" to "{name}"')
-            modifier.name = name
+        if utils.reset_property(modifier, 'name', name):
+            print(f'Rename to "{name}"')
 
             return False
 
@@ -75,10 +75,21 @@ class ModifierNameRule(ModifierRule):
 class ModifierPanelRule(ModifierRule):
     @classmethod
     def fix_modifier(cls, modifier, **kwargs):
-        if modifier.show_expanded:
+        if utils.reset_property(modifier, 'show_expanded', False):
             print(f'Shrink "{modifier.name}" constraint panel')
-            modifier.show_expanded = False
 
             return False
+
+        return True
+
+
+class SubSurfUVSmoothRule(ModifierRule):
+    @classmethod
+    def fix_modifier(cls, modifier, **kwargs):
+        if modifier.type == 'SUBSURF':
+            if utils.reset_property(modifier, 'uv_smooth', 'PRESERVE_CORNERS'):
+                print(f'Change {modifier.name} uv_smooth to PRESERVE_CORNERS')
+
+                return False
 
         return True
