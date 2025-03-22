@@ -251,8 +251,8 @@ class VIEW3D_OT_rig_snap_ik_to_fk(bpy.types.Operator):
     bl_description = 'Snap IK to FK'
     bl_options = {'UNDO'}
 
-    bone_group: bpy.props.StringProperty(default='')
-    bone_lr: bpy.props.StringProperty(default='')
+    bone_group: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    bone_lr: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
 
     def execute(self, _):
         bones, missing = ik_fk_bones(self.bone_group, self.bone_lr)
@@ -280,8 +280,8 @@ class VIEW3D_OT_rig_snap_fk_to_ik(bpy.types.Operator):
     bl_description = 'Snap FK to IK'
     bl_options = {'UNDO'}
 
-    bone_group: bpy.props.StringProperty(default='')
-    bone_lr: bpy.props.StringProperty(default='')
+    bone_group: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    bone_lr: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
 
     def execute(self, _):
         bones, missing = ik_fk_bones(self.bone_group, self.bone_lr)
