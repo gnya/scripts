@@ -6,12 +6,12 @@
 #define MAX_LOOP 50
 
 // Attribute getter
-#define GET_A(attribute, result) getattribute(attribute, result)
-#define GET_M(attribute, result) getmessage("trace", attribute, result)
+#define GET_THIS(attribute, result) getattribute(attribute, result)
+#define GET_HIT(attribute, result) getmessage("trace", attribute, result)
 
 // Convert index to group id
-#define S_GROUP(id) mod(id, 100)
-#define T_GROUP(id) trunc(id / 100)
+#define SHADOW(id) mod(id, 100)
+#define TRANSPARENT(id) trunc(id / 100)
 
 // Get group id
 #define GET_GROUP(type, getter, result) \
@@ -61,7 +61,7 @@ int shadow(vector L, float cutoff, float eps) {
     vector pos = P + offset;
 
     float this_group = 0.0;
-    GET_GROUP(S_GROUP, GET_A, this_group);
+    GET_GROUP(SHADOW, GET_THIS, this_group);
 
     if (this_group == 0.0) {
         return trace(pos, L);
@@ -72,7 +72,7 @@ int shadow(vector L, float cutoff, float eps) {
     float hit_group = 0.0;
 
     for (; count < max_loop & trace(pos, L); count++) {
-        GET_GROUP(S_GROUP, GET_M, hit_group);
+        GET_GROUP(SHADOW, GET_HIT, hit_group);
 
         if (hit_group != this_group) {
             return 1;
@@ -141,7 +141,7 @@ int transparent_culling(float eps) {
     }
 
     float this_group = 0.0;
-    GET_GROUP(T_GROUP, GET_A, this_group);
+    GET_GROUP(TRANSPARENT, GET_THIS, this_group);
 
     if (this_group == 0.0) {
         return 1;
@@ -149,13 +149,10 @@ int transparent_culling(float eps) {
 
     vector pos = P;
     int count = 0;
-
-    float hit_obj = 0.0;
-    float hit_mat = 0.0;
     float hit_group = 0.0;
 
     for (; count < t_depth & trace(pos, I); count++) {
-        GET_GROUP(T_GROUP, GET_M, hit_group);
+        GET_GROUP(TRANSPARENT, GET_HIT, hit_group);
 
         if (hit_group == this_group) {
             return 1;
