@@ -38,29 +38,30 @@ int shadow(vector L, float cutoff, float eps) {
     vector offset = ray_offset(L, cutoff, 5.0e-4, 1.0e-5);
     vector pos = P + offset;
     
-    float this_obj_id = 0.0;
-    getattribute("object:index", this_obj_id);
+    float this_id = 0.0;
+    getattribute("object:index", this_id);
+
+    float this_group = mod(this_id, 100);
     
-    if (this_obj_id == 0.0) {
+    if (this_group == 0.0) {
         return trace(pos, L);
     }
     
     int max_loop = 50;
     int count = 0;
-    float hit_obj_id = 0.0;
-    vector ng = Ng;
+    float hit_id = 0.0;
+    float hit_group = 0.0;
     
     for (; count < max_loop & trace(pos, L); count++) {
-        getmessage("trace", "object:index", hit_obj_id);
+        getmessage("trace", "object:index", hit_id);
+        hit_group = mod(hit_id, 100);
 
-        if (hit_obj_id != this_obj_id) {
+        if (hit_group != this_group) {
             return 1;
         }
         
         getmessage("trace", "P", pos);
-        // If the ray hits a backface, it returns the inverse normal.
-        getmessage("trace", "Ng", ng);
-        pos -= ng * eps;
+        pos += L * eps;
     }
     
     if (count == max_loop) {
@@ -74,7 +75,14 @@ int shadow(vector L, float cutoff, float eps) {
  * This function calculates how reflective other objects appear
  * at the point of current interest.
  */
-float mirror(float distance, float factor, float eps) {
+float glossy(float factor, float distance, int max_depth, float eps) {
+    int g_depth = 0;
+    getattribute("path:glossy_depth", g_depth);
+
+    if (g_depth > max_depth) {
+        return 0.0;
+    }
+
     vector dir = reflect(-I, N);
     float nd = dot(Ng, dir);
 
@@ -97,6 +105,50 @@ float mirror(float distance, float factor, float eps) {
     }
 
     return r;
+}
+
+/*
+ * This function checks whether transparency shouldn't be layeared.
+ */
+int transparent_culling(float eps) {
+    if (backfacing()) {
+        return 1;
+    }
+
+    int t_depth = 0;
+    getattribute("path:transparent_depth", t_depth);
+
+    if (t_depth == 0) {
+        return 0;
+    }
+
+    float this_id = 0.0;
+    getattribute("object:index", this_id);
+
+    float this_group = trunc(this_id / 100);
+
+    if (this_group == 0.0) {
+        return 1;
+    }
+    
+    vector pos = P;
+    int count = 0;
+    float hit_id = 0.0;
+    float hit_group = 0.0;
+
+    for (; count < t_depth & trace(pos, I); count++) {
+        getmessage("trace", "object:index", hit_id);
+        hit_group = trunc(hit_id / 100);
+
+        if (hit_group == this_group) {
+            return 1;
+        }
+        
+        getmessage("trace", "P", pos);
+        pos += I * eps;
+    }
+
+    return 0;
 }
 
 shader toon(
@@ -126,19 +178,18 @@ shader toon(
     color ShadowColor = color(0.1),
 
     /*
-     * Mirror
+     * Glossy
      */
-    int UseMirror = 0
+    int UseGlossy = 0
     [[ string widget = "boolean" ]],
-    float MirrorFactor = 0.5,
-    float MirrorDistance = 100.0,
+    float GlossyFactor = 0.5,
+    float MaxGlossyDistance = 100.0,
+    int MaxGlossyDepth = 8,
 
     /*
      * Transparency
      */
     int UseTransparent = 0
-    [[ string widget = "boolean" ]],
-    int UseTransparentCulling = 1
     [[ string widget = "boolean" ]],
     float Transparency = 1.0,
     float HighlightTransparency = 1.0,
@@ -154,8 +205,10 @@ shader toon(
         d *= max(0.0, dot(L, N)) * l_str;
     }
 
-    if (UseShadow & shadow(L, ShadowCutoff, 1.0e-4)) {
-        d = 0.0;
+    if (UseShadow) {
+        if (d != 0.0 & shadow(L, ShadowCutoff, 1.0e-4)) {
+            d = 0.0;
+        }
     }
     
     float h = 0.0; // highlight
@@ -167,8 +220,8 @@ shader toon(
 
     float r = 0.0; // reflection
 
-    if (UseMirror) {
-        r = mirror(MirrorDistance, MirrorFactor, 2.0e-4);
+    if (UseGlossy) {
+        r = glossy(GlossyFactor, MaxGlossyDistance, MaxGlossyDepth, 2.0e-4);
     }
 
     color c = BaseColor; // color
@@ -188,11 +241,8 @@ shader toon(
             t = HighlightTransparency;
         }
 
-        if (UseTransparentCulling) {
-            int t_depth = 0;
-            getattribute("path:transparent_depth", t_depth);
-
-            t *= t_depth == 0;
+        if (transparent_culling(1.0e-4)) {
+            t = 0.0;
         }
     }
 
