@@ -4,7 +4,7 @@ from . import rules
 bl_info = {
     'name': 'Formatter',
     'author': 'gnya',
-    'version': (0, 2, 1),
+    'version': (0, 2, 2),
     'blender': (3, 6, 0),
     'description':
         'Change the names, properties, and data structures in the '
@@ -28,8 +28,8 @@ class VIEW3D_OT_format_project(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        logs = context.scene.latest_formatter_fix_logs
-        errors = context.scene.latest_formatter_fix_errors
+        logs = context.window_manager.latest_formatter_fix_logs
+        errors = context.window_manager.latest_formatter_fix_errors
 
         logs.clear()
         errors.clear()
@@ -60,8 +60,8 @@ class VIEW3D_PT_format_project(bpy.types.Panel):
         layout = self.layout
         layout.operator('view3d.format_project', icon='BRUSH_DATA')
 
-        logs = context.scene.latest_formatter_fix_logs
-        errors = context.scene.latest_formatter_fix_errors
+        logs = context.window_manager.latest_formatter_fix_logs
+        errors = context.window_manager.latest_formatter_fix_errors
 
         if len(logs):
             layout.separator()
@@ -87,9 +87,9 @@ def register():
     bpy.utils.register_class(FixLogInfo)
     bpy.utils.register_class(FixErrorInfo)
 
-    bpy.types.Scene.latest_formatter_fix_logs = \
+    bpy.types.WindowManager.latest_formatter_fix_logs = \
         bpy.props.CollectionProperty(type=FixLogInfo)
-    bpy.types.Scene.latest_formatter_fix_errors = \
+    bpy.types.WindowManager.latest_formatter_fix_errors = \
         bpy.props.CollectionProperty(type=FixErrorInfo)
 
     bpy.utils.register_class(VIEW3D_OT_format_project)
@@ -100,8 +100,8 @@ def unregister():
     bpy.utils.unregister_class(FixLogInfo)
     bpy.utils.unregister_class(FixErrorInfo)
 
-    del bpy.types.Scene.latest_formatter_fix_logs
-    del bpy.types.Scene.latest_formatter_fix_errors
+    del bpy.types.WindowManager.latest_formatter_fix_logs
+    del bpy.types.WindowManager.latest_formatter_fix_errors
 
     bpy.utils.unregister_class(VIEW3D_OT_format_project)
     bpy.utils.unregister_class(VIEW3D_PT_format_project)
