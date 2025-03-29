@@ -1,4 +1,5 @@
 from .driver_utils import has_driver
+from .node_utils import node_location_absolute
 from .property_utils import reset_property
 from .property_utils import reset_properties
 from .symmetry_utils import switch_lr
@@ -8,6 +9,7 @@ from .symmetry_utils import is_symmetrical_driver_variable
 
 __all__ = [
     has_driver,
+    node_location_absolute,
     reset_property,
     reset_properties,
     switch_lr,

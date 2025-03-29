@@ -45,9 +45,9 @@ class ObjectRule(Rule):
         return r
 
 
-class ScenePropertiesRule(Rule):
+class SceneRule(Rule):
     @classmethod
-    def fix_scene_properties(cls, scene, **kwargs):
+    def fix_scene(cls, scene, **kwargs):
         raise Exception('Not Implemented')
 
     @classmethod
@@ -55,7 +55,38 @@ class ScenePropertiesRule(Rule):
         r = Report.nothing()
 
         for s in bpy.data.scenes:
-            r.add(cls.fix_scene_properties(s, **kwargs))
+            r.add(cls.fix_scene(s, **kwargs))
+
+        return r
+
+
+class NodeTreeRule(Rule):
+    @classmethod
+    def fix_node_tree(cls, node_tree, **kwargs):
+        raise Exception('Not Implemented')
+
+    @classmethod
+    def fix(cls, **kwargs):
+        r = Report.nothing()
+
+        for t in bpy.data.scenes:
+            if t.node_tree:
+                r.add(cls.fix_node_tree(t.node_tree, scene=t, name=t.name, **kwargs))
+
+        for t in bpy.data.worlds:
+            if t.node_tree:
+                r.add(cls.fix_node_tree(t.node_tree, world=t, name=t.name, **kwargs))
+
+        for t in bpy.data.materials:
+            if t.node_tree:
+                r.add(cls.fix_node_tree(t.node_tree, material=t, name=t.name, **kwargs))
+
+        for t in bpy.data.linestyles:
+            if t.node_tree:
+                r.add(cls.fix_node_tree(t.node_tree, linestyle=t, name=t.name, **kwargs))
+
+        for t in bpy.data.node_groups:
+            r.add(cls.fix_node_tree(t, name=t.name, **kwargs))
 
         return r
 

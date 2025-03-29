@@ -1,10 +1,10 @@
 from . import utils
-from .rules import Report, ScenePropertiesRule
+from .rules import Report, SceneRule
 
 
-class ToonScenePropertiesRule(ScenePropertiesRule):
+class ToonScenePropertiesRule(SceneRule):
     @classmethod
-    def fix_scene_properties(cls, scene, **kwargs):
+    def fix_scene(cls, scene, **kwargs):
         resetted = utils.reset_properties(scene, {
             'render.engine': 'CYCLES',
             'cycles.shading_system': True,
