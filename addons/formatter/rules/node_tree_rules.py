@@ -3,6 +3,7 @@ from . import utils
 from .rules import Report, NodeTreeRule
 
 
+# Align node-tree's right top corner
 class NodeTreeAlignRule(NodeTreeRule):
     @classmethod
     def fix_node_tree(cls, node_tree, **kwargs):
