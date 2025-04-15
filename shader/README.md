@@ -7,6 +7,15 @@ Blender 3.6 の Cycles でスクリプトノードから使用します
 
 ## シェーダーへの入力
 
+### LightStrength
+光源の方向と強さ デフォルトは `(0.0, 0.0, 0.0)`
+
+### BaseColor
+基本の色　デフォルトは `#808080`
+
+### UseBackfaceCulling
+裏面を非表示にするかどうか　デフォルトは `true`
+
 ### UseHighlight
 ハイライトを使うかどうか　デフォルトは `false`
 
