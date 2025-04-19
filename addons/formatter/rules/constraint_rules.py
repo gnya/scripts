@@ -93,6 +93,9 @@ class ConstraintTangetSpaceRule(ConstraintRule):
             if constraint.id_data.type != 'ARMATURE':
                 return Report.nothing()
 
+            if not constraint.target:
+                return Report.nothing()
+
             if constraint.target.type != 'ARMATURE':
                 return Report.nothing()
 

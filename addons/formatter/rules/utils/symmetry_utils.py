@@ -27,20 +27,26 @@ def _is_symmetrical(a, b, properties, symmetrical_properties):
     for p in properties:
         v_a, v_b = getattr(a, p), getattr(b, p)
 
-        if type(v_a) is float:
-            if abs(v_a - v_b) > 1.0e-6:
+        if v_a is not None:
+            if v_b is None:
                 return False, p
-        elif v_a != v_b:
-            return False, p
+            elif type(v_a) is float:
+                if abs(v_a - v_b) > 1.0e-6:
+                    return False, p
+            elif v_a != v_b:
+                return False, p
 
     for p in symmetrical_properties:
         v_a, v_b = getattr(a, p), getattr(b, p)
 
-        if hasattr(v_a, 'name'):
-            if v_a.name != switch_lr(v_b.name):
+        if v_a is not None:
+            if v_b is None:
                 return False, p
-        elif v_a != switch_lr(v_b):
-            return False, p
+            elif hasattr(v_a, 'name'):
+                if v_a.name != switch_lr(v_b.name):
+                    return False, p
+            elif v_a != switch_lr(v_b):
+                return False, p
 
     return True, ''
 
@@ -151,7 +157,7 @@ def is_symmetrical_transform_constraint(a, b):
         'from_min_x_rot', 'from_min_x_scale',
         'from_min_y', 'from_min_y_scale',
         'from_min_z', 'from_min_z_scale',
-        'from_rotation_mode', 'map_from', 'map_to', 'target',
+        'from_rotation_mode', 'map_from', 'map_to',
         'map_to_x_from', 'map_to_y_from', 'map_to_z_from',
         'mix_mode', 'mix_mode_rot', 'mix_mode_scale',
         'to_euler_order', 'use_motion_extrapolate'
@@ -175,15 +181,15 @@ def is_symmetrical_transform_constraint(a, b):
             'to_min_x_scale', 'to_min_y_scale', 'to_min_z_scale'
         ]
 
-    return _is_symmetrical(a, b, properties, ['subtarget'])
+    return _is_symmetrical(a, b, properties, ['target', 'subtarget'])
 
 
 def is_symmetrical_constraint(a, b):
     res, s = _is_symmetrical(a, b, [
         'enabled', 'error_location', 'error_rotation',
         'influence', 'is_override_data', 'is_valid', 'mute',
-        'owner_space', 'space_object', 'target_space', 'type'
-    ], ['name', 'space_subtarget'])
+        'owner_space', 'target_space', 'type'
+    ], ['name', 'space_object', 'space_subtarget'])
 
     if not res:
         return False, s
@@ -191,33 +197,33 @@ def is_symmetrical_constraint(a, b):
     match a.type:
         case 'COPY_LOCATION':
             return _is_symmetrical(a, b, [
-                'head_tail', 'invert_x', 'invert_y', 'invert_z', 'target',
+                'head_tail', 'invert_x', 'invert_y', 'invert_z',
                 'use_bbone_shape', 'use_offset', 'use_x', 'use_y', 'use_z'
-            ], ['subtarget'])
+            ], ['target', 'subtarget'])
         case 'COPY_ROTATION':
             return _is_symmetrical(a, b, [
                 'euler_order', 'invert_x', 'invert_y', 'invert_z', 'mix_mode',
-                'target', 'use_offset', 'use_x', 'use_y', 'use_z'
-            ], ['subtarget'])
+                'use_offset', 'use_x', 'use_y', 'use_z'
+            ], ['target', 'subtarget'])
         case 'COPY_SCALE':
             return _is_symmetrical(a, b, [
-                'power', 'target', 'use_add', 'use_make_uniform',
+                'power', 'use_add', 'use_make_uniform',
                 'use_offset', 'use_x', 'use_y', 'use_z'
-            ], ['subtarget'])
+            ], ['target', 'subtarget'])
         case 'COPY_TRANSFORMS':
             return _is_symmetrical(a, b, [
                 'head_tail', 'mix_mode',
                 'remove_target_shear', 'use_bbone_shape'
-            ], ['subtarget'])
+            ], ['target', 'subtarget'])
         case 'DAMPED_TRACK':
             return _is_symmetrical(a, b, [
-                'head_tail', 'target', 'track_axis', 'use_bbone_shape'
-            ], ['subtarget'])
+                'head_tail', 'track_axis', 'use_bbone_shape'
+            ], ['target', 'subtarget'])
         case 'LOCKED_TRACK':
             return _is_symmetrical(a, b, [
-                'head_tail', 'lock_axis', 'target',
+                'head_tail', 'lock_axis',
                 'track_axis', 'use_bbone_shape'
-            ], ['subtarget'])
+            ], ['target', 'subtarget'])
         case 'IK':
             return _is_symmetrical(a, b, [
                 'chain_count', 'distance', 'ik_type', 'iterations',
@@ -225,14 +231,14 @@ def is_symmetrical_constraint(a, b):
                 'lock_rotation_x', 'lock_rotation_y', 'lock_rotation_z',
                 'orient_weight', 'pole_angle', 'pole_target',
                 'reference_axis', 'limit_mode',
-                'target', 'use_location', 'use_rotation',
+                'use_location', 'use_rotation',
                 'use_stretch', 'use_tail', 'weight'
-            ], ['pole_subtarget', 'subtarget'])
+            ], ['pole_subtarget', 'target', 'subtarget'])
         case 'LIMIT_DISTANCE':
             return _is_symmetrical(a, b, [
-                'distance', 'head_tail', 'limit_mode', 'target',
+                'distance', 'head_tail', 'limit_mode',
                 'use_bbone_shape', 'use_transform_limit'
-            ], ['subtarget'])
+            ], ['target', 'subtarget'])
         case 'LIMIT_LOCATION':
             return _is_symmetrical(a, b, [
                 'max_x', 'max_y', 'max_z', 'min_x', 'min_y', 'min_z',
@@ -266,14 +272,14 @@ def is_symmetrical_constraint(a, b):
         case 'STRETCH_TO':
             return _is_symmetrical(a, b, [
                 'bulge', 'bulge_max', 'bulge_min', 'bulge_smooth', 'head_tail',
-                'keep_axis', 'rest_length', 'target', 'use_bbone_shape',
+                'keep_axis', 'rest_length', 'use_bbone_shape',
                 'use_bulge_max', 'use_bulge_min', 'volume'
-            ], ['subtarget'])
+            ], ['target', 'subtarget'])
         case 'TRACK_TO':
             return _is_symmetrical(a, b, [
-                'head_tail', 'target', 'track_axis', 'up_axis',
+                'head_tail', 'track_axis', 'up_axis',
                 'use_bbone_shape', 'use_target_z'
-            ], ['subtarget'])
+            ], ['target', 'subtarget'])
         case 'TRANSFORM':
             return is_symmetrical_transform_constraint(a, b)
 
