@@ -219,11 +219,6 @@ def is_symmetrical_constraint(a, b):
             return _is_symmetrical(a, b, [
                 'head_tail', 'track_axis', 'use_bbone_shape'
             ], ['target', 'subtarget'])
-        case 'LOCKED_TRACK':
-            return _is_symmetrical(a, b, [
-                'head_tail', 'lock_axis',
-                'track_axis', 'use_bbone_shape'
-            ], ['target', 'subtarget'])
         case 'IK':
             return _is_symmetrical(a, b, [
                 'chain_count', 'distance', 'ik_type', 'iterations',
@@ -234,6 +229,11 @@ def is_symmetrical_constraint(a, b):
                 'use_location', 'use_rotation',
                 'use_stretch', 'use_tail', 'weight'
             ], ['pole_subtarget', 'target', 'subtarget'])
+        case 'LOCKED_TRACK':
+            return _is_symmetrical(a, b, [
+                'head_tail', 'lock_axis',
+                'track_axis', 'use_bbone_shape'
+            ], ['target', 'subtarget'])
         case 'LIMIT_DISTANCE':
             return _is_symmetrical(a, b, [
                 'distance', 'head_tail', 'limit_mode',
@@ -262,6 +262,11 @@ def is_symmetrical_constraint(a, b):
                 'euler_order', 'max_x', 'min_x', 'use_transform_limit',
                 'use_limit_x', 'use_limit_y', 'use_limit_z'
             ], [])
+        case 'PIVOT':
+            return _is_symmetrical(a, b, [
+                'head_tail', 'offset', 'rotation_range',
+                'use_bbone_shape', 'use_relative_location'
+            ], ['target', 'subtarget'])
         case 'SHRINKWRAP':
             return _is_symmetrical(a, b, [
                 'cull_face', 'distance', 'project_axis', 'project_axis_space',

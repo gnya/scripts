@@ -7,6 +7,7 @@ class ToonScenePropertiesRule(SceneRule):
     def fix_scene(cls, scene, **kwargs):
         resetted = utils.reset_properties(scene, {
             'render.engine': 'CYCLES',
+            'cycles.device': 'CPU',
             'cycles.shading_system': True,
             'cycles.use_preview_adaptive_sampling': False,
             'cycles.preview_samples': 1,

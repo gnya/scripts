@@ -21,6 +21,7 @@ class ConstraintNameRule(ConstraintRule):
             'LIMIT_LOCATION': 'Limit Location',
             'LIMIT_SCALE': 'Limit Scale',
             'LIMIT_ROTATION': 'Limit Rotation',
+            'PIVOT': 'Pivot',
             'SHRINKWRAP': 'Shrinkwrap',
             'STRETCH_TO': 'Stretch To',
             'TRACK_TO': 'Track To',
@@ -85,8 +86,8 @@ class ConstraintTangetSpaceRule(ConstraintRule):
         ]
 
         ignore_types = [
-            'CHILD_OF', 'DAMPED_TRACK', 'LOCKED_TRACK', 'LIMIT_LOCATION',
-            'LIMIT_SCALE', 'LIMIT_ROTATION', 'IK', 'SHRINKWRAP', 'STRETCH_TO'
+            'CHILD_OF', 'DAMPED_TRACK', 'IK', 'LOCKED_TRACK', 'LIMIT_LOCATION',
+            'LIMIT_SCALE', 'LIMIT_ROTATION', 'PIVOT', 'SHRINKWRAP', 'STRETCH_TO'
         ]
 
         if constraint.type in notice_types:
@@ -123,8 +124,8 @@ class ConstraintOwnerSpaceRule(ConstraintRule):
         ]
 
         ignore_types = [
-            'CHILD_OF', 'DAMPED_TRACK', 'LOCKED_TRACK',
-            'IK', 'SHRINKWRAP', 'STRETCH_TO'
+            'CHILD_OF', 'DAMPED_TRACK', 'IK', 'LOCKED_TRACK',
+            'PIVOT', 'SHRINKWRAP', 'STRETCH_TO'
         ]
 
         if constraint.type in notice_types:

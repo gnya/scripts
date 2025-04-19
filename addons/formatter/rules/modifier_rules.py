@@ -15,6 +15,7 @@ class ModifierNameRule(ModifierRule):
             'DATA_TRANSFER': 'Data Transfer',
             'CAST': 'Cast',
             'LATTICE': 'Lattice',
+            'SOFT_BODY': 'Softbody',
             'SUBSURF': 'Subdivision',
             'HOOK': 'Hook',
             'ARMATURE': 'Armature',
