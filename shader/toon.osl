@@ -1,5 +1,5 @@
 /*
- * toon shader (0.3.2)
+ * toon shader (0.3.3)
  * author: gnya
  */
 
@@ -19,6 +19,13 @@
     getter("object:index", obj_id); \
     getter("material:index", mat_id); \
     result = type(obj_id) ? type(obj_id) : type(mat_id)
+
+// Convert index to properties
+#define PROPS(id) int(trunc(id / 10000))
+
+// Get properties (it must after GET_GROUP macro)
+#define GET_PROPS(result) \
+    result = PROPS(obj_id) | PROPS(mat_id)
 
 /*
  * This function calculates the amount by which the ray start
@@ -71,11 +78,17 @@ int shadow(vector L, float cutoff, float eps) {
     int count = 0;
     float hit_group = 0.0;
 
+    int is_backfacing = dot(Ng, L) < 0.0;
+    float hit_props = 0.0;
+
     for (; count < max_loop & trace(pos, L); count++) {
         GET_GROUP(SHADOW, GET_HIT, hit_group);
+        GET_PROPS(hit_props);
 
         if (hit_group != this_group) {
-            return 1;
+            if (!is_backfacing | hit_props == 0.0) {
+                return 1;
+            }
         }
 
         getmessage("trace", "P", pos);
