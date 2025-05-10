@@ -7,6 +7,9 @@ from .constraint_rules import ConstraintPanelRule
 
 from .data_bone_rules import DefBoneNameRule
 
+from .mesh_rules import UnusedVertexGroupsRule
+from .mesh_rules import UnusedMaterialsRule
+
 from .modifier_rules import ModifierNameRule
 from .modifier_rules import ModifierPanelRule
 from .modifier_rules import SubSurfUVSmoothRule
@@ -31,6 +34,8 @@ __all__ = [
     ConstraintNameRule,
     ConstraintPanelRule,
     DefBoneNameRule,
+    UnusedVertexGroupsRule,
+    UnusedMaterialsRule,
     ModifierNameRule,
     ModifierPanelRule,
     SubSurfUVSmoothRule,

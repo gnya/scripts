@@ -3,25 +3,34 @@ from . import utils
 
 
 class Report():
-    def __init__(self, logs, errors):
-        self.logs = logs
-        self.errors = errors
+    def __init__(self, title, description='', type='NONE'):
+        self.type = type
+        self.title = title
+        self.description = description
+        self.children = []
 
-    def add(self, report):
-        self.logs.extend(report.logs)
-        self.errors.extend(report.errors)
+    def to_list(self, type):
+        reports = []
+
+        if self.type == type:
+            reports.append(self)
+
+        for r in self.children:
+            reports += r.to_list(type)
+
+        return reports
 
     @staticmethod
-    def nothing():
-        return Report([], [])
+    def nothing(title='', description=''):
+        return Report(title, description)
 
     @staticmethod
-    def log(log):
-        return Report([log], [])
+    def log(title, description=''):
+        return Report(title, description, type='LOG')
 
     @staticmethod
-    def error(error):
-        return Report([], [error])
+    def error(title, description=''):
+        return Report(title, description, type='ERROR')
 
 
 class Rule():
@@ -40,7 +49,7 @@ class ObjectRule(Rule):
         r = Report.nothing()
 
         for o in bpy.data.objects:
-            r.add(cls.fix_object(o, **kwargs))
+            r.children.append(cls.fix_object(o, **kwargs))
 
         return r
 
@@ -55,7 +64,7 @@ class SceneRule(Rule):
         r = Report.nothing()
 
         for s in bpy.data.scenes:
-            r.add(cls.fix_scene(s, **kwargs))
+            r.children.append(cls.fix_scene(s, **kwargs))
 
         return r
 
@@ -71,24 +80,37 @@ class NodeTreeRule(Rule):
 
         for t in bpy.data.scenes:
             if t.node_tree:
-                r.add(cls.fix_node_tree(t.node_tree, scene=t, name=t.name, **kwargs))
+                r.children.append(cls.fix_node_tree(t.node_tree, scene=t, name=t.name, **kwargs))
 
         for t in bpy.data.worlds:
             if t.node_tree:
-                r.add(cls.fix_node_tree(t.node_tree, world=t, name=t.name, **kwargs))
+                r.children.append(cls.fix_node_tree(t.node_tree, world=t, name=t.name, **kwargs))
 
         for t in bpy.data.materials:
             if t.node_tree:
-                r.add(cls.fix_node_tree(t.node_tree, material=t, name=t.name, **kwargs))
+                r.children.append(cls.fix_node_tree(t.node_tree, material=t, name=t.name, **kwargs))
 
         for t in bpy.data.linestyles:
             if t.node_tree:
-                r.add(cls.fix_node_tree(t.node_tree, linestyle=t, name=t.name, **kwargs))
+                r.children.append(cls.fix_node_tree(t.node_tree, linestyle=t, name=t.name, **kwargs))
 
         for t in bpy.data.node_groups:
-            r.add(cls.fix_node_tree(t, name=t.name, **kwargs))
+            r.children.append(cls.fix_node_tree(t, name=t.name, **kwargs))
 
         return r
+
+
+class MeshRule(ObjectRule):
+    @classmethod
+    def fix_mesh(cls, mesh, **kwargs):
+        raise Exception('Not Implemented')
+
+    @classmethod
+    def fix_object(cls, obj, **kwargs):
+        if obj.type == 'MESH':
+            return cls.fix_mesh(obj)
+
+        return Report.nothing()
 
 
 class ArmatureRule(ObjectRule):
@@ -114,7 +136,7 @@ class ModifierRule(ObjectRule):
         r = Report.nothing()
 
         for m in obj.modifiers:
-            r.add(cls.fix_modifier(m, obj=obj, **kwargs))
+            r.children.append(cls.fix_modifier(m, obj=obj, **kwargs))
 
         return r
 
@@ -133,7 +155,7 @@ class BoneDriverRule(ArmatureRule):
         drivers = armature.animation_data.drivers
 
         for d in drivers:
-            r.add(cls.fix_bone_driver(d, drivers=drivers, **kwargs))
+            r.children.append(cls.fix_bone_driver(d, drivers=drivers, **kwargs))
 
         return r
 
@@ -148,7 +170,7 @@ class DataBoneRule(ArmatureRule):
         r = Report.nothing()
 
         for b in armature.data.bones:
-            r.add(cls.fix_data_bone(b, armature=armature, **kwargs))
+            r.children.append(cls.fix_data_bone(b, armature=armature, **kwargs))
 
         return r
 
@@ -163,7 +185,7 @@ class PoseBoneRule(ArmatureRule):
         r = Report.nothing()
 
         for b in armature.pose.bones:
-            r.add(cls.fix_pose_bone(b, armature=armature, **kwargs))
+            r.children.append(cls.fix_pose_bone(b, armature=armature, **kwargs))
 
         return r
 
@@ -192,7 +214,7 @@ class BoneConstraintRule(PoseBoneRule):
         r = Report.nothing()
 
         for c in bone.constraints:
-            r.add(cls.fix_bone_constraint(c, bone=bone, **kwargs))
+            r.children.append(cls.fix_bone_constraint(c, bone=bone, **kwargs))
 
         return r
 
@@ -207,7 +229,7 @@ class ConstraintRule(PoseBoneRule):
         r = Report.nothing()
 
         for c in bone.constraints:
-            r.add(cls.fix_constraint(c, bone=bone, **kwargs))
+            r.children.append(cls.fix_constraint(c, bone=bone, **kwargs))
 
         return r
 
@@ -216,6 +238,6 @@ class ConstraintRule(PoseBoneRule):
         r = super(PoseBoneRule, cls).fix_object(obj, **kwargs)
 
         for c in obj.constraints:
-            r.add(cls.fix_constraint(c, obj=obj, **kwargs))
+            r.children.append(cls.fix_constraint(c, obj=obj, **kwargs))
 
         return r
