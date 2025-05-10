@@ -20,6 +20,7 @@ from .object_rules import UnusedCustomShapeRule
 
 from .pose_bone_rules import BoneTransformLockRule
 from .pose_bone_rules import BoneIKPropsRule
+from .pose_bone_rules import RestPoseMatchRule
 
 from .scene_rules import ToonScenePropertiesRule
 
@@ -43,6 +44,7 @@ __all__ = [
     UnusedCustomShapeRule,
     BoneTransformLockRule,
     BoneIKPropsRule,
+    RestPoseMatchRule,
     ToonScenePropertiesRule,
     SymmetryBoneNameRule,
     SymmetryBoneConstraintRule,

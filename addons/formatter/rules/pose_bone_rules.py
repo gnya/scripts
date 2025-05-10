@@ -1,4 +1,5 @@
 import re
+import mathutils
 from . import utils
 from .rules import Report, PoseBoneRule
 
@@ -60,5 +61,37 @@ class BoneTransformLockRule(PoseBoneRule):
             s = ', '.join(resetted)
 
             return Report.log(f'Reset "{bone.name}" Transform locks: {s}')
+
+        return Report.nothing()
+
+
+# On pose mode, bone transform must match with rest pose
+class RestPoseMatchRule(PoseBoneRule):
+    @classmethod
+    def fix_pose_bone(cls, bone, **kwargs):
+        ignore = [
+            'CTR_thumb_ik.L', 'CTR_finger_index_ik.L', 'CTR_finger_middle_ik.L',
+            'CTR_finger_ring_ik.L', 'CTR_finger_pinky_ik.L'
+        ]
+
+        if bone.name in ignore or utils.switch_lr(bone.name) in ignore:
+            return Report.nothing()
+
+        m = bone.matrix_channel
+        m_rest = mathutils.Matrix.Identity(4)
+        max_error = 0.0
+
+        for i in range(4):
+            for j in range(4):
+                error = abs(m[i][j] - m_rest[i][j])
+
+                if error > max_error:
+                    max_error = error
+
+        if max_error > 1.0e-3:
+            r = Report.error(f'Unmatch with rest pose: {bone.name}')
+            r.description = f'error: {max_error}'
+
+            return r
 
         return Report.nothing()

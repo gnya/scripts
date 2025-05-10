@@ -2,6 +2,7 @@ import re
 from .rules import Report, MeshRule
 
 
+# Check not used vertex groups
 class UnusedVertexGroupsRule(MeshRule):
     @classmethod
     def fix_mesh(cls, mesh, **kwargs):
@@ -29,6 +30,7 @@ class UnusedVertexGroupsRule(MeshRule):
         return Report.nothing()
 
 
+# Check not used materials
 class UnusedMaterialsRule(MeshRule):
     @classmethod
     def fix_mesh(cls, mesh, **kwargs):
@@ -38,9 +40,7 @@ class UnusedMaterialsRule(MeshRule):
         for p in mesh.data.polygons:
             used.add(p.material_index)
 
-        unused = all - used
-
-        if unused:
+        if all - used:
             return Report.error(f'Unused materials: {mesh.name}')
 
         return Report.nothing()
