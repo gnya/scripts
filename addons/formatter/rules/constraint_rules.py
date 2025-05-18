@@ -9,6 +9,7 @@ class ConstraintNameRule(ConstraintRule):
     @classmethod
     def fix_constraint(cls, constraint, **kwargs):
         constraint_names = {
+            'ARMATURE': 'Armature',
             'COPY_LOCATION': 'Copy Location',
             'COPY_ROTATION': 'Copy Rotation',
             'COPY_SCALE': 'Copy Scale',
@@ -86,8 +87,9 @@ class ConstraintTangetSpaceRule(ConstraintRule):
         ]
 
         ignore_types = [
-            'CHILD_OF', 'DAMPED_TRACK', 'IK', 'LOCKED_TRACK', 'LIMIT_LOCATION',
-            'LIMIT_SCALE', 'LIMIT_ROTATION', 'PIVOT', 'SHRINKWRAP', 'STRETCH_TO'
+            'ARMATURE', 'CHILD_OF', 'DAMPED_TRACK', 'IK', 'LOCKED_TRACK',
+            'LIMIT_LOCATION', 'LIMIT_SCALE', 'LIMIT_ROTATION',
+            'PIVOT', 'SHRINKWRAP', 'STRETCH_TO'
         ]
 
         if constraint.type in notice_types:
@@ -124,7 +126,7 @@ class ConstraintOwnerSpaceRule(ConstraintRule):
         ]
 
         ignore_types = [
-            'CHILD_OF', 'DAMPED_TRACK', 'IK', 'LOCKED_TRACK',
+            'ARMATURE', 'CHILD_OF', 'DAMPED_TRACK', 'IK', 'LOCKED_TRACK',
             'PIVOT', 'SHRINKWRAP', 'STRETCH_TO'
         ]
 

@@ -73,6 +73,28 @@ def is_symmetrical_driver_variable(a, b):
     return not info, ', '.join(info)
 
 
+def is_symmetrical_armature_constraint(a, b):
+    info = []
+
+    for (a_t, b_t) in zip(a.targets, b.targets):
+        is_pair, s = _is_symmetrical(a_t, b_t, [
+            'weight'
+        ], [
+            'target', 'subtarget'
+        ])
+
+        if not is_pair:
+            info.append(s)
+
+    if info:
+        return False, ', '.join(info)
+
+    return _is_symmetrical(a, b, [
+        'use_bone_envelopes', 'use_current_location',
+        'use_deform_preserve_volume'
+    ], [])
+
+
 def is_symmetrical_transform_constraint(a, b):
     to_loc = a.map_to == 'LOCATION'
     to_rot = a.map_to == 'ROTATION'
@@ -185,16 +207,18 @@ def is_symmetrical_transform_constraint(a, b):
 
 
 def is_symmetrical_constraint(a, b):
-    res, s = _is_symmetrical(a, b, [
+    is_pair, s = _is_symmetrical(a, b, [
         'enabled', 'error_location', 'error_rotation',
         'influence', 'is_override_data', 'is_valid', 'mute',
         'owner_space', 'target_space', 'type'
     ], ['name', 'space_object', 'space_subtarget'])
 
-    if not res:
+    if not is_pair:
         return False, s
 
     match a.type:
+        case 'ARMATURE':
+            return is_symmetrical_armature_constraint(a, b)
         case 'COPY_LOCATION':
             return _is_symmetrical(a, b, [
                 'head_tail', 'invert_x', 'invert_y', 'invert_z',
