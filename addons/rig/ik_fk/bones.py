@@ -32,7 +32,7 @@ def check_ik_fk_bone(bone):
     return False, '', '', ''
 
 
-def ik_fk_arm_bone_names(lr):
+def _ik_fk_arm_bone_names(lr):
     return {
         'parent': f'MCH_arm_parent.{lr}',
         'ik_pole': f'CTR_arm_ik_pole.{lr}',
@@ -50,7 +50,7 @@ def ik_fk_arm_bone_names(lr):
     }
 
 
-def ik_fk_leg_bone_names(lr):
+def _ik_fk_leg_bone_names(lr):
     return {
         'parent': f'MCH_leg_parent.{lr}',
         'ik_pole': f'CTR_leg_ik_pole.{lr}',
@@ -79,9 +79,9 @@ def ik_fk_bones(armature, group, lr):
     bone_names = {}
 
     if 'arm' == group:
-        bone_names = ik_fk_arm_bone_names(lr)
+        bone_names = _ik_fk_arm_bone_names(lr)
     elif 'leg' == group:
-        bone_names = ik_fk_leg_bone_names(lr)
+        bone_names = _ik_fk_leg_bone_names(lr)
 
     bones = armature.pose.bones
 
