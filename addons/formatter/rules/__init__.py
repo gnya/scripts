@@ -6,6 +6,7 @@ from .constraint_rules import ConstraintNameRule
 from .constraint_rules import ConstraintPanelRule
 
 from .data_bone_rules import DefBoneNameRule
+from .data_bone_rules import UnusedBonesRule
 
 from .mesh_rules import UnusedVertexGroupsRule
 from .mesh_rules import UnusedMaterialsRule
@@ -16,7 +17,7 @@ from .modifier_rules import SubSurfUVSmoothRule
 
 from .node_tree_rules import NodeTreeAlignRule
 
-from .object_rules import UnusedCustomShapeRule
+from .object_rules import UnusedCustomShapesRule
 
 from .pose_bone_rules import BoneTransformLockRule
 from .pose_bone_rules import BoneIKPropsRule
@@ -35,13 +36,14 @@ __all__ = [
     ConstraintNameRule,
     ConstraintPanelRule,
     DefBoneNameRule,
+    UnusedBonesRule,
     UnusedVertexGroupsRule,
     UnusedMaterialsRule,
     ModifierNameRule,
     ModifierPanelRule,
     SubSurfUVSmoothRule,
     NodeTreeAlignRule,
-    UnusedCustomShapeRule,
+    UnusedCustomShapesRule,
     BoneTransformLockRule,
     BoneIKPropsRule,
     RestPoseMatchRule,

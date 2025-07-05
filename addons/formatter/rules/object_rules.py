@@ -4,7 +4,7 @@ from .rules import Report, ObjectRule
 
 
 # Check not used customeshapes
-class UnusedCustomShapeRule(ObjectRule):
+class UnusedCustomShapesRule(ObjectRule):
     @classmethod
     def fix_object(cls, obj, **kwargs):
         if not re.match(r'^[^_.]*_CUSTOMSHAPE.*$', obj.name):
