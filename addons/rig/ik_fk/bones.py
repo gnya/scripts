@@ -1,7 +1,7 @@
 import re
 
 
-def check_ik_fk_bone(bone):
+def _check_ik_fk_bone(bone):
     name = bone.name if bone else ''
     match = re.match(r'CTR_(.+)_(ik|fk).*\.(L|R)', name)
 
@@ -30,6 +30,18 @@ def check_ik_fk_bone(bone):
         return True, group, ik_or_fk, l_or_r
 
     return False, '', '', ''
+
+
+def check_ik_fk_bones(bones):
+    groups = set()
+
+    for b in bones:
+        check, group, ikfk, lr = _check_ik_fk_bone(b)
+
+        if check:
+            groups.add((group, ikfk, lr))
+
+    return groups
 
 
 def _ik_fk_arm_bone_names(lr):
