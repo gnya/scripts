@@ -40,7 +40,7 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
             col = layout.column(align=True)
             props_expr = bones['CTR_properties_expression']
 
-            col.prop(props_expr, '["auto_ctrl_switching"]', toggle=1, text='Auto Switch (Expression)')
+            col.prop(props_expr, '["auto_ctrl_switching"]', toggle=1, text='Auto Switch (Expr)')
             col.prop(props_expr, '["show_double_eyelid"]', toggle=1, text='Double Eyelid')
             col.prop(props_expr, '["show_eyelashes_A"]', toggle=1, text='Eyelashes A')
             col.prop(props_expr, '["show_lip_line"]', toggle=1, text='Lip Line')

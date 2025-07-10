@@ -60,76 +60,6 @@ class VIEW3D_OT_rig_snap_fk_to_ik(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class IKParentTypes(bpy.types.PropertyGroup):
-    @staticmethod
-    def _get_prop(self, prop):
-        if self.id_data.pose:
-            if 'CTR_properties_body' in self.id_data.pose.bones:
-                b = self.id_data.pose.bones['CTR_properties_body']
-
-                if prop in b:
-                    return b[prop]
-
-        return 0
-
-    @staticmethod
-    def _set_prop(self, prop, value):
-        if self.id_data.pose:
-            if 'CTR_properties_body' in self.id_data.pose.bones:
-                b = self.id_data.pose.bones['CTR_properties_body']
-
-                if prop in b:
-                    b[prop] = int(value)
-
-    arm_l: bpy.props.EnumProperty(
-        items=[
-            ('0', 'IK Parent - Root', ''),  # noqa: F722 F821
-            ('1', 'IK Parent - Torso', ''),  # noqa: F722 F821
-            ('2', 'IK Parent - Chest', '')  # noqa: F722 F821
-        ],
-        name='IK Arm Parent L',  # noqa: F722
-        options=set(),
-        get=lambda self: IKParentTypes._get_prop(self, 'ik_arm_parent.L'),
-        set=lambda self, value:  IKParentTypes._set_prop(self, 'ik_arm_parent.L', value)
-    )  # type: ignore
-
-    arm_r: bpy.props.EnumProperty(
-        items=[
-            ('0', 'IK Parent - Root', ''),  # noqa: F722 F821
-            ('1', 'IK Parent - Torso', ''),  # noqa: F722 F821
-            ('2', 'IK Parent - Chest', '')  # noqa: F722 F821
-        ],
-        name='IK Arm Parent R',  # noqa: F722
-        options=set(),
-        get=lambda self: IKParentTypes._get_prop(self, 'ik_arm_parent.R'),
-        set=lambda self, value:  IKParentTypes._set_prop(self, 'ik_arm_parent.R', value)
-    )  # type: ignore
-
-    leg_l: bpy.props.EnumProperty(
-        items=[
-            ('0', 'IK Parent - Root', ''),  # noqa: F722 F821
-            ('1', 'IK Parent - Torso', ''),  # noqa: F722 F821
-            ('2', 'IK Parent - Chest', '')  # noqa: F722 F821
-        ],
-        name='IK Leg Parent L',  # noqa: F722
-        options=set(),
-        get=lambda self: IKParentTypes._get_prop(self, 'ik_leg_parent.L'),
-        set=lambda self, value:  IKParentTypes._set_prop(self, 'ik_leg_parent.L', value)
-    )  # type: ignore
-
-    leg_r: bpy.props.EnumProperty(
-        items=[
-            ('0', 'IK Parent - Root', ''),  # noqa: F722 F821
-            ('1', 'IK Parent - Torso', ''),  # noqa: F722 F821
-            ('2', 'IK Parent - Chest', '')  # noqa: F722 F821
-        ],
-        name='IK Leg Parent R',  # noqa: F722
-        options=set(),
-        get=lambda self: IKParentTypes._get_prop(self, 'ik_leg_parent.R'),
-        set=lambda self, value:  IKParentTypes._set_prop(self, 'ik_leg_parent.R', value)
-    )  # type: ignore
-
-
 class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
     bl_idname = 'VIEW3D_PT_rig_ikfk'
     bl_label = 'IK/FK'
@@ -178,7 +108,14 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
             col.prop(props, f'["ik_stretch_{group}s"]', text='IK Stretch')
             col.prop(props, f'["ik_{group}_pole_parent.{lr}"]', text='IK Pole Parent')
 
-            split = col.split(align=True, factor=0.7)
+            parent_type = ''
 
-            split.prop(armature.rig_addon_props, f'{group}_{lr}'.lower(), toggle=1, text='')
-            split.prop(props, f'["ik_{group}_parent.{lr}"]', text='')
+            match props[f'ik_{group}_parent.{lr}']:
+                case 0:
+                    parent_type = 'Root'
+                case 1:
+                    parent_type = 'Torso'
+                case 2:
+                    parent_type = 'Chest'
+
+            col.prop(props, f'["ik_{group}_parent.{lr}"]', text=f'IK Parent ({parent_type})')

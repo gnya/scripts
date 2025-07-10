@@ -6,7 +6,7 @@ from . import props
 bl_info = {
     'name': 'Rig',
     'author': 'gnya',
-    'version': (0, 1, 3),
+    'version': (0, 1, 4),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make character rigs easier to use. '
@@ -43,11 +43,6 @@ def register():
 
     bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
     bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_snap_fk_to_ik)
-    bpy.utils.register_class(ik_fk.IKParentTypes)
-
-    bpy.types.Object.rig_addon_props = \
-        bpy.props.PointerProperty(type=ik_fk.IKParentTypes)
-
     bpy.utils.register_class(ik_fk.VIEW3D_PT_rig_ikfk)
 
 
@@ -58,10 +53,6 @@ def unregister():
 
     bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
     bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_snap_fk_to_ik)
-    bpy.utils.unregister_class(ik_fk.IKParentTypes)
-
-    del bpy.types.Object.rig_addon_props
-
     bpy.utils.unregister_class(ik_fk.VIEW3D_PT_rig_ikfk)
 
 
