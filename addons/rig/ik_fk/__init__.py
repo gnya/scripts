@@ -96,17 +96,17 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
 
             col = box.column(align=True)
 
-            op_ik_fk = col.operator('view3d.rig_snap_ik_to_fk', icon='SNAP_ON')
+            op_ik_fk = col.operator('view3d.rig_snap_ik_to_fk', translate=False, icon='SNAP_ON')
             op_ik_fk.bone_group = group
             op_ik_fk.bone_lr = lr
 
-            op_fk_ik = col.operator('view3d.rig_snap_fk_to_ik', icon='SNAP_ON')
+            op_fk_ik = col.operator('view3d.rig_snap_fk_to_ik', translate=False, icon='SNAP_ON')
             op_fk_ik.bone_group = group
             op_fk_ik.bone_lr = lr
 
-            col.prop(props, f'["fk_{group}.{lr}"]', text='IK - FK')
-            col.prop(props, f'["ik_stretch_{group}s"]', text='IK Stretch')
-            col.prop(props, f'["ik_{group}_pole_parent.{lr}"]', text='IK Pole Parent')
+            col.prop(props, f'["fk_{group}.{lr}"]', text='IK - FK', translate=False)
+            col.prop(props, f'["ik_stretch_{group}s"]', text='IK Stretch', translate=False)
+            col.prop(props, f'["ik_{group}_pole_parent.{lr}"]', text='IK Pole Parent', translate=False)
 
             parent_type = ''
 
@@ -118,4 +118,4 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
                 case 2:
                     parent_type = 'Chest'
 
-            col.prop(props, f'["ik_{group}_parent.{lr}"]', text=f'IK Parent ({parent_type})')
+            col.prop(props, f'["ik_{group}_parent.{lr}"]', text=f'IK Parent ({parent_type})', translate=False)

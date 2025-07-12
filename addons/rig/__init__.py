@@ -6,7 +6,7 @@ from . import props
 bl_info = {
     'name': 'Rig',
     'author': 'gnya',
-    'version': (0, 1, 4),
+    'version': (0, 1, 5),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make character rigs easier to use. '
