@@ -1,12 +1,12 @@
 import bpy
-from . import ik_fk
-from . import props
+from rig import ik_fk
+from rig import props
 
 
 bl_info = {
     'name': 'Rig',
     'author': 'gnya',
-    'version': (0, 1, 6),
+    'version': (0, 1, 7),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make character rigs easier to use. '
@@ -51,6 +51,7 @@ class VIEW3D_PT_rig_main(bpy.types.Panel):
 def register():
     bpy.utils.register_class(VIEW3D_PT_rig_main)
 
+    bpy.utils.register_class(props.VIEW3D_OT_rig_attach_light)
     bpy.utils.register_class(props.VIEW3D_PT_rig_props)
 
     bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
@@ -62,6 +63,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(VIEW3D_PT_rig_main)
 
+    bpy.utils.unregister_class(props.VIEW3D_OT_rig_attach_light)
     bpy.utils.unregister_class(props.VIEW3D_PT_rig_props)
 
     bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
