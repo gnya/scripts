@@ -39,7 +39,7 @@ def check_ik_fk_bones(bones):
         check, group, ikfk, lr = _check_ik_fk_bone(b)
 
         if check:
-            groups.add((group, ikfk, lr))
+            groups.add((b.id_data, group, ikfk, lr))
 
     return groups
 

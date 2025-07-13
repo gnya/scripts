@@ -12,7 +12,7 @@ class VIEW3D_OT_rig_snap_ik_to_fk(bpy.types.Operator):
     bone_lr: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
 
     def execute(self, context):
-        bones, missing = utils.ik_fk_bones(context.pose_object, self.bone_group, self.bone_lr)
+        bones, missing = utils.ik_fk_bones(context.snap_target, self.bone_group, self.bone_lr)
 
         if not bones:
             self.report({'ERROR'}, 'Required ik/fk bones not found.')
@@ -41,7 +41,7 @@ class VIEW3D_OT_rig_snap_fk_to_ik(bpy.types.Operator):
     bone_lr: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
 
     def execute(self, context):
-        bones, missing = utils.ik_fk_bones(context.pose_object, self.bone_group, self.bone_lr)
+        bones, missing = utils.ik_fk_bones(context.snap_target, self.bone_group, self.bone_lr)
 
         if not bones:
             self.report({'ERROR'}, 'Required ik/fk bones not found.')
@@ -56,6 +56,38 @@ class VIEW3D_OT_rig_snap_fk_to_ik(bpy.types.Operator):
             utils.snap_arm_fk2ik(bones)
         elif self.bone_group == 'leg':
             utils.snap_leg_fk2ik(bones)
+
+        return {'FINISHED'}
+
+
+class VIEW3D_OT_rig_set_ik_parent(bpy.types.Operator):
+    bl_idname = 'view3d.rig_set_ik_parent'
+    bl_label = 'IK Parent'
+    bl_description = 'Set IK Controller\'s parent'
+    bl_options = {'UNDO'}
+
+    prop: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    type: bpy.props.EnumProperty(
+        items=[
+            ('0', 'Root', ''),  # noqa: F722 F821
+            ('1', 'Torso', ''),  # noqa: F722 F821
+            ('2', 'Chest', '')  # noqa: F722 F821
+        ],
+        translation_context='Operator'  # noqa: F821
+    )  # type: ignore
+
+    def execute(self, context):
+        if not context.props_body:
+            self.report({'ERROR'}, 'Required bone is missing.')
+
+            return {'CANCELLED'}
+
+        if self.prop not in context.props_body:
+            self.report({'ERROR'}, f'Required custom property is missing. : {self.prop}')
+
+            return {'CANCELLED'}
+
+        context.props_body[self.prop] = int(self.type)
 
         return {'FINISHED'}
 
@@ -83,39 +115,48 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
         layout = self.layout
 
         bones = context.selected_pose_bones
-        armature = context.active_object
         groups = utils.check_ik_fk_bones(bones)
-        props = armature.pose.bones["CTR_properties_body"]
+        groups = sorted(list(groups), key=lambda g: g[0].name + g[1] + g[3])
 
-        for group, _, lr in groups:
+        for obj, group, _, lr in groups:
+            props = obj.pose.bones["CTR_properties_body"]
+
             box = layout.box()
+            box.context_pointer_set(name='snap_target', data=obj)
+            box.context_pointer_set(name='props_body', data=props)
 
             row = box.row()
             row.alignment = 'CENTER'
-            row.label(text=f'{group}.{lr}')
+            row.label(text=f'{group}.{lr} ({obj.name})', translate=False)
 
             col = box.column(align=True)
 
-            op_ik_fk = col.operator('view3d.rig_snap_ik_to_fk', translate=False, icon='SNAP_ON')
-            op_ik_fk.bone_group = group
-            op_ik_fk.bone_lr = lr
+            op = col.operator('view3d.rig_snap_ik_to_fk', translate=False, icon='SNAP_ON')
+            op.bone_group = group
+            op.bone_lr = lr
 
-            op_fk_ik = col.operator('view3d.rig_snap_fk_to_ik', translate=False, icon='SNAP_ON')
-            op_fk_ik.bone_group = group
-            op_fk_ik.bone_lr = lr
+            op = col.operator('view3d.rig_snap_fk_to_ik', translate=False, icon='SNAP_ON')
+            op.bone_group = group
+            op.bone_lr = lr
 
             col.prop(props, f'["fk_{group}.{lr}"]', text='IK - FK', translate=False)
             col.prop(props, f'["ik_stretch_{group}s"]', text='IK Stretch', translate=False)
-            col.prop(props, f'["ik_{group}_pole_parent.{lr}"]', text='IK Pole Parent', translate=False)
+            col.prop(
+                props, f'["ik_{group}_pole_parent.{lr}"]', text='IK Pole Parent', translate=False)
 
-            parent_type = ''
+            parent = ''
+            prop = f'ik_{group}_parent.{lr}'
 
-            match props[f'ik_{group}_parent.{lr}']:
+            match props[prop]:
                 case 0:
-                    parent_type = 'Root'
+                    parent = 'Root'
                 case 1:
-                    parent_type = 'Torso'
+                    parent = 'Torso'
                 case 2:
-                    parent_type = 'Chest'
+                    parent = 'Chest'
 
-            col.prop(props, f'["ik_{group}_parent.{lr}"]', text=f'IK Parent ({parent_type})', translate=False)
+            split = col.split(align=True, factor=0.7)
+            op = split.operator_menu_enum(
+                'view3d.rig_set_ik_parent', 'type', text=f'IK Parent ({parent})', translate=False)
+            op.prop = prop
+            split.prop(props, f'["{prop}"]', text='')

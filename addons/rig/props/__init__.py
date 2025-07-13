@@ -1,5 +1,7 @@
 import bpy
+import copy
 import re
+from . import info
 
 
 class VIEW3D_PT_rig_props(bpy.types.Panel):
@@ -11,8 +13,8 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
     bl_order = 1
 
     @staticmethod
-    def _collect_props(props, data, info):
-        for p in info.keys():
+    def _collect_props(props, data, prop_info):
+        for p in prop_info.keys():
             prop = p
             index = -1
             custom_prop = ''
@@ -28,12 +30,12 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
                 custom_prop = p.strip('"[]')
 
             if hasattr(data, prop) or custom_prop in data.keys():
-                group, text, order = info[p]
+                group, text, order, width = prop_info[p]
 
                 if group not in props:
                     props[group] = []
 
-                props[group].append((data, prop, text, index, order))
+                props[group].append((data, prop, text, index, order, width))
 
     @staticmethod
     def _draw_props(layout, props):
@@ -42,71 +44,62 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
         for group in groups:
             layout.separator()
             col = layout.column(align=True)
+            split = None
+            total_width = 0.0
+            width_scale = 1.0
+
             p = sorted(props[group], key=lambda p: p[4])
 
-            for data, prop, text, index, _ in p:
-                col.prop(data, prop, text=text, translate=False, toggle=1, index=index)
+            for i in range(len(p)):
+                data, prop, text, index, _, width = p[i]
+                width = min(width, 1.0 - total_width)
+                factor = width_scale * width
+                ui = split if split else col
+
+                if factor < 1.0:
+                    split = ui.split(align=True, factor=factor)
+                    ui = split
+
+                ui.prop(data, prop, text=text, translate=False, toggle=1, index=index)
+
+                total_width += width
+
+                if factor >= 1.0:
+                    total_width = 0.0
+                    width_scale = 1.0
+                    split = None if split else split
+                else:
+                    width_scale = width_scale / (1.0 - factor)
 
     def draw(self, context):
-        armature = context.active_object
-        bones = armature.pose.bones
+        obj = context.active_object
+        bones = obj.pose.bones if obj.pose else {}
+        asset_name = obj.name.split('_')[0]
+        p_info = info.RIG_PROP_INFO['']
+        p_info = copy.deepcopy(p_info)
+        p_asset_info = info.RIG_PROP_INFO.get(asset_name, {})
+        p_asset_info = copy.deepcopy(p_asset_info)
 
-        prop_info = {
-            '': {
-                '["quality"]': ('Quality', 'Quality', 0),
-                '["preview_quality"]': ('Quality', 'Preview Quality', 1),
-                '["show_gloves"]': ('Show/Hide Clothes', 'Gloves', 100),
-                'layers[0]': ('Show/Hide Body', 'Fingers', 201),
-                'layers[1]': ('Show/Hide Body', 'Arm IK', 202),
-                'layers[2]': ('Show/Hide Body', 'Arm FK', 203),
-                'layers[16]': ('Show/Hide Body', 'Root & Spine', 204),
-                'layers[17]': ('Show/Hide Body', 'Leg IK', 205),
-                'layers[18]': ('Show/Hide Body', 'Lef FK', 206),
-                'layers[4]': ('Show/Hide Bones', 'Eyebrows', 300),
-                'layers[5]': ('Show/Hide Bones', 'Eye Target', 301),
-                'layers[6]': ('Show/Hide Bones', 'Expressions', 302),
-                'layers[7]': ('Show/Hide Bones', 'Lattice', 303),
-                'layers[20]': ('Show/Hide Bones', 'Eyes', 304),
-                'layers[21]': ('Show/Hide Bones', 'Mouth', 305),
-                'layers[22]': ('Show/Hide Bones', 'Tooth & Tongue', 306),
-                'layers[23]': ('Show/Hide Props', 'Properties', 600),
-            },
-            'CTR_properties_body': {
-                '["auto_ctrl_switching"]': ('Show/Hide Body', 'Auto Switch (Body)', 200)
-            },
-            'CTR_properties_expression': {
-                '["auto_ctrl_switching"]': ('Show/Hide Face', 'Auto Switch (Expression)', 400),
-                '["show_double_eyelid"]': ('Show/Hide Face', 'Double Eyelid', 401),
-                '["show_eyelashes_A"]': ('Show/Hide Face', 'Eyelashes A', 402),
-                '["show_lip_line"]': ('Show/Hide Face', 'Lip Line', 403),
-                '["show_eyelashes_B"]': ('Show/Hide Face', 'Eyelashes B', 404),
-                '["show_sweat.L"]': ('Show/Hide Face', 'Sweat L', 405),
-                '["show_sweat.R"]': ('Show/Hide Face', 'Sweat R', 406),
-                '["show_wrinkles_A"]': ('Show/Hide Face', 'Wrinkles A', 407),
-                '["show_wrinkles_B"]': ('Show/Hide Face', 'Wrinkles B', 408)
-            },
-            'CTR_properties_head': {
-                '["head_hinge"]': ('Head', 'Head Hinge', 500),
-                '["neck_hinge"]': ('Head', 'Neck Hinge', 501),
-                '["sticky_eyesockets"]': ('Head', 'Sticky Eyesockets', 502),
-                '["reduce_perspective"]': ('Head', 'Reduce Perspective', 503)
-            },
-            'CTR_lattice_target': {
-                'target': ('Head', 'Camera', 504)
-            }
-        }
+        for k, v in p_asset_info.items():
+            if k not in p_info:
+                p_info[k] = {}
+
+            p_info[k].update(v)
 
         props = {}
 
-        VIEW3D_PT_rig_props._collect_props(props, armature, prop_info[''])
-        VIEW3D_PT_rig_props._collect_props(props, armature.data, prop_info[''])
+        VIEW3D_PT_rig_props._collect_props(props, obj, p_info[''])
+
+        if obj.data:
+            VIEW3D_PT_rig_props._collect_props(props, obj.data, p_info[''])
 
         for b in bones:
-            if b.name in prop_info:
-                VIEW3D_PT_rig_props._collect_props(props, b, prop_info[b.name])
+            if b.name in p_info:
+                VIEW3D_PT_rig_props._collect_props(props, b, p_info[b.name])
 
         if 'CTR_lattice_target' in bones and bones['CTR_lattice_target'].constraints:
-            con = bones['CTR_lattice_target'].constraints[0]
-            VIEW3D_PT_rig_props._collect_props(props, con, prop_info['CTR_lattice_target'])
+            c = bones['CTR_lattice_target'].constraints[0]
+            VIEW3D_PT_rig_props._collect_props(props, c, p_info['CTR_lattice_target'])
 
-        VIEW3D_PT_rig_props._draw_props(self.layout, props)
+        col = self.layout.column(align=True)
+        VIEW3D_PT_rig_props._draw_props(col, props)

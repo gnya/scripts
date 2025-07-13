@@ -6,7 +6,7 @@ from . import props
 bl_info = {
     'name': 'Rig',
     'author': 'gnya',
-    'version': (0, 1, 5),
+    'version': (0, 1, 6),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make character rigs easier to use. '
@@ -27,8 +27,20 @@ class VIEW3D_PT_rig_main(bpy.types.Panel):
     def poll(self, context):
         obj = context.active_object
 
-        if obj and obj.type == 'ARMATURE':
-            return True
+        if obj and (s := obj.name.split('_')):
+            col_name = f'{s[0]}_RIGS'
+
+            if col_name not in bpy.data.collections:
+                return False
+
+            if bpy.data.collections[col_name] not in obj.users_collection:
+                return False
+
+            if obj.type == 'ARMATURE':
+                return True
+
+            if obj.type == 'EMPTY':
+                return True
 
         return False
 
@@ -43,6 +55,7 @@ def register():
 
     bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
     bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_snap_fk_to_ik)
+    bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_set_ik_parent)
     bpy.utils.register_class(ik_fk.VIEW3D_PT_rig_ikfk)
 
 
@@ -53,6 +66,7 @@ def unregister():
 
     bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
     bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_snap_fk_to_ik)
+    bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_set_ik_parent)
     bpy.utils.unregister_class(ik_fk.VIEW3D_PT_rig_ikfk)
 
 
