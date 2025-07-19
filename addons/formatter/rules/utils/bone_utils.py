@@ -12,10 +12,10 @@ def _bones_used_in_driver(driver, armature):
             if t.bone_target:
                 used_bones.add(t.bone_target)
 
-            m = re.match(r'(data.bones|pose.bones)\["([^"]+)"\]', t.data_path)
+            m = re.search(r'bones\["([^"]+)"\]', t.data_path)
 
             if m:
-                used_bones.add(m.group(2))
+                used_bones.add(m.group(1))
 
     return used_bones
 

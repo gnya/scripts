@@ -6,7 +6,7 @@ from rig import props
 bl_info = {
     'name': 'Rig',
     'author': 'gnya',
-    'version': (0, 1, 8),
+    'version': (0, 1, 9),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make character rigs easier to use. '
@@ -52,6 +52,9 @@ def register():
     bpy.utils.register_class(VIEW3D_PT_rig_main)
 
     bpy.utils.register_class(props.VIEW3D_OT_rig_attach_light)
+    bpy.utils.register_class(props.VIEW3D_OT_rig_copy_pose)
+    bpy.utils.register_class(props.VIEW3D_OT_rig_paste_pose)
+    bpy.utils.register_class(props.VIEW3D_OT_rig_copy_whole_pose)
     bpy.utils.register_class(props.VIEW3D_OT_rig_show_animated_bones)
     bpy.utils.register_class(props.VIEW3D_PT_rig_props)
 
@@ -65,6 +68,9 @@ def unregister():
     bpy.utils.unregister_class(VIEW3D_PT_rig_main)
 
     bpy.utils.unregister_class(props.VIEW3D_OT_rig_attach_light)
+    bpy.utils.unregister_class(props.VIEW3D_OT_rig_copy_pose)
+    bpy.utils.unregister_class(props.VIEW3D_OT_rig_paste_pose)
+    bpy.utils.unregister_class(props.VIEW3D_OT_rig_copy_whole_pose)
     bpy.utils.unregister_class(props.VIEW3D_OT_rig_show_animated_bones)
     bpy.utils.unregister_class(props.VIEW3D_PT_rig_props)
 
