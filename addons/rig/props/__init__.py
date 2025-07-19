@@ -1,5 +1,6 @@
 import bpy
 import copy
+import re
 from rig import ui_utils
 
 
@@ -9,7 +10,65 @@ class VIEW3D_OT_rig_attach_light(bpy.types.Operator):
     bl_description = 'Attach a light object'
     bl_options = {'UNDO'}
 
+    @classmethod
+    def poll(cls, context):
+        return False
+
     def execute(self, context):
+        return {'FINISHED'}
+
+
+class VIEW3D_OT_rig_show_animated_bones(bpy.types.Operator):
+    bl_idname = 'view3d.rig_show_animated_bones'
+    bl_label = 'Show animated bones'
+    bl_description = 'Show animated bones'
+    bl_options = {'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+
+        if not obj or not obj.type == 'ARMATURE':
+            return False
+
+        if context.mode != 'POSE':
+            return False
+
+        if not obj.animation_data or not obj.animation_data.action:
+            return False
+
+        return True
+
+    def execute(self, context):
+        obj = context.active_object
+        data = obj.data
+        animated_bones = set()
+
+        for f in obj.animation_data.action.fcurves:
+            m = re.findall(r'CTR_[^"]+', f.data_path)
+
+            if m and m[0] in data.bones:
+                animated_bones.add(m[0])
+
+        layers = [False] * 32
+
+        for b in data.bones:
+            if not re.match('CTR_.*', b.name):
+                continue
+
+            if b.name not in animated_bones:
+                b.hide = True
+
+                continue
+
+            b.hide = False
+
+            for i in range(32):
+                layers[i] |= b.layers[i]
+
+        for i in range(32):
+            data.layers[i] = layers[i]
+
         return {'FINISHED'}
 
 
@@ -18,57 +77,64 @@ UI_CONTENTS = {}
 # Common
 UI_CONTENTS[''] = {
     '': {
-        '["quality"]': ('Quality', 'Quality', '', 0, 1.0),
-        '["preview_quality"]': ('Quality', 'Preview Quality', '', 1, 1.0)
+        '["quality"]': ('Quality', 'Quality', '', 500, 1.0),
+        '["preview_quality"]': ('Quality', 'Preview Quality', '', 501, 1.0)
+    },
+    '$view3d.rig_show_animated_bones': {
+        '': ('Tool', 'Show Animated Bones', 'HIDE_OFF', 0, 1.0)
     }
 }
+
+
+def _layers_icon(value):
+    return 'HIDE_OFF' if value else 'HIDE_ON'
+
 
 # PTB
 UI_CONTENTS['PTB'] = {
     '': {
-        'layers[0]': ('Show/Hide Body', 'Body', '', 200, 1.0)
+        'layers[0]': ('Body', 'Body', _layers_icon, 700, 1.0)
     }
 }
 
 _HUMAN_RIG_PROP_INFO = {
     'data': {
-        'layers[0]': ('Show/Hide Body', 'Fingers', '', 200, 1.0),
-        'layers[1]': ('Show/Hide Body', 'Arm IK', '', 201, 0.5),
-        'layers[2]': ('Show/Hide Body', 'Arm FK', '', 202, 0.5),
-        'layers[17]': ('Show/Hide Body', 'Leg IK', '', 203, 0.5),
-        'layers[18]': ('Show/Hide Body', 'Leg FK', '', 204, 0.5),
-        'layers[16]': ('Show/Hide Body', 'Root & Spine', '', 205, 1.0),
-        'layers[5]': ('Show/Hide Bones', 'Eye Target', '', 300, 1.0),
-        'layers[4]': ('Show/Hide Bones', 'Eyebrows', '', 301, 0.5),
-        'layers[20]': ('Show/Hide Bones', 'Eyes', '', 302, 0.5),
-        'layers[21]': ('Show/Hide Bones', 'Lips & Jaw', '', 303, 1.0),
-        'layers[22]': ('Show/Hide Bones', 'Tooth & Tongue', '', 304, 1.0),
-        'layers[6]': ('Show/Hide Bones', 'Expressions', '', 305, 1.0),
-        'layers[7]': ('Show/Hide Bones', 'Lattice', '', 306, 1.0),
-        'layers[23]': ('Show/Hide Props', 'Properties', '', 600, 1.0)
+        'layers[16]': ('Body', 'Root & Spine', _layers_icon, 700, 1.0),
+        'layers[1]': ('Body', 'Arm IK', _layers_icon, 701, 0.5),
+        'layers[2]': ('Body', 'Arm FK', _layers_icon, 702, 0.5),
+        'layers[17]': ('Body', 'Leg IK', _layers_icon, 703, 0.5),
+        'layers[18]': ('Body', 'Leg FK', _layers_icon, 704, 0.5),
+        'layers[0]': ('Body', 'Fingers', _layers_icon, 705, 1.0),
+        'layers[5]': ('Eyes', 'Eye Target', _layers_icon, 800, 1.0),
+        'layers[4]': ('Eyes', 'Eyebrows', _layers_icon, 801, 0.5),
+        'layers[20]': ('Eyes', 'Eyes', _layers_icon, 802, 0.5),
+        'layers[21]': ('Mouth', 'Lips & Jaw', _layers_icon, 900, 1.0),
+        'layers[22]': ('Mouth', 'Tooth & Tongue', _layers_icon, 901, 1.0),
+        'layers[6]': ('Expressions', 'Expressions', _layers_icon, 1000, 1.0),
+        'layers[7]': ('Lattice', 'Lattice', _layers_icon, 1100, 1.0),
+        'layers[23]': ('Properties', 'Properties', _layers_icon, 1200, 1.0)
     },
     'pose.bones["CTR_properties_expression"]': {
-        '["auto_ctrl_switching"]': ('Show/Hide Face', 'Auto Switch (Expression)', '', 400, 1.0),
-        '["show_double_eyelid"]': ('Show/Hide Face', 'Double Eyelid', '', 401, 1.0),
-        '["show_eyelashes_A"]': ('Show/Hide Face', 'Eyelashes A', '', 402, 1.0),
-        '["show_lip_line"]': ('Show/Hide Face', 'Lip Line', '', 403, 1.0),
-        '["show_eyelashes_B"]': ('Show/Hide Face', 'Eyelashes B', '', 404, 1.0),
-        '["show_sweat.L"]': ('Show/Hide Face', 'Sweat L', '', 405, 0.5),
-        '["show_sweat.R"]': ('Show/Hide Face', 'Sweat R', '', 406, 0.5),
-        '["show_wrinkles_A"]': ('Show/Hide Face', 'Wrinkles A', '', 407, 0.5),
-        '["show_wrinkles_B"]': ('Show/Hide Face', 'Wrinkles B', '', 408, 0.5)
+        '["show_double_eyelid"]': ('Eyes', 'Double Eyelid', _layers_icon, 803, 1.0),
+        '["show_eyelashes_A"]': ('Eyes', 'Eyelashes A', _layers_icon, 804, 1.0),
+        '["show_lip_line"]': ('Mouth', 'Lip Line', _layers_icon, 902, 1.0),
+        '["show_eyelashes_B"]': ('Expressions', 'Eyelashes B', _layers_icon, 1001, 1.0),
+        '["show_sweat.L"]': ('Expressions', 'Sweat L', _layers_icon, 1002, 0.5),
+        '["show_sweat.R"]': ('Expressions', 'Sweat R', _layers_icon, 1003, 0.5),
+        '["show_wrinkles_A"]': ('Expressions', 'Wrinkles A', _layers_icon, 1004, 0.5),
+        '["show_wrinkles_B"]': ('Expressions', 'Wrinkles B', _layers_icon, 1005, 0.5)
     },
     'pose.bones["CTR_properties_head"]': {
-        '["head_hinge"]': ('Head', 'Head Hinge', '', 500, 1.0),
-        '["neck_hinge"]': ('Head', 'Neck Hinge', '', 501, 1.0),
-        '["sticky_eyesockets"]': ('Head', 'Sticky Eyesockets', '', 502, 1.0),
-        '["reduce_perspective"]': ('Head', 'Reduce Perspective', '', 503, 1.0)
+        '["head_hinge"]': ('Body', 'Head Hinge', '', 706, 1.0),
+        '["neck_hinge"]': ('Body', 'Neck Hinge', '', 707, 1.0),
+        '["sticky_eyesockets"]': ('Eyes', 'Sticky Eyesockets', '', 805, 1.0),
+        '["reduce_perspective"]': ('Lattice', 'Reduce Perspective', '', 1101, 1.0)
     },
     'pose.bones["CTR_lattice_target"].constraints[0]': {
-        'target': ('Head', 'Camera', '', 504, 1.0)
+        'target': ('Lattice', 'Camera', '', 1102, 1.0)
     },
     '$view3d.rig_attach_light': {
-        '': ('Light', 'Attach Light', 'LIGHT', 100, 1.0)
+        '': ('Tool', 'Attach Light', 'LIGHT', 1, 1.0)
     }
 }
 
@@ -78,7 +144,7 @@ UI_CONTENTS['MCP'] = copy.deepcopy(_HUMAN_RIG_PROP_INFO)
 # MCL
 UI_CONTENTS['MCL'] = copy.deepcopy(_HUMAN_RIG_PROP_INFO)
 UI_CONTENTS['MCL'][''] = {
-    '["show_gloves"]': ('Show/Hide Clothes', 'Gloves', '', 100, 1.0)
+    '["show_gloves"]': ('Clothes', 'Gloves', _layers_icon, 600, 1.0)
 }
 
 

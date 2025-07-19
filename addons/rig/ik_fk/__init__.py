@@ -104,19 +104,19 @@ class VIEW3D_OT_rig_set_ik_parent(bpy.types.Operator):
 def _UI_CONTENTS(group, lr, parent):
     return {
         '$view3d.rig_snap_ik_to_fk': {
-            '': ('IK/FK', 'IK → FK', '', 200, 1.0)
+            '': ('IK/FK', 'IK → FK', '', 0, 1.0)
         },
         '$view3d.rig_snap_fk_to_ik': {
-            '': ('IK/FK', 'FK → IK', '', 201, 1.0)
+            '': ('IK/FK', 'FK → IK', '', 1, 1.0)
         },
         'pose.bones["CTR_properties_body"]': {
-            f'["fk_{group}.{lr}"]': ('IK/FK', 'IK - FK', '', 202, 1.0),
-            f'["ik_stretch_{group}s"]': ('IK/FK', 'IK Stretch', '', 203, 1.0),
-            f'["ik_{group}_pole_parent.{lr}"]': ('IK/FK', 'IK Pole Parent', '', 204, 1.0),
-            f'["ik_{group}_parent.{lr}"]': ('IK/FK', '', '', 206, 0.3)
+            f'["fk_{group}.{lr}"]': ('IK/FK', 'IK - FK', '', 2, 1.0),
+            f'["ik_stretch_{group}s"]': ('IK/FK', 'IK Stretch', '', 3, 1.0),
+            f'["ik_{group}_pole_parent.{lr}"]': ('IK/FK', 'IK Pole Parent', '', 4, 1.0),
+            f'["ik_{group}_parent.{lr}"]': ('IK/FK', '', '', 6, 0.3)
         },
         '$view3d.rig_set_ik_parent': {
-            'type': ('IK/FK', f'IK Parent ({parent})', '', 205, 0.7)
+            'type': ('IK/FK', f'IK Parent ({parent})', '', 5, 0.7)
         }
     }
 
@@ -130,7 +130,7 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
     bl_order = 1
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         bones = context.selected_pose_bones
 
         if not bones:

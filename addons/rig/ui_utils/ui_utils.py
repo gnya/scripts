@@ -9,7 +9,7 @@ def _collect_ops(contents, path, props):
         if group not in contents:
             contents[group] = []
 
-        contents[group].append((path, prop, text, icon, -1, order, width))
+        contents[group].append((order, path, prop, None, text, icon, -1, width))
 
 
 def _collect_props(contents, data, props):
@@ -19,13 +19,22 @@ def _collect_props(contents, data, props):
         i = int(m[1]) if m[0] and len(m) > 1 else -1
         custom_p = m[1] if not m[0] and len(m) > 1 else ''
 
-        if hasattr(data, p) or custom_p in data.keys():
+        value = None
+
+        if hasattr(data, p):
+            value = getattr(data, p)
+        elif custom_p in data.keys():
+            value = data[custom_p]
+
+        value = value[i] if i >= 0 else value
+
+        if value is not None:
             group, text, icon, order, width = props[prop]
 
             if group not in contents:
                 contents[group] = []
 
-            contents[group].append((data, p, text, icon, i, order, width))
+            contents[group].append((order, data, p, value, text, icon, i, width))
 
 
 def collect_contents(contents, data, props):
@@ -49,7 +58,7 @@ def collect_contents(contents, data, props):
 
 
 def draw_contents(layout, contents, operator_args={}):
-    groups = sorted(contents.keys(), key=lambda g: contents[g][0][5])
+    groups = sorted(contents.keys(), key=lambda g: contents[g][0][0])
     is_first = True
 
     for group in groups:
@@ -63,9 +72,14 @@ def draw_contents(layout, contents, operator_args={}):
         total_width = 0.0
         width_scale = 1.0
 
-        c = sorted(contents[group], key=lambda c: c[5])
+        col.label(text=group, translate=False)
 
-        for d, p, t, icon, i, _, width in c:
+        c = sorted(contents[group], key=lambda c: c[0])
+
+        for _, d, p, v, t, icon, i, width in c:
+            t = t(v) if callable(t) else t
+            icon = icon(v) if callable(icon) else icon
+
             icon = icon if icon else 'NONE'
             width = min(width, 1.0 - total_width)
             factor = width_scale * width
