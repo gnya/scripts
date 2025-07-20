@@ -6,7 +6,7 @@ from rig import props
 bl_info = {
     'name': 'Rig',
     'author': 'gnya',
-    'version': (0, 1, 10),
+    'version': (0, 1, 11),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make character rigs easier to use. '
@@ -57,7 +57,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(VIEW3D_PT_rig_main)
     props.unregister()
-    ik_fk.register()
+    ik_fk.unregister()
 
 
 if __name__ == '__main__':

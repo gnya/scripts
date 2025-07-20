@@ -101,7 +101,7 @@ def _bones_used_in_driver(driver, armature):
     return used_bones
 
 
-def dependence_depth(armature):
+def calc_dependency_depth(armature):
     # Enumerate other bones on which the bone depends.
     bones = armature.pose.bones
     deps = {}

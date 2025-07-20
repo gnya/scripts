@@ -12,20 +12,23 @@ UI_CONTENTS[''] = {
         '["quality"]': ('Quality', 'Quality', '', 500, 1.0),
         '["preview_quality"]': ('Quality', 'Preview Quality', '', 501, 1.0)
     },
+    '$view3d.rig_update_asset': {
+        '': ('Asset', 'Update Asset', 'FILE_REFRESH', 0, 1.0)
+    },
     '$view3d.rig_show_animated_bones': {
-        '': ('Pose', 'Show Animated Bones', 'HIDE_OFF', 0, 1.0)
+        '': ('Pose', 'Show Animated Bones', 'HIDE_OFF', 100, 1.0)
     },
     '$view3d.rig_copy_pose': {
-        '': ('Pose', 'Copy Pose', 'COPYDOWN', 1, 0.5)
+        '': ('Pose', 'Copy Pose', 'COPYDOWN', 101, 0.5)
     },
     '$view3d.rig_paste_pose': {
-        '': ('Pose', 'Paste Pose', 'PASTEDOWN', 2, 0.5)
+        '': ('Pose', 'Paste Pose', 'PASTEDOWN', 102, 0.5)
     },
     '$view3d.rig_copy_whole_pose': {
-        '': ('Pose', 'Copy Whole Pose', 'COPYDOWN', 3, 1.0)
+        '': ('Pose', 'Copy Whole Pose', 'COPYDOWN', 103, 1.0)
     },
     '$view3d.rig_attach_light': {
-        '': ('Light', 'Attach Light', 'LIGHT', 100, 1.0)
+        '': ('Light', 'Attach Light', 'LIGHT', 200, 1.0)
     }
 }
 
