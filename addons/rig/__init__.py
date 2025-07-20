@@ -6,7 +6,7 @@ from rig import props
 bl_info = {
     'name': 'Rig',
     'author': 'gnya',
-    'version': (0, 1, 9),
+    'version': (0, 1, 10),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make character rigs easier to use. '
@@ -50,34 +50,14 @@ class VIEW3D_PT_rig_main(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(VIEW3D_PT_rig_main)
-
-    bpy.utils.register_class(props.VIEW3D_OT_rig_attach_light)
-    bpy.utils.register_class(props.VIEW3D_OT_rig_copy_pose)
-    bpy.utils.register_class(props.VIEW3D_OT_rig_paste_pose)
-    bpy.utils.register_class(props.VIEW3D_OT_rig_copy_whole_pose)
-    bpy.utils.register_class(props.VIEW3D_OT_rig_show_animated_bones)
-    bpy.utils.register_class(props.VIEW3D_PT_rig_props)
-
-    bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
-    bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_snap_fk_to_ik)
-    bpy.utils.register_class(ik_fk.VIEW3D_OT_rig_set_ik_parent)
-    bpy.utils.register_class(ik_fk.VIEW3D_PT_rig_ikfk)
+    props.register()
+    ik_fk.register()
 
 
 def unregister():
     bpy.utils.unregister_class(VIEW3D_PT_rig_main)
-
-    bpy.utils.unregister_class(props.VIEW3D_OT_rig_attach_light)
-    bpy.utils.unregister_class(props.VIEW3D_OT_rig_copy_pose)
-    bpy.utils.unregister_class(props.VIEW3D_OT_rig_paste_pose)
-    bpy.utils.unregister_class(props.VIEW3D_OT_rig_copy_whole_pose)
-    bpy.utils.unregister_class(props.VIEW3D_OT_rig_show_animated_bones)
-    bpy.utils.unregister_class(props.VIEW3D_PT_rig_props)
-
-    bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_snap_ik_to_fk)
-    bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_snap_fk_to_ik)
-    bpy.utils.unregister_class(ik_fk.VIEW3D_OT_rig_set_ik_parent)
-    bpy.utils.unregister_class(ik_fk.VIEW3D_PT_rig_ikfk)
+    props.unregister()
+    ik_fk.register()
 
 
 if __name__ == '__main__':

@@ -72,7 +72,8 @@ def draw_contents(layout, contents, operator_args={}):
         total_width = 0.0
         width_scale = 1.0
 
-        col.label(text=group, translate=False)
+        if group:
+            col.label(text=group, translate=False)
 
         c = sorted(contents[group], key=lambda c: c[0])
 
