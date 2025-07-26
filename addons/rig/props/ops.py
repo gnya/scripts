@@ -223,11 +223,82 @@ class VIEW3D_OT_rig_copy_whole_pose(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class VIEW3D_OT_rig_show_overrided_bones(bpy.types.Operator):
+    bl_idname = 'view3d.rig_show_overrided_bones'
+    bl_label = 'Show overrided bones'
+    bl_description = 'Show overrided bones \n* Shift to show all bones'
+    bl_options = {'UNDO'}
+
+    only_visible: bpy.props.BoolProperty(default=True)  # type: ignore
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+
+        if not obj or not obj.type == 'ARMATURE':
+            return False
+
+        if context.mode != 'POSE':
+            return False
+
+        if not obj.override_library:
+            return False
+
+        return True
+
+    def execute(self, context):
+        obj = context.active_object
+        bones = obj.pose.bones
+        overrided_bones = set()
+
+        for p in obj.override_library.properties:
+            if m := re.match(r'^pose.bones\["(CTR_[^"]+)"\].[^.]+$', p.rna_path):
+                overrided_bones.add(m.group(1))
+
+        if self.only_visible:
+            for b in bones:
+                if not re.match('CTR_.*', b.name):
+                    continue
+
+                if not any([(b.bone.layers[i] and obj.data.layers[i]) for i in range(32)]):
+                    continue
+
+                b.bone.hide = b.name not in overrided_bones
+        else:
+            layers = [False] * 32
+
+            for b in bones:
+                if not re.match('CTR_.*', b.name):
+                    continue
+
+                if b.name not in overrided_bones:
+                    b.bone.hide = True
+
+                    continue
+
+                b.bone.hide = False
+
+                for i in range(32):
+                    layers[i] |= b.bone.layers[i]
+
+            for i in range(32):
+                obj.data.layers[i] = layers[i]
+
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        self.only_visible = not event.shift
+
+        return self.execute(context)
+
+
 class VIEW3D_OT_rig_show_animated_bones(bpy.types.Operator):
     bl_idname = 'view3d.rig_show_animated_bones'
     bl_label = 'Show animated bones'
-    bl_description = 'Show animated bones'
+    bl_description = 'Show animated bones \n* Shift to show all bones'
     bl_options = {'UNDO'}
+
+    only_visible: bpy.props.BoolProperty(default=True)  # type: ignore
 
     @classmethod
     def poll(cls, context):
@@ -246,32 +317,45 @@ class VIEW3D_OT_rig_show_animated_bones(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.active_object
-        data = obj.data
+        bones = obj.pose.bones
         animated_bones = set()
 
         for f in obj.animation_data.action.fcurves:
-            m = re.findall(r'CTR_[^"]+', f.data_path)
+            if m := re.match(r'^pose.bones\["(CTR_[^"]+)"\]', f.data_path):
+                animated_bones.add(m.group(1))
 
-            if m and m[0] in data.bones:
-                animated_bones.add(m[0])
+        if self.only_visible:
+            for b in bones:
+                if not re.match('CTR_.*', b.name):
+                    continue
 
-        layers = [False] * 32
+                if not any([(b.bone.layers[i] and obj.data.layers[i]) for i in range(32)]):
+                    continue
 
-        for b in data.bones:
-            if not re.match('CTR_.*', b.name):
-                continue
+                b.bone.hide = b.name not in animated_bones
+        else:
+            layers = [False] * 32
 
-            if b.name not in animated_bones:
-                b.hide = True
+            for b in bones:
+                if not re.match('CTR_.*', b.name):
+                    continue
 
-                continue
+                if b.name not in animated_bones:
+                    b.bone.hide = True
 
-            b.hide = False
+                    continue
+
+                b.bone.hide = False
+
+                for i in range(32):
+                    layers[i] |= b.bone.layers[i]
 
             for i in range(32):
-                layers[i] |= b.layers[i]
-
-        for i in range(32):
-            data.layers[i] = layers[i]
+                obj.data.layers[i] = layers[i]
 
         return {'FINISHED'}
+
+    def invoke(self, context, event):
+        self.only_visible = not event.shift
+
+        return self.execute(context)

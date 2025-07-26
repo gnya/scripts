@@ -16,7 +16,10 @@ UI_CONTENTS[''] = {
         '': ('Asset', 'Update Asset', 'FILE_REFRESH', 0, 1.0)
     },
     '$view3d.rig_show_animated_bones': {
-        '': ('Pose', 'Show Animated Bones', 'HIDE_OFF', 100, 1.0)
+        '': ('Show', 'Show Animated Bones', 'HIDE_OFF', 100, 1.0)
+    },
+    '$view3d.rig_show_overrided_bones': {
+        '': ('Show', 'Show Overrided Bones', 'HIDE_OFF', 100, 1.0)
     },
     '$view3d.rig_copy_pose': {
         '': ('Pose', 'Copy Pose', 'COPYDOWN', 101, 0.5)
