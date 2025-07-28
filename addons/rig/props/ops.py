@@ -255,34 +255,30 @@ class VIEW3D_OT_rig_show_overrided_bones(bpy.types.Operator):
             if m := re.match(r'^pose.bones\["(CTR_[^"]+)"\].[^.]+$', p.rna_path):
                 overrided_bones.add(m.group(1))
 
+        layers = [False] * 32
+
         if self.only_visible:
-            for b in bones:
-                if not re.match('CTR_.*', b.name):
-                    continue
-
-                if not any([(b.bone.layers[i] and obj.data.layers[i]) for i in range(32)]):
-                    continue
-
-                b.bone.hide = b.name not in overrided_bones
+            layers = obj.data.layers
         else:
-            layers = [False] * 32
-
             for b in bones:
                 if not re.match('CTR_.*', b.name):
                     continue
 
-                if b.name not in overrided_bones:
-                    b.bone.hide = True
+                if b.name in overrided_bones:
+                    for i in range(32):
+                        layers[i] |= b.bone.layers[i]
 
-                    continue
+        for b in bones:
+            if not re.match('CTR_.*', b.name):
+                continue
 
-                b.bone.hide = False
+            if not any([(b.bone.layers[i] and layers[i]) for i in range(32)]):
+                continue
 
-                for i in range(32):
-                    layers[i] |= b.bone.layers[i]
+            b.bone.hide = b.name not in overrided_bones
 
-            for i in range(32):
-                obj.data.layers[i] = layers[i]
+        for i in range(32):
+            obj.data.layers[i] = layers[i]
 
         return {'FINISHED'}
 
@@ -324,34 +320,30 @@ class VIEW3D_OT_rig_show_animated_bones(bpy.types.Operator):
             if m := re.match(r'^pose.bones\["(CTR_[^"]+)"\]', f.data_path):
                 animated_bones.add(m.group(1))
 
+        layers = [False] * 32
+
         if self.only_visible:
-            for b in bones:
-                if not re.match('CTR_.*', b.name):
-                    continue
-
-                if not any([(b.bone.layers[i] and obj.data.layers[i]) for i in range(32)]):
-                    continue
-
-                b.bone.hide = b.name not in animated_bones
+            layers = obj.data.layers
         else:
-            layers = [False] * 32
-
             for b in bones:
                 if not re.match('CTR_.*', b.name):
                     continue
 
-                if b.name not in animated_bones:
-                    b.bone.hide = True
+                if b.name in animated_bones:
+                    for i in range(32):
+                        layers[i] |= b.bone.layers[i]
 
-                    continue
+        for b in bones:
+            if not re.match('CTR_.*', b.name):
+                continue
 
-                b.bone.hide = False
+            if not any([(b.bone.layers[i] and layers[i]) for i in range(32)]):
+                continue
 
-                for i in range(32):
-                    layers[i] |= b.bone.layers[i]
+            b.bone.hide = b.name not in animated_bones
 
-            for i in range(32):
-                obj.data.layers[i] = layers[i]
+        for i in range(32):
+            obj.data.layers[i] = layers[i]
 
         return {'FINISHED'}
 
