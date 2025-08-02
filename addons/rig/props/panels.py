@@ -11,27 +11,6 @@ UI_CONTENTS[''] = {
     '': {
         '["quality"]': ('Quality', 'Quality', '', 500, 1.0),
         '["preview_quality"]': ('Quality', 'Preview Quality', '', 501, 1.0)
-    },
-    '$view3d.rig_update_asset': {
-        '': ('Asset', 'Update', 'FILE_REFRESH', 0, 1.0)
-    },
-    '$view3d.rig_show_animated_bones': {
-        '': ('Show Bones', 'Animated', 'HIDE_OFF', 100, 0.5)
-    },
-    '$view3d.rig_show_overrided_bones': {
-        '': ('Show Bones', 'Overrided', 'HIDE_OFF', 101, 0.5)
-    },
-    '$view3d.rig_copy_pose': {
-        '': ('Pose', 'Copy Pose', 'COPYDOWN', 200, 0.5)
-    },
-    '$view3d.rig_paste_pose': {
-        '': ('Pose', 'Paste Pose', 'PASTEDOWN', 201, 0.5)
-    },
-    '$view3d.rig_copy_whole_pose': {
-        '': ('Pose', 'Copy Whole Pose', 'COPYDOWN', 202, 1.0)
-    },
-    '$view3d.rig_attach_light': {
-        '': ('Light', 'Attach', 'LIGHT', 300, 1.0)
     }
 }
 
@@ -100,12 +79,11 @@ UI_CONTENTS['MCL'][''] = {
 
 
 class VIEW3D_PT_rig_props(bpy.types.Panel):
-    bl_idname = 'VIEW3D_PT_rig_show'
+    bl_idname = 'VIEW3D_PT_rig_props'
     bl_label = 'Properties'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_parent_id = 'VIEW3D_PT_rig_main'
-    bl_order = 1
 
     def draw(self, context):
         obj = context.active_object

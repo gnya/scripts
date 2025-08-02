@@ -36,13 +36,13 @@ class Report():
 class Rule():
     @classmethod
     def fix(cls, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
 
 class ObjectRule(Rule):
     @classmethod
     def fix_object(cls, obj, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix(cls, **kwargs):
@@ -57,7 +57,7 @@ class ObjectRule(Rule):
 class SceneRule(Rule):
     @classmethod
     def fix_scene(cls, scene, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix(cls, **kwargs):
@@ -72,7 +72,7 @@ class SceneRule(Rule):
 class NodeTreeRule(Rule):
     @classmethod
     def fix_node_tree(cls, node_tree, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix(cls, **kwargs):
@@ -103,7 +103,7 @@ class NodeTreeRule(Rule):
 class MeshRule(ObjectRule):
     @classmethod
     def fix_mesh(cls, mesh, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_object(cls, obj, **kwargs):
@@ -116,7 +116,7 @@ class MeshRule(ObjectRule):
 class ArmatureRule(ObjectRule):
     @classmethod
     def fix_armature(cls, armature, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_object(cls, obj, **kwargs):
@@ -129,7 +129,7 @@ class ArmatureRule(ObjectRule):
 class ModifierRule(ObjectRule):
     @classmethod
     def fix_modifier(cls, modifier, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_object(cls, obj, **kwargs):
@@ -144,7 +144,7 @@ class ModifierRule(ObjectRule):
 class BoneDriverRule(ArmatureRule):
     @classmethod
     def fix_bone_driver(cls, driver, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_armature(cls, armature, **kwargs):
@@ -163,7 +163,7 @@ class BoneDriverRule(ArmatureRule):
 class DataBoneRule(ArmatureRule):
     @classmethod
     def fix_data_bone(cls, bone, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_armature(cls, armature, **kwargs):
@@ -178,7 +178,7 @@ class DataBoneRule(ArmatureRule):
 class PoseBoneRule(ArmatureRule):
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_armature(cls, armature, **kwargs):
@@ -193,7 +193,7 @@ class PoseBoneRule(ArmatureRule):
 class SymmetryBoneRule(PoseBoneRule):
     @classmethod
     def fix_symmetry_bone(cls, bone, pair_bone, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):
@@ -207,7 +207,7 @@ class SymmetryBoneRule(PoseBoneRule):
 class BoneConstraintRule(PoseBoneRule):
     @classmethod
     def fix_bone_constraint(cls, constraint, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):
@@ -222,7 +222,7 @@ class BoneConstraintRule(PoseBoneRule):
 class ConstraintRule(PoseBoneRule):
     @classmethod
     def fix_constraint(cls, constraint, **kwargs):
-        raise Exception('Not Implemented')
+        raise NotImplementedError()
 
     @classmethod
     def fix_pose_bone(cls, bone, **kwargs):

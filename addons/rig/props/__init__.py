@@ -1,23 +1,8 @@
-from .ops import VIEW3D_OT_rig_attach_light
-from .ops import VIEW3D_OT_rig_copy_pose
-from .ops import VIEW3D_OT_rig_copy_whole_pose
-from .ops import VIEW3D_OT_rig_paste_pose
-from .ops import VIEW3D_OT_rig_show_animated_bones
-from .ops import VIEW3D_OT_rig_show_overrided_bones
-from .ops import VIEW3D_OT_rig_update_asset
-
 from .panels import VIEW3D_PT_rig_props
 
 
 classes = (
-    VIEW3D_OT_rig_attach_light,
-    VIEW3D_OT_rig_copy_pose,
-    VIEW3D_OT_rig_paste_pose,
-    VIEW3D_OT_rig_copy_whole_pose,
-    VIEW3D_OT_rig_show_animated_bones,
-    VIEW3D_OT_rig_show_overrided_bones,
-    VIEW3D_OT_rig_update_asset,
-    VIEW3D_PT_rig_props
+    VIEW3D_PT_rig_props,
 )
 
 

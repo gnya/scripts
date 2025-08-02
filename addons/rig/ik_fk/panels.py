@@ -31,7 +31,6 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_parent_id = 'VIEW3D_PT_rig_main'
-    bl_order = 1
 
     @classmethod
     def poll(cls, context):
