@@ -8,7 +8,7 @@ class ShowBonesOperator(bpy.types.Operator):
     only_visible: bpy.props.BoolProperty(default=True)  # type: ignore
 
     @classmethod
-    def poll_armature(cls, armature):
+    def poll_armature(cls, armature, mode):
         raise NotImplementedError()
 
     @classmethod
@@ -18,10 +18,7 @@ class ShowBonesOperator(bpy.types.Operator):
         if not obj or not obj.type == 'ARMATURE':
             return False
 
-        if context.mode != 'POSE':
-            return False
-
-        return cls.poll_armature(obj)
+        return cls.poll_armature(obj, context.mode)
 
     def target_bones(self, armature):
         raise NotImplementedError()
@@ -62,7 +59,10 @@ class VIEW3D_OT_rig_show_overrided_bones(ShowBonesOperator):
     bl_description = 'Show overrided bones \n* Shift to show all bones'
 
     @classmethod
-    def poll_armature(cls, armature):
+    def poll_armature(cls, armature, mode):
+        if mode != 'POSE':
+            return False
+
         if not armature.override_library:
             return False
 
@@ -84,8 +84,14 @@ class VIEW3D_OT_rig_show_animated_bones(ShowBonesOperator):
     bl_description = 'Show animated bones \n* Shift to show all bones'
 
     @classmethod
-    def poll_armature(cls, armature):
-        if not armature.animation_data or not armature.animation_data.action:
+    def poll_armature(cls, armature, mode):
+        if mode != 'POSE':
+            return False
+
+        if not armature.animation_data:
+            return False
+
+        if not armature.animation_data.action:
             return False
 
         return True
@@ -116,7 +122,7 @@ class VIEW3D_OT_rig_show_prefix_bones(ShowBonesOperator):
     )  # type: ignore
 
     @classmethod
-    def poll_armature(cls, armature):
+    def poll_armature(cls, armature, mode):
         return True
 
     def target_bones(self, armature):

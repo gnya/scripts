@@ -9,7 +9,7 @@ from .deps_depth import calc_dependency_depth
 class VIEW3D_OT_rig_copy_pose(bpy.types.Operator):
     bl_idname = 'view3d.rig_copy_pose'
     bl_label = 'Copy Pose (World Space)'
-    bl_description = 'Copy pose (world space)'
+    bl_description = 'Copy pose (World space)'
     bl_options = {'UNDO'}
 
     @classmethod
@@ -55,7 +55,7 @@ class VIEW3D_OT_rig_copy_pose(bpy.types.Operator):
 class VIEW3D_OT_rig_paste_pose(bpy.types.Operator):
     bl_idname = 'view3d.rig_paste_pose'
     bl_label = 'Copy Pose (World Space)'
-    bl_description = 'Paste pose (world space)'
+    bl_description = 'Paste pose (World space)'
     bl_options = {'UNDO'}
 
     @classmethod

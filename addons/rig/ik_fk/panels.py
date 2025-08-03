@@ -1,6 +1,6 @@
 import bpy
 
-from rig import ui_drawer
+from rig import utils
 
 from .bones import check_ik_fk_bones
 
@@ -30,10 +30,13 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
     bl_label = 'IK/FK'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'VIEW3D_PT_rig_main'
+    bl_category = 'Rig'
 
     @classmethod
     def poll(cls, context):
+        if not utils.is_rig(context.active_object):
+            return False
+
         bones = context.selected_pose_bones
 
         if not bones:
@@ -70,7 +73,7 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
 
             contents = {}
             props = _UI_CONTENTS(group, lr, parent)
-            ui_drawer.collect_contents(contents, obj, props)
+            utils.ui.collect_contents(contents, obj, props)
 
             operator_args = {
                 'bone_group': group,
@@ -78,4 +81,4 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
             }
             box.context_pointer_set('snap_target', obj)
             box.context_pointer_set('props_body', props_body)
-            ui_drawer.draw_contents(box, contents, operator_args)
+            utils.ui.draw_contents(box, contents, operator_args)

@@ -1,7 +1,7 @@
 import bpy
 import copy
 
-from rig import ui_drawer
+from rig import utils
 
 
 UI_CONTENTS = {}
@@ -25,7 +25,7 @@ def _visibility_icon(value):
 
 # PTB
 UI_CONTENTS['PTB'] = {
-    '': {
+    'data': {
         'layers[0]': ('Body', 'Body', _layers_icon, 700, 1.0)
     }
 }
@@ -83,7 +83,11 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
     bl_label = 'Properties'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'VIEW3D_PT_rig_main'
+    bl_category = 'Rig'
+
+    @classmethod
+    def poll(cls, context):
+        return utils.is_rig(context.active_object)
 
     def draw(self, context):
         obj = context.active_object
@@ -98,7 +102,7 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
             props[k].update(v)
 
         contents = {}
-        ui_drawer.collect_contents(contents, obj, props)
+        utils.ui.collect_contents(contents, obj, props)
 
         col = self.layout.column(align=True)
-        ui_drawer.draw_contents(col, contents)
+        utils.ui.draw_contents(col, contents)

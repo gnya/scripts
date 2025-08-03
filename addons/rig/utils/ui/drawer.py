@@ -2,6 +2,31 @@ import bpy  # noqa: F401
 import re
 
 
+class PropNotFoundError(Exception):
+    pass
+
+
+def _get_prop(data, prop):
+    m = re.split(r'[\"\[\]]+', prop)
+    p = m[0] if m[0] else prop
+    i = int(m[1]) if m[0] and len(m) > 1 else -1
+    custom_p = m[1] if not m[0] and len(m) > 1 else ''
+
+    v = None
+
+    if hasattr(data, p):
+        v = getattr(data, p)
+    elif custom_p in data.keys():
+        v = data[custom_p]
+
+    v = v[i] if v and i >= 0 else v
+
+    if v is None:
+        raise PropNotFoundError(f'"{prop}" wasn\'t found in "{repr(data)}".')
+
+    return p, v, i
+
+
 def _collect_ops(contents, path, props):
     for prop in props.keys():
         group, text, icon, order, width = props[prop]
@@ -14,27 +39,13 @@ def _collect_ops(contents, path, props):
 
 def _collect_props(contents, data, props):
     for prop in props.keys():
-        m = re.split(r'[\"\[\]]+', prop)
-        p = m[0] if m[0] else prop
-        i = int(m[1]) if m[0] and len(m) > 1 else -1
-        custom_p = m[1] if not m[0] and len(m) > 1 else ''
+        group, text, icon, order, width = props[prop]
+        p, v, i = _get_prop(data, prop)
 
-        value = None
+        if group not in contents:
+            contents[group] = []
 
-        if hasattr(data, p):
-            value = getattr(data, p)
-        elif custom_p in data.keys():
-            value = data[custom_p]
-
-        value = value[i] if i >= 0 else value
-
-        if value is not None:
-            group, text, icon, order, width = props[prop]
-
-            if group not in contents:
-                contents[group] = []
-
-            contents[group].append((order, data, p, value, text, icon, i, width))
+        contents[group].append((order, data, p, v, text, icon, i, width))
 
 
 def collect_contents(contents, data, props):

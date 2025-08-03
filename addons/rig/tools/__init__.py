@@ -1,5 +1,3 @@
-from .ops_light import VIEW3D_OT_rig_attach_light
-
 from .ops_pose import VIEW3D_OT_rig_copy_pose
 from .ops_pose import VIEW3D_OT_rig_paste_pose
 
@@ -13,7 +11,6 @@ from .panels import VIEW3D_PT_rig_tools
 
 
 classes = (
-    VIEW3D_OT_rig_attach_light,
     VIEW3D_OT_rig_copy_pose,
     VIEW3D_OT_rig_paste_pose,
     VIEW3D_OT_rig_show_animated_bones,
