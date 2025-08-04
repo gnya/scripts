@@ -19,8 +19,8 @@ from asset_tools import utils
 
 ```
 {
-    <data path> or $<operator id>: {
-        <property id>: (<group name>, <text>, <icon>, <order>, <width>)
+    <group name>: {
+        <data path> or <operator id>: (<text>, <icon>, <order>, <width>),
     }
 }
 ```
@@ -36,7 +36,7 @@ UI_CONTENTS = {
             'prop1[1]': ('Property 1 R', '', 2, 0.5)
         },
         '$sample.sample_operator': {
-            'type': ('Button', '', 3, 1.0),
+            'type': ('Enum Dropdown', '', 3, 1.0),
             'sample_arg0': 'Test0'
         }
     },
@@ -44,7 +44,7 @@ UI_CONTENTS = {
         'data.path.sample1': {
             '["sample_prop"]': ('Custom Property', '', 0, 1.0),
         },
-        '$sample.sample_operator': ('Enum Dropdown', '', 1, 1.0)
+        '$sample.sample_operator': ('Button', '', 1, 1.0)
     }
 }
 ```
