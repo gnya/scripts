@@ -5,8 +5,8 @@ from asset_tools import utils
 
 
 UI_CONTENTS = {
-    '$view3d.rig_attach_light': {
-        '': ('Light', 'Attach', 'LIGHT', 0, 1.0)
+    'Light': {
+        '$view3d.color_attach_light': ('Attach', 'LIGHT', 0, 1.0)
     }
 }
 
@@ -61,9 +61,10 @@ def _ui_contents(obj):
     for key, names in props.items():
         group, path, prop = key
 
-        ui_contents[path] = {
-            prop: (group, ', '.join(names), '', 0, 0.5)
-        }
+        if group not in ui_contents:
+            ui_contents[group] = {}
+
+        ui_contents[group][f'{path}.{prop}'] = (', '.join(names), '', 0, 0.5)
 
     return ui_contents
 
@@ -81,10 +82,7 @@ class VIEW3D_PT_color(bpy.types.Panel):
 
     def draw(self, context):
         obj = context.active_object
-
-        contents = {}
-        utils.ui.collect_contents(contents, obj, UI_CONTENTS)
-        utils.ui.collect_contents(contents, None, _ui_contents(obj))
-
         col = self.layout.column(align=True)
-        utils.ui.draw_contents(col, contents)
+
+        utils.ui.draw(col, UI_CONTENTS, obj)
+        utils.ui.draw(col, _ui_contents(obj))

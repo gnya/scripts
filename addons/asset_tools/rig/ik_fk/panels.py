@@ -7,20 +7,18 @@ from .bones import check_ik_fk_bones
 
 def _UI_CONTENTS(group, lr, parent):
     return {
-        '$view3d.rig_snap_ik_to_fk': {
-            '': ('', 'IK → FK', '', 0, 1.0)
-        },
-        '$view3d.rig_snap_fk_to_ik': {
-            '': ('', 'FK → IK', '', 1, 1.0)
-        },
-        'pose.bones["CTR_properties_body"]': {
-            f'["fk_{group}.{lr}"]': ('', 'IK - FK', '', 2, 1.0),
-            f'["ik_stretch_{group}s"]': ('', 'IK Stretch', '', 3, 1.0),
-            f'["ik_{group}_pole_parent.{lr}"]': ('', 'IK Pole Parent', '', 4, 1.0),
-            f'["ik_{group}_parent.{lr}"]': ('', '', '', 6, 0.3)
-        },
-        '$view3d.rig_set_ik_parent': {
-            'type': ('', f'IK Parent ({parent})', '', 5, 0.7)
+        '': {
+            '$view3d.rig_snap_ik_to_fk': ('IK → FK', '', 0, 1.0),
+            '$view3d.rig_snap_fk_to_ik': ('FK → IK', '', 1, 1.0),
+            'pose.bones["CTR_properties_body"]': {
+                f'["fk_{group}.{lr}"]': ('IK - FK', '', 2, 1.0),
+                f'["ik_stretch_{group}s"]': ('IK Stretch', '', 3, 1.0),
+                f'["ik_{group}_pole_parent.{lr}"]': ('IK Pole Parent', '', 4, 1.0),
+                f'["ik_{group}_parent.{lr}"]': ('', '', 6, 0.3)
+            },
+            '$view3d.rig_set_ik_parent': {
+                'type': (f'IK Parent ({parent})', '', 5, 0.7)
+            }
         }
     }
 
@@ -31,6 +29,7 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Rig'
+    bl_order = 3
 
     @classmethod
     def poll(cls, context):
@@ -71,14 +70,8 @@ class VIEW3D_PT_rig_ikfk(bpy.types.Panel):
             row.alignment = 'CENTER'
             row.label(text=f'{group}.{lr} ({obj.name})', translate=False)
 
-            contents = {}
-            props = _UI_CONTENTS(group, lr, parent)
-            utils.ui.collect_contents(contents, obj, props)
+            contents = _UI_CONTENTS(group, lr, parent)
 
-            operator_args = {
-                'bone_group': group,
-                'bone_lr': lr
-            }
             box.context_pointer_set('snap_target', obj)
             box.context_pointer_set('props_body', props_body)
-            utils.ui.draw_contents(box, contents, operator_args)
+            utils.ui.draw(box, contents, obj, bone_group=group, bone_lr=lr)

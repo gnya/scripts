@@ -6,7 +6,8 @@ UIを描画する際にすこし便利なユーティリティです
 
 使い方を簡単に説明します
 
-> **注意**　これは `0.2.0` 時点の使用方法であり、今後の更新で変更される可能性があります
+> [!NOTE]
+> これは `0.2.1` 時点の使用方法であり、今後の更新で変更される可能性があります
 
 まずこのモジュールをインポートします
 
@@ -28,19 +29,22 @@ from asset_tools import utils
 
 ``` python
 UI_CONTENTS = {
-    'data.path.sample0': {
-        'prop0': ('Sample0', 'Property 0', 'HIDE_OFF', 0, 1.0),
-        'prop1[0]': ('Sample0', 'Property 1 L', '', 1, 0.5),
-        'prop1[1]': ('Sample0', 'Property 1 R', '', 2, 0.5),
+    'Sample0': {
+        'data.path.sample0': {
+            'prop0': ('Property 0', 'HIDE_OFF', 0, 1.0),
+            'prop1[0]': ('Property 1 L', '', 1, 0.5),
+            'prop1[1]': ('Property 1 R', '', 2, 0.5)
+        },
+        '$sample.sample_operator': {
+            'type': ('Button', '', 3, 1.0),
+            'sample_arg0': 'Test0'
+        }
     },
-    'data.path.sample1': {
-        '["sample_prop"]': ('Sample1', 'Custom Property', '', 100, 1.0),
-    }
-    '$sample.sample_operator': {
-        'type': ('Sample0', 'Button', '', 200, 1.0)
-    }
-    '$sample.sample_operator': {
-        '': ('Sample1', 'Enum Dropdown', '', 200, 1.0)
+    'Sample1' {
+        'data.path.sample1': {
+            '["sample_prop"]': ('Custom Property', '', 0, 1.0),
+        },
+        '$sample.sample_operator': ('Enum Dropdown', '', 1, 1.0)
     }
 }
 ```
@@ -48,10 +52,16 @@ UI_CONTENTS = {
 さいごに、UIの描画を行う例を以下に示します
 
 ``` python
-        contents = {}
-        utils.ui.collect_contents(contents, obj, UI_CONTENTS)
-        utils.ui.collect_contents(contents, None, OTHER_UI_CONTENTS)
+col = self.layout.column(align=True)
 
-        col = self.layout.column(align=True)
-        utils.ui.draw_contents(col, contents)
+utils.ui.draw(col, UI_CONTENTS_0, obj)
+
+# データパスがフルパスの場合はdataを省略できます
+utils.ui.draw(col, UI_CONTENTS_1)
+
+# 可変長引数でオペレーターの引数を設定できます
+utils.ui.draw(col, UI_CONTENTS_2, sample_arg1='Test1')
+
+# レイアウト定義の引数にタプル型を渡すこともできます
+utils.ui.draw(col, (UI_CONTENTS_3, UI_CONTENTS_4))
 ```

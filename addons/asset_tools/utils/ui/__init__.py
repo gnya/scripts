@@ -1,7 +1,5 @@
-from .drawer import collect_contents
-from .drawer import draw_contents
+from .drawer import draw
 
 __all__ = [
-    collect_contents,
-    draw_contents
+    draw
 ]

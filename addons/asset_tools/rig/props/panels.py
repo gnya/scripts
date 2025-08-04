@@ -4,17 +4,6 @@ import copy
 from asset_tools import utils
 
 
-UI_CONTENTS = {}
-
-# Common
-UI_CONTENTS[''] = {
-    '': {
-        '["quality"]': ('Quality', 'Quality', '', 500, 1.0),
-        '["preview_quality"]': ('Quality', 'Preview Quality', '', 501, 1.0)
-    }
-}
-
-
 def _layers_icon(value):
     return 'RADIOBUT_ON' if value else 'RADIOBUT_OFF'
 
@@ -23,45 +12,79 @@ def _visibility_icon(value):
     return 'HIDE_OFF' if value else 'HIDE_ON'
 
 
+UI_CONTENTS = {}
+
+# Common
+UI_CONTENTS[''] = {
+    'Quality': {
+        '["quality"]': ('Quality', '', 0, 1.0),
+        '["preview_quality"]': ('Preview Quality', '', 1, 1.0)
+    }
+}
+
 # PTB
 UI_CONTENTS['PTB'] = {
-    'data': {
-        'layers[0]': ('Body', 'Body', _layers_icon, 700, 1.0)
+    'Body': {
+        'data.layers[0]': ('Body', _layers_icon, 0, 1.0)
     }
 }
 
 _HUMAN_UI_CONTENTS = {
-    'data': {
-        'layers[16]': ('Body', 'Root & Spine', _layers_icon, 700, 1.0),
-        'layers[1]': ('Body', 'Arm IK', _layers_icon, 701, 0.5),
-        'layers[2]': ('Body', 'Arm FK', _layers_icon, 702, 0.5),
-        'layers[17]': ('Body', 'Leg IK', _layers_icon, 703, 0.5),
-        'layers[18]': ('Body', 'Leg FK', _layers_icon, 704, 0.5),
-        'layers[0]': ('Body', 'Fingers', _layers_icon, 705, 1.0),
-        'layers[5]': ('Eyes', 'Eye Target', _layers_icon, 800, 1.0),
-        'layers[4]': ('Eyes', 'Eyebrows', _layers_icon, 801, 0.5),
-        'layers[20]': ('Eyes', 'Eyes', _layers_icon, 802, 0.5),
-        'layers[21]': ('Mouth', 'Lips & Jaw', _layers_icon, 900, 1.0),
-        'layers[22]': ('Mouth', 'Tooth & Tongue', _layers_icon, 901, 1.0),
-        'layers[6]': ('Expressions', 'Expressions', _layers_icon, 1000, 1.0),
-        'layers[7]': ('Lattice', 'Lattice', _layers_icon, 1100, 1.0),
-        'layers[23]': ('Properties', 'Properties', _layers_icon, 1200, 1.0)
+    'Body': {
+        'data': {
+            'layers[16]': ('Root & Spine', _layers_icon, 0, 1.0),
+            'layers[1]': ('Arm IK', _layers_icon, 1, 0.5),
+            'layers[2]': ('Arm FK', _layers_icon, 2, 0.5),
+            'layers[17]': ('Leg IK', _layers_icon, 3, 0.5),
+            'layers[18]': ('Leg FK', _layers_icon, 4, 0.5),
+            'layers[0]': ('Fingers', _layers_icon, 5, 1.0)
+        },
+        'pose.bones["CTR_properties_head"]': {
+            '["head_hinge"]': ('Head Hinge', '', 6, 1.0),
+            '["neck_hinge"]': ('Neck Hinge', '', 7, 1.0)
+        }
     },
-    'pose.bones["CTR_properties_expression"]': {
-        '["show_double_eyelid"]': ('Eyes', 'Double Eyelid', _visibility_icon, 803, 1.0),
-        '["show_eyelashes_A"]': ('Eyes', 'Eyelashes A', _visibility_icon, 804, 1.0),
-        '["show_lip_line"]': ('Mouth', 'Lip Line', _visibility_icon, 902, 1.0),
-        '["show_eyelashes_B"]': ('Expressions', 'Eyelashes B', _visibility_icon, 1001, 1.0),
-        '["show_sweat.L"]': ('Expressions', 'Sweat L', _visibility_icon, 1002, 0.5),
-        '["show_sweat.R"]': ('Expressions', 'Sweat R', _visibility_icon, 1003, 0.5),
-        '["show_wrinkles_A"]': ('Expressions', 'Wrinkles A', _visibility_icon, 1004, 0.5),
-        '["show_wrinkles_B"]': ('Expressions', 'Wrinkles B', _visibility_icon, 1005, 0.5)
+    'Eyes': {
+        'data': {
+            'layers[5]': ('Eye Target', _layers_icon, 0, 1.0),
+            'layers[4]': ('Eyebrows', _layers_icon, 1, 0.5),
+            'layers[20]': ('Eyes', _layers_icon, 2, 0.5)
+        },
+        'pose.bones["CTR_properties_expression"]': {
+            '["show_double_eyelid"]': ('Double Eyelid', _visibility_icon, 3, 1.0),
+            '["show_eyelashes_A"]': ('Eyelashes A', _visibility_icon, 4, 1.0)
+        },
+        'pose.bones["CTR_properties_head"]': {
+            '["sticky_eyesockets"]': ('Sticky Eyesockets', '', 5, 1.0)
+        }
     },
-    'pose.bones["CTR_properties_head"]': {
-        '["head_hinge"]': ('Body', 'Head Hinge', '', 706, 1.0),
-        '["neck_hinge"]': ('Body', 'Neck Hinge', '', 707, 1.0),
-        '["sticky_eyesockets"]': ('Eyes', 'Sticky Eyesockets', '', 805, 1.0),
-        '["reduce_perspective"]': ('Lattice', 'Reduce Perspective', '', 1101, 1.0)
+    'Mouth': {
+        'data': {
+            'layers[21]': ('Lips & Jaw', _layers_icon, 0, 1.0),
+            'layers[22]': ('Tooth & Tongue', _layers_icon, 1, 1.0)
+        },
+        'pose.bones["CTR_properties_expression"]': {
+            '["show_lip_line"]': ('Lip Line', _visibility_icon, 2, 1.0)
+        }
+    },
+    'Expressions': {
+        'data.layers[6]': ('Expressions', _layers_icon, 0, 1.0),
+        'pose.bones["CTR_properties_expression"]': {
+            '["show_eyelashes_B"]': ('Eyelashes B', _visibility_icon, 1, 1.0),
+            '["show_sweat.L"]': ('Sweat L', _visibility_icon, 2, 0.5),
+            '["show_sweat.R"]': ('Sweat R', _visibility_icon, 3, 0.5),
+            '["show_wrinkles_A"]': ('Wrinkles A', _visibility_icon, 4, 0.5),
+            '["show_wrinkles_B"]': ('Wrinkles B', _visibility_icon, 5, 0.5)
+        },
+    },
+    'Lattice': {
+        'data.layers[7]': ('Lattice', _layers_icon, 0, 1.0),
+        'pose.bones["CTR_properties_head"]': {
+            '["reduce_perspective"]': ('Reduce Perspective', '', 1, 1.0)
+        }
+    },
+    'Properties': {
+        'data.layers[23]': ('Properties', _layers_icon, 0, 1.0)
     }
 }
 
@@ -71,7 +94,9 @@ UI_CONTENTS['MCP'] = copy.deepcopy(_HUMAN_UI_CONTENTS)
 # MCL
 UI_CONTENTS['MCL'] = copy.deepcopy(_HUMAN_UI_CONTENTS)
 UI_CONTENTS['MCL'][''] = {
-    '["show_gloves"]': ('Clothes', 'Gloves', _visibility_icon, 600, 1.0)
+    'Clothes': {
+        '["show_gloves"]': ('Gloves', _visibility_icon, 0, 1.0)
+    }
 }
 
 
@@ -81,6 +106,7 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Rig'
+    bl_order = 2
 
     @classmethod
     def poll(cls, context):
@@ -89,10 +115,7 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
     def draw(self, context):
         obj = context.active_object
         name = obj.name.split('_')[0]
-
-        contents = {}
-        utils.ui.collect_contents(contents, obj, UI_CONTENTS[''])
-        utils.ui.collect_contents(contents, obj, UI_CONTENTS.get(name, {}))
-
+        contents = (UI_CONTENTS[''], UI_CONTENTS.get(name, {}))
         col = self.layout.column(align=True)
-        utils.ui.draw_contents(col, contents)
+
+        utils.ui.draw(col, contents, obj)

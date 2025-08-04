@@ -1,143 +1,154 @@
-import bpy  # noqa: F401
-import re
+import bpy
+
+from bpy.types import UILayout
+from re import match
+from typing import Any
+
+from .collect import _collect_contents
 
 
-class OpNotFoundError(Exception):
+class ParseDataPathError(Exception):
     pass
 
 
-class PropNotFoundError(Exception):
+class OperatorNotFoundError(Exception):
     pass
 
 
-def _get_prop(data, prop):
-    m = re.split(r'[\"\[\]]+', prop)
-    p = m[0] if m[0] else prop
-    i = int(m[1]) if m[0] and len(m) > 1 else -1
-    custom_p = m[1] if not m[0] and len(m) > 1 else ''
-
-    v = None
-
-    if hasattr(data, p):
-        v = getattr(data, p)
-    elif custom_p in data.keys():
-        v = data[custom_p]
-
-    v = v[i] if v and i >= 0 else v
-
-    return p, v, i
+class PropertyNotFoundError(Exception):
+    pass
 
 
-def _exists_op(path):
-    try:
-        p = path.split('.')
+def _exists_operator(path: str) -> bool:
+    op = bpy.ops
 
-        getattr(getattr(bpy.ops, p[0]), p[1])
-    except AttributeError:
-        return False
+    for p in path.split('.'):
+        if p in dir(op):
+            op = getattr(op, p)
+        else:
+            return False
 
     return True
 
 
-def _collect_ops(contents, path, props):
-    if not _exists_op(path):
-        raise OpNotFoundError(f'"{path}" wasn\'t found.')
+def _parse_path(path: str, data: Any | None = None) -> tuple[str, str, str, int]:
+    head_path = repr(data) if data else ''
 
-    for prop in props.keys():
-        group, text, icon, order, width = props[prop]
+    if not head_path:
+        full_path = path
+    elif not path:
+        full_path = head_path
+    elif path.startswith('['):
+        full_path = head_path + path
+    else:
+        full_path = head_path + '.' + path
 
-        if group not in contents:
-            contents[group] = []
+    prop_path, index = full_path, -1
 
-        contents[group].append((order, path, prop, None, text, icon, -1, width))
+    if m := match(r'^(.+)\[(\d+)\]$', prop_path):
+        prop_path, index = m.group(1), int(m.group(2))
 
+    if not (m := match(r'^(.+)(\[".+"\]|\.[^."]+)$', prop_path)):
+        raise ParseDataPathError(f'"{full_path}": parsing data path was failed.')
 
-def _collect_props(contents, data, props):
-    for prop in props.keys():
-        group, text, icon, order, width = props[prop]
-        p, v, i = _get_prop(data, prop)
+    data_path, prop = m.group(1), m.group(2)
+    prop = prop[1:] if prop.startswith('.') else prop
 
-        if v is None:
-            raise PropNotFoundError(f'"{prop}" wasn\'t found in "{repr(data)}".')
-
-        if group not in contents:
-            contents[group] = []
-
-        contents[group].append((order, data, p, v, text, icon, i, width))
+    return full_path, data_path, prop, index
 
 
-def collect_contents(contents, data, props):
-    for path, p in props.items():
-        if path.startswith('$'):
-            _collect_ops(contents, path[1:], p)
+def draw_operator(layout: UILayout, content: tuple, **kwargs):
+    path, (text, icon, order, width), enum_arg, args = content
+    icon = icon if icon else 'NONE'
+
+    if not _exists_operator(path):
+        raise OperatorNotFoundError(f'"{path}" wasn\'t found.')
+
+    if enum_arg:
+        op = layout.operator_menu_enum(path, enum_arg, text=text, icon=icon, translate=False)
+    else:
+        op = layout.operator(path, text=text, icon=icon, translate=False)
+
+    for key, value in args.items():
+        if hasattr(op, key):
+            setattr(op, key, value)
+
+    for key, value in kwargs.items():
+        if hasattr(op, key):
+            setattr(op, key, value)
+
+
+def draw_property(layout: UILayout, content: tuple, data: Any | None = None):
+    path, (text, icon, order, width) = content
+    full_path, data_path, prop, index = _parse_path(path, data)
+
+    try:
+        v = eval(full_path)
+        d = eval(data_path)
+    except (AttributeError, IndexError) as e:
+        raise PropertyNotFoundError(f'"{full_path}" wasn\'t found.') from e
+
+    text = text(v) if callable(text) else text
+    icon = icon(v) if callable(icon) else icon
+    icon = icon if icon else 'NONE'
+
+    layout.prop(d, prop, index=index, text=text, icon=icon, translate=False, toggle=1)
+
+
+def draw_group(layout: UILayout, contents: dict | tuple[dict], data: Any | None = None, **kwargs):
+    content_list = _collect_contents(contents)
+    content_list = sorted(content_list, key=lambda c: c[1][2])
+
+    _layout = layout
+    width_scale = 1.0
+
+    for c in content_list:
+        width = c[1][3]
+        width_factor = width_scale * width
+
+        if width_factor < 1.0:
+            _layout = _layout.split(align=True, factor=width_factor)
+
+        if len(c) == 4:
+            draw_operator(_layout, c, **kwargs)
         else:
-            data_path = repr(data) if data else ''
+            draw_property(_layout, c, data)
 
-            if not data_path or not path or path.startswith('['):
-                data_path += path
+        if width_factor >= 1.0:
+            _layout = layout
+            width_scale = 1.0
+        else:
+            width_scale = width_scale / (1.0 - width_factor)
+
+
+def _marge_groups(contents: tuple[dict]):
+    marged = {}
+
+    for content_dict in contents:
+        for group, c in content_dict.items():
+            if group not in marged:
+                marged[group] = (c,)
             else:
-                data_path += '.' + path
+                marged[group].add(c)
 
-            try:
-                d = eval(f'{data_path}')
-            except (AttributeError, IndexError) as e:
-                raise PropNotFoundError(f'"{data_path}" wasn\'t found.') from e
-            else:
-                _collect_props(contents, d, p)
+    return marged
 
 
-def draw_contents(layout, contents, operator_args={}):
-    groups = sorted(contents.keys(), key=lambda g: contents[g][0][0])
+def draw(layout: UILayout, contents: dict | tuple[dict], data: Any | None = None, **kwargs):
+    if isinstance(contents, tuple):
+        contents = _marge_groups(contents)
+
     is_first = True
 
-    for group in groups:
+    for group, c in contents.items():
         if is_first:
             is_first = False
         else:
             layout.separator()
 
         col = layout.column(align=True)
-        split = None
-        total_width = 0.0
-        width_scale = 1.0
 
         if group:
             col.label(text=group, translate=False)
 
-        c = sorted(contents[group], key=lambda c: c[0])
-
-        for _, d, p, v, t, icon, i, width in c:
-            t = t(v) if callable(t) else t
-            icon = icon(v) if callable(icon) else icon
-
-            icon = icon if icon else 'NONE'
-            width = min(width, 1.0 - total_width)
-            factor = width_scale * width
-            ui = split if split else col
-
-            if factor < 1.0:
-                split = ui.split(align=True, factor=factor)
-                ui = split
-
-            if isinstance(d, str):
-                op = None
-
-                if p:
-                    op = ui.operator_menu_enum(d, p, text=t, icon=icon, translate=False)
-                else:
-                    op = ui.operator(d, text=t, icon=icon, translate=False)
-
-                for name, arg in operator_args.items():
-                    if hasattr(op, name):
-                        setattr(op, name, arg)
-            else:
-                ui.prop(d, p, text=t, icon=icon, translate=False, toggle=1, index=i)
-
-            total_width += width
-
-            if factor >= 1.0:
-                total_width = 0.0
-                width_scale = 1.0
-                split = None if split else split
-            else:
-                width_scale = width_scale / (1.0 - factor)
+        draw_group(col, c, data, **kwargs)
