@@ -1,11 +1,11 @@
-from .ops import VIEW3D_OT_rig_attach_light
+from .ops import VIEW3D_OT_color_attach_light
 
-from .panels import VIEW3D_PT_rig_color
+from .panels import VIEW3D_PT_color
 
 
 classes = (
-    VIEW3D_OT_rig_attach_light,
-    VIEW3D_PT_rig_color
+    VIEW3D_OT_color_attach_light,
+    VIEW3D_PT_color
 )
 
 

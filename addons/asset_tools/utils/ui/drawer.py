@@ -2,6 +2,10 @@ import bpy  # noqa: F401
 import re
 
 
+class OpNotFoundError(Exception):
+    pass
+
+
 class PropNotFoundError(Exception):
     pass
 
@@ -21,13 +25,24 @@ def _get_prop(data, prop):
 
     v = v[i] if v and i >= 0 else v
 
-    if v is None:
-        raise PropNotFoundError(f'"{prop}" wasn\'t found in "{repr(data)}".')
-
     return p, v, i
 
 
+def _exists_op(path):
+    try:
+        p = path.split('.')
+
+        getattr(getattr(bpy.ops, p[0]), p[1])
+    except AttributeError:
+        return False
+
+    return True
+
+
 def _collect_ops(contents, path, props):
+    if not _exists_op(path):
+        raise OpNotFoundError(f'"{path}" wasn\'t found.')
+
     for prop in props.keys():
         group, text, icon, order, width = props[prop]
 
@@ -42,6 +57,9 @@ def _collect_props(contents, data, props):
         group, text, icon, order, width = props[prop]
         p, v, i = _get_prop(data, prop)
 
+        if v is None:
+            raise PropNotFoundError(f'"{prop}" wasn\'t found in "{repr(data)}".')
+
         if group not in contents:
             contents[group] = []
 
@@ -53,17 +71,17 @@ def collect_contents(contents, data, props):
         if path.startswith('$'):
             _collect_ops(contents, path[1:], p)
         else:
-            data_path = repr(data)
+            data_path = repr(data) if data else ''
 
-            if not path or path.startswith('['):
+            if not data_path or not path or path.startswith('['):
                 data_path += path
             else:
                 data_path += '.' + path
 
             try:
                 d = eval(f'{data_path}')
-            except (AttributeError, IndexError):
-                continue
+            except (AttributeError, IndexError) as e:
+                raise PropNotFoundError(f'"{data_path}" wasn\'t found.') from e
             else:
                 _collect_props(contents, d, p)
 

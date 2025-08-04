@@ -1,7 +1,7 @@
 import bpy
 import copy
 
-from rig import utils
+from asset_tools import utils
 
 
 UI_CONTENTS = {}
@@ -30,7 +30,7 @@ UI_CONTENTS['PTB'] = {
     }
 }
 
-_HUMAN_RIG_PROP_INFO = {
+_HUMAN_UI_CONTENTS = {
     'data': {
         'layers[16]': ('Body', 'Root & Spine', _layers_icon, 700, 1.0),
         'layers[1]': ('Body', 'Arm IK', _layers_icon, 701, 0.5),
@@ -62,17 +62,14 @@ _HUMAN_RIG_PROP_INFO = {
         '["neck_hinge"]': ('Body', 'Neck Hinge', '', 707, 1.0),
         '["sticky_eyesockets"]': ('Eyes', 'Sticky Eyesockets', '', 805, 1.0),
         '["reduce_perspective"]': ('Lattice', 'Reduce Perspective', '', 1101, 1.0)
-    },
-    'pose.bones["CTR_lattice_target"].constraints[0]': {
-        'target': ('Lattice', 'Camera', '', 1102, 1.0)
     }
 }
 
 # MCP
-UI_CONTENTS['MCP'] = copy.deepcopy(_HUMAN_RIG_PROP_INFO)
+UI_CONTENTS['MCP'] = copy.deepcopy(_HUMAN_UI_CONTENTS)
 
 # MCL
-UI_CONTENTS['MCL'] = copy.deepcopy(_HUMAN_RIG_PROP_INFO)
+UI_CONTENTS['MCL'] = copy.deepcopy(_HUMAN_UI_CONTENTS)
 UI_CONTENTS['MCL'][''] = {
     '["show_gloves"]': ('Clothes', 'Gloves', _visibility_icon, 600, 1.0)
 }
@@ -91,18 +88,11 @@ class VIEW3D_PT_rig_props(bpy.types.Panel):
 
     def draw(self, context):
         obj = context.active_object
-        asset_name = obj.name.split('_')[0]
-        props = copy.deepcopy(UI_CONTENTS[''])
-        asset_props = copy.deepcopy(UI_CONTENTS.get(asset_name, {}))
-
-        for k, v in asset_props.items():
-            if k not in props:
-                props[k] = {}
-
-            props[k].update(v)
+        name = obj.name.split('_')[0]
 
         contents = {}
-        utils.ui.collect_contents(contents, obj, props)
+        utils.ui.collect_contents(contents, obj, UI_CONTENTS[''])
+        utils.ui.collect_contents(contents, obj, UI_CONTENTS.get(name, {}))
 
         col = self.layout.column(align=True)
         utils.ui.draw_contents(col, contents)

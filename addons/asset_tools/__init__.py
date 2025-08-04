@@ -1,13 +1,11 @@
-from rig import color
-from rig import ik_fk
-from rig import props
-from rig import tools
+from . import color
+from . import rig
 
 
 bl_info = {
-    'name': 'Rig',
+    'name': 'Asset Tools',
     'author': 'gnya',
-    'version': (0, 1, 15),
+    'version': (0, 2, 0),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make assets easier to use. '
@@ -18,16 +16,12 @@ bl_info = {
 
 def register():
     color.register()
-    tools.register()
-    props.register()
-    ik_fk.register()
+    rig.register()
 
 
 def unregister():
     color.unregister()
-    tools.unregister()
-    props.unregister()
-    ik_fk.unregister()
+    rig.unregister()
 
 
 if __name__ == '__main__':

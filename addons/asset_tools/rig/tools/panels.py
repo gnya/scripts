@@ -1,6 +1,6 @@
 import bpy
 
-from rig import utils
+from asset_tools import utils
 
 
 UI_CONTENTS = {
