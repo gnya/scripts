@@ -7,7 +7,7 @@ UIを描画する際にすこし便利なユーティリティです
 使い方を簡単に説明します
 
 > [!NOTE]
-> これは `0.2.1` 時点の使用方法であり、今後の更新で変更される可能性があります
+> これは `0.2.2` 時点の使用方法であり、今後の更新で変更される可能性があります
 
 まずこのモジュールをインポートします
 
@@ -20,7 +20,7 @@ from asset_tools import utils
 ```
 {
     <group name>: {
-        <data path> or <operator id>: (<text>, <icon>, <order>, <width>),
+        <data path> or <operator id>: (<text>, <icon>, <order>, <width>)
     }
 }
 ```
@@ -42,7 +42,7 @@ UI_CONTENTS = {
     },
     'Sample1' {
         'data.path.sample1': {
-            '["sample_prop"]': ('Custom Property', '', 0, 1.0),
+            '["sample_prop"]': ('Custom Property', '', 0, 1.0)
         },
         '$sample.sample_operator': ('Button', '', 1, 1.0)
     }
@@ -54,6 +54,7 @@ UI_CONTENTS = {
 ``` python
 col = self.layout.column(align=True)
 
+# 定義したレイアウト UI_CONTENTS_0 を描画する
 utils.ui.draw(col, UI_CONTENTS_0, obj)
 
 # データパスがフルパスの場合はdataを省略できます

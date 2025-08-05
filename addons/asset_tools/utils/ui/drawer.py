@@ -1,7 +1,7 @@
 import bpy
 
 from bpy.types import UILayout
-from re import match
+from re import match, split
 from typing import Any
 
 from .collect import _collect_contents
@@ -20,41 +20,12 @@ class PropertyNotFoundError(Exception):
 
 
 def _exists_operator(path: str) -> bool:
-    op = bpy.ops
-
-    for p in path.split('.'):
-        if p in dir(op):
-            op = getattr(op, p)
-        else:
-            return False
+    try:
+        bpy.ops._op_as_string(path)
+    except AttributeError:
+        return False
 
     return True
-
-
-def _parse_path(path: str, data: Any | None = None) -> tuple[str, str, str, int]:
-    head_path = repr(data) if data else ''
-
-    if not head_path:
-        full_path = path
-    elif not path:
-        full_path = head_path
-    elif path.startswith('['):
-        full_path = head_path + path
-    else:
-        full_path = head_path + '.' + path
-
-    prop_path, index = full_path, -1
-
-    if m := match(r'^(.+)\[(\d+)\]$', prop_path):
-        prop_path, index = m.group(1), int(m.group(2))
-
-    if not (m := match(r'^(.+)(\[".+"\]|\.[^."]+)$', prop_path)):
-        raise ParseDataPathError(f'"{full_path}": parsing data path was failed.')
-
-    data_path, prop = m.group(1), m.group(2)
-    prop = prop[1:] if prop.startswith('.') else prop
-
-    return full_path, data_path, prop, index
 
 
 def draw_operator(layout: UILayout, content: tuple, **kwargs):
@@ -78,21 +49,71 @@ def draw_operator(layout: UILayout, content: tuple, **kwargs):
             setattr(op, key, value)
 
 
+def _parse_path(path: str) -> tuple[str, str, int]:
+    prop_path, index = path, -1
+
+    if m := match(r'^(.+)\[(\d+)\]$', prop_path):
+        prop_path = m.group(1)
+        index = int(m.group(2))
+
+    if not (m := match(r'^(.+|)(\[".+"\]|\.[^."]+)$', prop_path)):
+        raise ParseDataPathError(f'"{path}": parsing data path was failed.')
+
+    data_path = m.group(1)
+    prop = m.group(2)
+    prop = prop[1:] if prop.startswith('.') else prop
+
+    return data_path, prop, index
+
+
+def _get_data(path: str, data: Any | None = None) -> Any:
+    if not data and path.startswith('bpy'):
+        data = bpy
+        path = path[4:]
+
+    for path_or_key in split(r'[\[\]]+', path):
+        if not path_or_key:
+            continue
+        elif path_or_key.isdecimal():
+            data = data[int(path_or_key)]
+        elif path_or_key.startswith(('\'', '"')):
+            data = data[path_or_key[1:-1]]
+        else:
+            for prop in path_or_key.split('.'):
+                if not prop:
+                    continue
+
+                data = getattr(data, prop)
+
+    return data
+
+
+def _get_value(prop: str, index: int, data: Any | None = None) -> Any:
+    if prop.startswith('['):
+        value = data[prop[2:-2]]
+    else:
+        value = getattr(data, prop)
+
+    value = value[index] if index != -1 else value
+
+    return value
+
+
 def draw_property(layout: UILayout, content: tuple, data: Any | None = None):
     path, (text, icon, order, width) = content
-    full_path, data_path, prop, index = _parse_path(path, data)
+    data_path, prop, index = _parse_path(path)
 
     try:
-        v = eval(full_path)
-        d = eval(data_path)
+        data = _get_data(data_path, data)
+        value = _get_value(prop, index, data)
     except (AttributeError, IndexError) as e:
-        raise PropertyNotFoundError(f'"{full_path}" wasn\'t found.') from e
+        raise PropertyNotFoundError(f'"{path}" wasn\'t found.') from e
 
-    text = text(v) if callable(text) else text
-    icon = icon(v) if callable(icon) else icon
+    text = text(value) if callable(text) else text
+    icon = icon(value) if callable(icon) else icon
     icon = icon if icon else 'NONE'
 
-    layout.prop(d, prop, index=index, text=text, icon=icon, translate=False, toggle=1)
+    layout.prop(data, prop, index=index, text=text, icon=icon, translate=False, toggle=1)
 
 
 def draw_group(layout: UILayout, contents: dict | tuple[dict], data: Any | None = None, **kwargs):

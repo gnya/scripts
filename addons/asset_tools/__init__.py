@@ -5,7 +5,7 @@ from . import rig
 bl_info = {
     'name': 'Asset Tools',
     'author': 'gnya',
-    'version': (0, 2, 1),
+    'version': (0, 2, 2),
     'blender': (3, 6, 0),
     'description':
         'A set of tools to make assets easier to use. '
