@@ -2,7 +2,7 @@ class ParseContentError(Exception):
     pass
 
 
-def _collect_operator(content: dict | tuple) -> tuple[tuple, str, dict]:
+def _parse_operator(content: dict | tuple) -> tuple[tuple, str, dict]:
     if isinstance(content, tuple):
         return content, '', {}
 
@@ -19,24 +19,24 @@ def _collect_operator(content: dict | tuple) -> tuple[tuple, str, dict]:
     return c, enum_arg, args
 
 
-def _collect_operators(content_list: list, path: str, content: dict | tuple):
+def _parse_operators(content_list: list, path: str, content: dict | tuple):
     if '.' not in path:
         if not isinstance(content, dict):
             raise ParseContentError(f'"{path}": parsing operator was failed.')
 
         for p, c in content.items():
-            _collect_operators(content_list, f'{path}.{p}', c)
+            _parse_operators(content_list, f'{path}.{p}', c)
     else:
-        content_list.append((path, *_collect_operator(content)))
+        content_list.append((path, *_parse_operator(content)))
 
 
-def _collect_properties(content_list: list, path: str, content: dict | tuple):
+def _parse_properties(content_list: list, path: str, content: dict | tuple):
     if isinstance(content, dict):
         for p, c in content.items():
             if p.startswith('['):
-                _collect_properties(content_list, f'{path}{p}', c)
+                _parse_properties(content_list, f'{path}{p}', c)
             else:
-                _collect_properties(content_list, f'{path}.{p}', c)
+                _parse_properties(content_list, f'{path}.{p}', c)
     else:
         if not isinstance(content, tuple):
             raise ParseContentError(f'"{path}": parsing property was failed.')
@@ -44,7 +44,7 @@ def _collect_properties(content_list: list, path: str, content: dict | tuple):
         content_list.append((path, content))
 
 
-def _collect_contents(contents: dict | tuple[dict]) -> list:
+def parse_contents(contents: dict | tuple[dict]) -> list:
     if isinstance(contents, dict):
         contents = (contents,)
 
@@ -53,8 +53,8 @@ def _collect_contents(contents: dict | tuple[dict]) -> list:
     for content_dict in contents:
         for path, c in content_dict.items():
             if path.startswith('$'):
-                _collect_operators(content_list, path[1:], c)
+                _parse_operators(content_list, path[1:], c)
             else:
-                _collect_properties(content_list, path, c)
+                _parse_properties(content_list, path, c)
 
     return content_list

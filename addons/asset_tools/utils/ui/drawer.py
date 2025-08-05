@@ -1,14 +1,10 @@
 import bpy
 
 from bpy.types import UILayout
-from re import match, split
 from typing import Any
 
-from .collect import _collect_contents
-
-
-class ParseDataPathError(Exception):
-    pass
+from .parser import parse_contents
+from .property import parse_path, get_data, get_value
 
 
 class OperatorNotFoundError(Exception):
@@ -49,63 +45,13 @@ def draw_operator(layout: UILayout, content: tuple, **kwargs):
             setattr(op, key, value)
 
 
-def _parse_path(path: str) -> tuple[str, str, int]:
-    prop_path, index = path, -1
-
-    if m := match(r'^(.+)\[(\d+)\]$', prop_path):
-        prop_path = m.group(1)
-        index = int(m.group(2))
-
-    if not (m := match(r'^(.+|)(\[".+"\]|\.[^."]+)$', prop_path)):
-        raise ParseDataPathError(f'"{path}": parsing data path was failed.')
-
-    data_path = m.group(1)
-    prop = m.group(2)
-    prop = prop[1:] if prop.startswith('.') else prop
-
-    return data_path, prop, index
-
-
-def _get_data(path: str, data: Any | None = None) -> Any:
-    if not data and path.startswith('bpy'):
-        data = bpy
-        path = path[4:]
-
-    for path_or_key in split(r'[\[\]]+', path):
-        if not path_or_key:
-            continue
-        elif path_or_key.isdecimal():
-            data = data[int(path_or_key)]
-        elif path_or_key.startswith(('\'', '"')):
-            data = data[path_or_key[1:-1]]
-        else:
-            for prop in path_or_key.split('.'):
-                if not prop:
-                    continue
-
-                data = getattr(data, prop)
-
-    return data
-
-
-def _get_value(prop: str, index: int, data: Any | None = None) -> Any:
-    if prop.startswith('['):
-        value = data[prop[2:-2]]
-    else:
-        value = getattr(data, prop)
-
-    value = value[index] if index != -1 else value
-
-    return value
-
-
 def draw_property(layout: UILayout, content: tuple, data: Any | None = None):
     path, (text, icon, order, width) = content
-    data_path, prop, index = _parse_path(path)
+    data_path, prop, index = parse_path(path)
 
     try:
-        data = _get_data(data_path, data)
-        value = _get_value(prop, index, data)
+        data = get_data(data_path, data)
+        value = get_value(prop, index, data)
     except (AttributeError, IndexError) as e:
         raise PropertyNotFoundError(f'"{path}" wasn\'t found.') from e
 
@@ -117,7 +63,7 @@ def draw_property(layout: UILayout, content: tuple, data: Any | None = None):
 
 
 def draw_group(layout: UILayout, contents: dict | tuple[dict], data: Any | None = None, **kwargs):
-    content_list = _collect_contents(contents)
+    content_list = parse_contents(contents)
     content_list = sorted(content_list, key=lambda c: c[1][2])
 
     _layout = layout
@@ -142,7 +88,7 @@ def draw_group(layout: UILayout, contents: dict | tuple[dict], data: Any | None 
             width_scale = width_scale / (1.0 - width_factor)
 
 
-def _marge_groups(contents: tuple[dict]):
+def _marge_groups(contents: tuple[dict]) -> dict:
     marged = {}
 
     for content_dict in contents:
