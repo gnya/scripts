@@ -34,7 +34,7 @@ class UnusedBonesRule(DataBoneRule):
     def fix_armature(cls, armature, **kwargs):
         used_bones = set()
 
-        for o in bpy.data.objects:
+        for o in cls.local_objects():
             used_bones |= utils.bones_used_in_object(o, armature)
 
         return super().fix_armature(armature, used_bones=used_bones, **kwargs)

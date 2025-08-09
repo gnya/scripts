@@ -45,10 +45,16 @@ class ObjectRule(Rule):
         raise NotImplementedError()
 
     @classmethod
+    def local_objects(cls):
+        for o in bpy.data.objects:
+            if not (o.library or o.override_library):
+                yield o
+
+    @classmethod
     def fix(cls, **kwargs):
         r = Report.nothing()
 
-        for o in bpy.data.objects:
+        for o in cls.local_objects():
             r.children.append(cls.fix_object(o, **kwargs))
 
         return r

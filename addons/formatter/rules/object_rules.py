@@ -10,7 +10,7 @@ class UnusedCustomShapesRule(ObjectRule):
         if not re.match(r'^[^_.]*_CUSTOMSHAPE.*$', obj.name):
             return Report.nothing()
 
-        for o in bpy.data.objects:
+        for o in cls.local_objects():
             if o.type == 'ARMATURE':
                 for b in o.pose.bones:
                     shape = b.custom_shape
