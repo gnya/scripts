@@ -1,0 +1,18 @@
+/*
+ * toon shader (0.4.0)
+ * author: gnya
+ */
+
+#include "node_math.h"
+
+shader sun_light(
+    point Rotation = point(0.0, 0.0, 0.0),
+    float Energy = 1.0,
+
+    output vector Light = vector(0.0, 0.0, 0.0)
+) {
+    matrix mat = euler_to_mat(Rotation);
+    float strength = Energy / M_PI;
+
+    Light = vector(mat[2][0], mat[2][1], mat[2][2]) * strength;
+}

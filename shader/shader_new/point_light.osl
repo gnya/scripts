@@ -1,0 +1,17 @@
+/*
+ * toon shader (0.4.0)
+ * author: gnya
+ */
+
+shader point_light(
+    vector Location = vector(0.0, 0.0, 0.0),
+    float Energy = 1.0,
+    float Distance = 1.0,
+
+    output vector Light = vector(0.0, 0.0, 0.0)
+) {
+    float falloff = length(Location - P) / Distance;
+    float strength = Energy / M_PI / exp2(falloff);
+
+    Light = normalize(Location - P) * strength;
+}

@@ -1,0 +1,118 @@
+/*
+ * toon shader (0.4.0)
+ * author: gnya
+ */
+
+#include "group_id.h"
+
+#define MAX_LOOP 50
+
+/*
+ * This function calculates the amount by which the ray start
+ * point is moved along the geometry normal. This is based on
+ * the shadow terminator setting in cycles, but is not perfect
+ * due to limitation of OSL functionality.
+ * ref: https://github.com/blender/.../cycles/kernel/light/sample.h
+ */
+vector ray_offset(vector L, float cutoff, float eps0, float eps1) {
+    if (cutoff == 0.0) {
+        return 0.0;
+    }
+
+    float NL = dot(N, L);
+    int transmit = NL < 0.0;
+
+    NL = abs(NL);
+
+    vector n = transmit ? -Ng : Ng;
+    float nL = dot(n, L);
+
+    float offset = 0.0;
+    float eps = transmit ? eps1 : eps0;
+
+    if (NL < cutoff) {
+        offset = clamp(2.0 - (nL + NL) / cutoff, 0.0, 1.0);
+    } else {
+        offset = clamp(1.0 - nL / cutoff, 0.0, 1.0);
+    }
+
+    return n * offset * eps;
+}
+
+/*
+ * This function checks whether lights from the direction of
+ * a given light source reaches the point of current interest.
+ */
+int shadow(vector L, float cutoff, float eps) {
+    vector offset = ray_offset(L, cutoff, 5.0e-4, 1.0e-5);
+    vector pos = P + offset;
+
+    float this_group = 0.0;
+    float this_props = 0.0;  // Unused.
+    get_this_shadow_group(this_group, this_props);
+
+    if (this_group == 0.0) {
+        return trace(pos, L);
+    }
+
+    int max_loop = MAX_LOOP;
+    int count = 0;
+    float hit_group = 0.0;
+
+    int is_backfacing = dot(Ng, L) < 0.0;
+    float hit_props = 0.0;
+
+    for (; count < max_loop && trace(pos, L); count++) {
+        get_hit_shadow_group(hit_group, hit_props);
+
+        if (hit_group != this_group) {
+            if (!is_backfacing | hit_props == 0.0) {
+                return 1;
+            }
+        }
+
+        getmessage("trace", "P", pos);
+        pos += L * eps;
+    }
+
+    if (count == max_loop) {
+        warning("the max loop has been reached.");
+    }
+
+    return 0;
+}
+
+shader material(
+    vector Light = vector(0.0, 0.0, 0.0)
+    [[ string widget = "null" ]],
+    float Cutoff = 0.05,
+    float Reflectance = 0.5,
+    float Exponent = 10.0,
+
+    /*
+     * This is a hack necessary to determine whether the currently
+     * used renderer can use OSL and perform fallback processing.
+     */
+    output int IsCycles = 1
+    [[ string widget = "boolean" ]],
+
+    output float Diffuse = 0.0,
+    output float Specular = 0.0
+) {
+    Diffuse = clamp(dot(Light, N), 0.0, 1.0);
+
+    if (Reflectance != 0.0) {
+        vector R = reflect(normalize(Light), N);
+        
+        Specular = pow(max(0.0, dot(-I, R)), Exponent) * Reflectance;
+    }
+
+    if (Diffuse != 0.0) {
+        vector L = normalize(Light);
+
+        if (shadow(L, Cutoff, 1.0e-4)) {
+            Diffuse = 0.0;
+            Specular = 0.0;
+        }
+    }
+}

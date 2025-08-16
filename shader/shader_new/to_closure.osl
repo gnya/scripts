@@ -1,0 +1,106 @@
+/*
+ * toon shader (0.4.0)
+ * author: gnya
+ */
+
+#include "node_math.h"
+#include "group_id.h"
+
+#define GLOSSY_EPS 2.0e-4
+#define TRANSPARENT_EPS 1.0e-4
+
+ /*
+ * This function calculates how reflective other objects appear
+ * at the point of current interest.
+ */
+float glossy(float reflectance, float distance, int max_depth) {
+    int g_depth = 0;
+    getattribute("path:glossy_depth", g_depth);
+
+    if (g_depth > max_depth) {
+        return 0.0;
+    }
+
+    vector dir = reflect(-I, N);
+    float nd = dot(Ng, dir);
+
+    if (nd < 0.0) {
+        return 0.0;
+    }
+
+    float value = 0.0;
+    vector offset = safe_divide(1.0, nd) * dir * GLOSSY_EPS;
+    vector pos = P + offset;
+
+    if (trace(pos, dir)) {
+        float p_dist = 0.0; // distance from rendering point
+        float s_dist = 0.0; // distance from rendering surface
+        getmessage("trace", "hitdist", p_dist);
+        s_dist = dot(I, N) * p_dist;
+
+        value = (distance - s_dist) / distance;
+        value = pow(clamp(value, 0.0, 1.0), 2.0) * reflectance;
+    }
+
+    return value;
+}
+
+/*
+ * This function checks whether transparency shouldn't be layeared.
+ */
+int transparent_culling() {
+    int t_depth = 0;
+    getattribute("path:transparent_depth", t_depth);
+
+    if (t_depth == 0) {
+        return 0;
+    }
+
+    float this_group = 0.0;
+    get_this_transparent_group(this_group);
+
+    if (this_group == 0.0) {
+        return 0;
+    }
+
+    vector pos = P;
+    int count = 0;
+    float hit_group = 0.0;
+
+    for (; count < t_depth && trace(pos, I); count++) {
+        get_hit_transparent_group(hit_group);
+
+        if (hit_group == this_group) {
+            return 1;
+        }
+
+        getmessage("trace", "P", pos);
+        pos += I * TRANSPARENT_EPS;
+    }
+
+    return 0;
+}
+
+shader to_closure(
+    color Color = color(1.0),
+    float Reflectance = 0.0,
+    float Distance = 100.0,
+    int Depth = 8,
+    float Transparency = 1.0,
+
+    output closure color Shader = emission()
+) {
+    Shader = Color * emission();
+
+    if (Reflectance > 0.0) {
+        float r = glossy(Reflectance, Distance, Depth);
+
+        Shader = mix(Shader, reflection(N), r);
+    }
+
+    if (Transparency < 1.0) {
+        float t = transparent_culling() ? 0.0 : Transparency;
+
+        Shader = mix(transparent(), Shader, t);
+    }
+}
