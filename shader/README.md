@@ -1,89 +1,160 @@
-# toon.osl
-
 ## これはなに？
+[Open Shader Language](https://docs.blender.org/manual/en/latest/render/shader_nodes/osl.html) (OSL) で記述された個人プロジェクト用のシェーダースクリプトです<br>
+Blender 3.6 の Cycles でスクリプトノードから読み込んで使用することを想定しています
 
-[Open Shader Language](https://docs.blender.org/manual/en/latest/render/shader_nodes/osl.html) (OSL) で記述された個人プロジェクト用のトゥーンシェーダーです<br>
-Blender 3.6 の Cycles でスクリプトノードから使用します
+> [!NOTE]
+> これは `0.4.0` 時点の使用方法であり、今後の更新で変更される可能性があります
 
-## シェーダーへの入力
+## 各スクリプトの説明
 
-### LightStrength
-光源の方向と強さ デフォルトは `(0.0, 0.0, 0.0)`
+### `sun_light.osl`
 
-### BaseColor
-基本の色　デフォルトは `#808080`
+#### Inputs
+* Rotation
 
-### UseBackfaceCulling
-裏面を非表示にするかどうか　デフォルトは `true`
+  ライトオブジェクトのオイラーXYZ回転角（ワールド座標系）
 
-### UseHighlight
-ハイライトを使うかどうか　デフォルトは `false`
+* Energy
 
-### HighlightThreshold
-ハイライトのしきい値　デフォルトは `0.9`
+  ライトオブジェクトのライトの強さ
 
-この値を下げるとハイライトが出やすくなります
+#### Outputs
+* Light
 
-### HighlightMap
-ハイライトのマップ　デフォルトは `0.0`
+  レンダリングポイントにおけるライトベクトル
 
-この値はハイライトの値に加算されます
+### `point_light.osl`
 
-### HighlightColor
-ハイライト部分に使う色　デフォルトは `#ffffff`
+#### Inputs
+* Location
 
-### UseShade
-陰を使うかどうか　デフォルトは `true`
+  ライトオブジェクトの位置（ワールド座標系）
 
-陰は光源の方向を向いていない面にできます
+* Energy
 
-### UseShadow
-影を使うかどうか　デフォルトは `true`
+  ライトオブジェクトのライトの強さ
 
-影は他の物体に光源が遮られている面にできます
+* Distance
 
-### ShadowThreshold
-影のしきい値　デフォルトは `0.1`
+  光源の強さが1/2に減衰する距離
 
-この値を下げると影が出やすくなります
+#### Outputs
+* Light
 
-### ShadowCutoff
-影のカットオフ　デフォルトは `0.05`
+  レンダリングポイントにおけるライトベクトル
 
-影の境界にギザギザが出る場合この値を調節します
+### `tex_light.osl`
 
-### ShadowMap
-影のマップ　デフォルトは `1.0`
+#### Inputs
+* Location
 
-この値はディフューズの値に乗算されます
+  ライトオブジェクトの位置（ワールド座標系）
 
-### ShadowColor
-影の色　デフォルトは `#1A1A1A`
+* Rotation
 
-### UseGlossy
-光沢を使うかどうか　デフォルトは `false`
+  ライトオブジェクトのオイラーXYZ回転角（ワールド座標系）
 
-### GlossyFactor
-光沢の強さ　デフォルトは `0.5`
+* Energy
 
-### MaxGlossyDistance
-光沢の最大距離　デフォルトは `100.0`
+  ライトオブジェクトのライトの強さ
 
-この距離より遠いオブジェクトは表面に反射されません
+* Size
 
-### MaxGlossyDepth
-光沢の最大深度　デフォルトは `8`
+  ライトに照らされる領域の大きさを表す角度
 
-反射の回数をこの値までに制限します
+#### Outputs
+* Light
 
-### UseTransparent
-透過を使うかどうか　デフォルトは `false`
+  レンダリングポイントにおけるライトベクトル
 
-### Transparency
-透明度　デフォルトは `1.0`
+* UV
 
-### HighlightTransparency
-ハイライトの透明度　デフォルトは `1.0`
+  レンダリングポイントにおけるライトテクスチャのUV座標
+
+### `material.osl`
+
+#### Inputs
+* Light
+
+  レンダリングポイントにおけるライトベクトル
+
+* Cutoff
+
+  影の境界に出るギザギザを調整するためのパラメータ
+
+* Reflectance
+
+  スペキュラーの反射率
+
+* Exponent
+
+  スペキュラーの指数
+
+#### Outputs
+* IsCycles
+
+  現在のレンダラーにCyclesが使用されているかどうか
+
+* Diffuse
+
+  ディフューズの値
+
+* Specular
+
+  スペキュラーの値
+
+### `to_closure.osl`
+
+#### Inputs
+* Color
+
+  色
+
+* Reflectance
+
+  光沢の強さ
+
+* Distance
+
+  光沢の最大距離
+
+* Depth
+
+  光沢を計算する際の反射回数の上限
+
+* Transparency
+
+  透明度
+
+#### Outputs
+* Shader
+
+  シェーダー
+
+### `matcap.osl`
+
+#### Outputs
+* UV
+
+  レンダリングポイントにおけるMatcapのUV座標
+
+### `visualize.osl`
+
+#### Inputs
+* Type
+
+  ビジュアライズするプロパティの種類
+
+  | Type | 説明 |
+  | :-: | :-: |
+  | 0 | 影のグループID |
+  | 1 | 透過のグループID |
+  | 2 | 影のプロパティ |
+
+#### Outputs
+* Color
+
+  プロパティの値によって色分けされた結果
 
 ## プロパティ
 オブジェクトインデックスとマテリアルインデックスに設定する値によって<br>
@@ -94,7 +165,7 @@ Blender 3.6 の Cycles でスクリプトノードから使用します
 | 機能 | 影の貫通を無効 | 透過のグループID | 影のグループID |
 | 値の範囲 | `0` - `1` | `0` - `99` |`0` - `99` |
 | 初期値 | `0` | `0` | `0` |
-| 競合する場合 | 論理和 | `0` でない方またはオブジェクトを優先 | `0` でない方またはオブジェクトを優先 |
+| 競合する場合 | 論理和 | オブジェクトを優先 | オブジェクトを優先 |
 
 ### 影のグループID
 グループのIDは `1` から `99` までの数字で `0` の場合は何もしません

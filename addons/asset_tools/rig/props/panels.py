@@ -93,10 +93,8 @@ UI_CONTENTS['MCP'] = copy.deepcopy(_HUMAN_UI_CONTENTS)
 
 # MCL
 UI_CONTENTS['MCL'] = copy.deepcopy(_HUMAN_UI_CONTENTS)
-UI_CONTENTS['MCL'][''] = {
-    'Clothes': {
-        '["show_gloves"]': ('Gloves', _visibility_icon, 0, 1.0)
-    }
+UI_CONTENTS['MCL']['Clothes'] = {
+    '["show_gloves"]': ('Gloves', _visibility_icon, 0, 1.0)
 }
 
 
