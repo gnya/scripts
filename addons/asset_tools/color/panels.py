@@ -1,8 +1,6 @@
 import bpy
-import re
 
 from asset_tools import utils
-
 
 UI_CONTENTS = {
     'Light': {
@@ -11,12 +9,12 @@ UI_CONTENTS = {
 }
 
 
-def _collect_props(props, group, name, links):
+def _collect_props(props, group, path, name, links):
     for link in links:
         n = link.from_socket.node
 
         if n.type == 'TEX_IMAGE':
-            key = (group, repr(n), 'image')
+            key = (group, f'{path}.nodes["{n.name}"]', 'image')
 
             if key in props:
                 props[key].append(name)
@@ -24,37 +22,37 @@ def _collect_props(props, group, name, links):
                 props[key] = [name]
 
         for i in n.inputs:
-            if i.links:
-                _collect_props(props, group, name, i.links)
+            if i.is_linked:
+                _collect_props(props, group, path, name, i.links)
 
 
 def _ui_contents(obj):
-    materials = set()
-
-    for o in obj.children_recursive:
-        if o.type == 'MESH':
-            for m in o.data.materials:
-                materials.add(m)
-
     node_trees = set()
+    code = obj.name.split('_')[0]
 
-    for m in materials:
-        for n in m.node_tree.nodes:
-            if n.type == 'GROUP':
-                if re.match(r'[^_]+_COLOR', n.node_tree.name):
-                    node_trees.add(n.node_tree)
+    for n in bpy.data.node_groups:
+        s = n.name.split('_')
+
+        if s[-1] == 'COLOR' and code.startswith(s[0]):
+            node_trees.add(n)
 
     props = {}
 
     for nt in node_trees:
-        for n in nt.nodes:
-            if n.type == 'GROUP_OUTPUT':
-                for i in n.inputs:
-                    if i.type == 'RGBA':
-                        if i.links:
-                            _collect_props(props, nt.name, i.name, i.links)
-                        else:
-                            props[(nt.name, repr(i), 'default_value')] = [i.name]
+        path = repr(nt)
+
+        if n := nt.nodes['Group Output']:
+            for i in range(len(n.inputs)):
+                n_in = n.inputs[i]
+
+                if n_in.type != 'RGBA':
+                    continue
+
+                if n_in.is_linked:
+                    _collect_props(props, nt.name, path, n_in.name, n_in.links)
+                else:
+                    p = f'{path}.nodes["Group Output"].inputs[{i}]'
+                    props[(nt.name, p, 'default_value')] = [n_in.name]
 
     ui_contents = {}
 
