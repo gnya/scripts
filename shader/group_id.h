@@ -1,11 +1,11 @@
 /*
- * toon shader (0.4.0)
+ * toon shader (0.4.1)
  * author: gnya
  */
 
 #define GET_SHADOW(id) mod(id, 100)
 #define GET_TRANSPARENT(id) trunc(id / 100)
-#define GET_SHADOW_PROPS(id) int(trunc(id / 10000))
+#define GET_SHADOW_PROPS(id) trunc(id / 10000)
 
 /*
  * Get this shadow group id and shadow props.
@@ -16,7 +16,7 @@ void get_this_shadow_group(output float group, output float props) {
     getattribute("material:index", mat_id);
 
     group = GET_SHADOW(obj_id) ? GET_SHADOW(obj_id) : GET_SHADOW(mat_id);
-    props = GET_SHADOW_PROPS(obj_id) | GET_SHADOW_PROPS(mat_id);
+    props = GET_SHADOW_PROPS(obj_id) ? GET_SHADOW_PROPS(obj_id) : GET_SHADOW_PROPS(mat_id);
 }
 
 /*
@@ -28,7 +28,7 @@ void get_hit_shadow_group(output float group, output float props) {
     getmessage("trace", "material:index", mat_id);
 
     group = GET_SHADOW(obj_id) ? GET_SHADOW(obj_id) : GET_SHADOW(mat_id);
-    props = GET_SHADOW_PROPS(obj_id) | GET_SHADOW_PROPS(mat_id);
+    props = GET_SHADOW_PROPS(obj_id) ? GET_SHADOW_PROPS(obj_id) : GET_SHADOW_PROPS(mat_id);
 }
 
 /*

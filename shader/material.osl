@@ -1,5 +1,5 @@
 /*
- * toon shader (0.4.0)
+ * toon shader (0.4.1)
  * author: gnya
  */
 
@@ -49,24 +49,24 @@ int shadow(vector L, float cutoff, float eps) {
 
     float this_group = 0.0;
     float this_props = 0.0;  // Unused.
-    get_this_shadow_group(this_group, this_props);
 
-    if (this_group == 0.0) {
-        return trace(pos, L);
-    }
+    get_this_shadow_group(this_group, this_props);
 
     int max_loop = MAX_LOOP;
     int count = 0;
-    float hit_group = 0.0;
 
-    int is_backfacing = dot(Ng, L) < 0.0;
+    float hit_group = 0.0;
     float hit_props = 0.0;
+
+    int this_backfacing = dot(Ng, L) < 0.0;
 
     for (; count < max_loop && trace(pos, L); count++) {
         get_hit_shadow_group(hit_group, hit_props);
 
-        if (hit_group != this_group) {
-            if (!is_backfacing | hit_props == 0.0) {
+        if (this_group == 0.0 || this_group != hit_group) {
+            if (hit_props == 0.0) {
+                return 1;
+            } else if (hit_props == 1.0 && !this_backfacing) {
                 return 1;
             }
         }
