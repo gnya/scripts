@@ -1,0 +1,27 @@
+/*
+ * toon shader (0.4.2)
+ * author: gnya
+ */
+
+#include "node_math.h"
+
+shader area_light(
+    vector Location = vector(0.0, 0.0, 0.0),
+    point Rotation = point(0.0, 0.0, 0.0),
+    float Energy = 1.0,
+    float Distance = 1.0,
+
+    output vector Light = vector(0.0, 0.0, 0.0)
+) {
+    matrix mat = euler_to_mat(Rotation);
+    vector z_axis = vector(mat[2][0], mat[2][1], mat[2][2]);
+
+    float W = dot(Location - P, z_axis);
+
+    if (W >= 0.0) {
+        float falloff = W / Distance;
+        float strength = Energy / M_PI / exp2(falloff);
+
+        Light = z_axis * strength;
+    }
+}
