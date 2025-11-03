@@ -18,6 +18,7 @@ class ToonNodeVisualize(ToonNodeBase):
         script.inputs[0].default_value = int(self.visualize_type)
 
     visualize_type: bpy.props.EnumProperty(
+        name='Visualize Type',  # noqa: F722
         default='0', items=visualize_types, update=update_visualize_type
     )  # type: ignore
 

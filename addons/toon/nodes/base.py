@@ -1,12 +1,12 @@
 import bpy
-import os
+
+from toon.shaders import script_abs_path
 
 
-def create_script_node(node_tree, osl_name):
-    addon_path = os.path.dirname(os.path.abspath(__file__))
+def create_script_node(node_tree, script_name):
     script = node_tree.nodes.new('ShaderNodeScript')
     script.mode = 'EXTERNAL'
-    script.filepath = f'{addon_path}\\shader\\{osl_name}.osl'
+    script.filepath = script_abs_path(script_name)
 
     return script
 
@@ -35,6 +35,7 @@ class ToonNodeLightBase(ToonNodeBase):
         raise NotImplementedError()
 
     object: bpy.props.PointerProperty(
+        name='Object',  # noqa: F821
         type=bpy.types.Object,
         update=lambda self, context: self.update_object(context)
     )  # type: ignore

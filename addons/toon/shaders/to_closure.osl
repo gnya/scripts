@@ -56,16 +56,16 @@ int transparent_culling() {
         return 0;
     }
 
-    float this_group = 0.0;
+    int this_group = 0;
     get_this_transparent_group(this_group);
 
-    if (this_group == 0.0) {
+    if (this_group == 0) {
         return 0;
     }
 
     vector pos = P;
     int count = 0;
-    float hit_group = 0.0;
+    int hit_group = 0;
 
     for (; count < t_depth && trace(pos, I); count++) {
         get_hit_transparent_group(hit_group);

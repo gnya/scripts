@@ -13,7 +13,7 @@
  * Linear congruential generator (m=100, a=19, c=3)
  * ref: https://en.wikipedia.org/wiki/Linear_congruential_generator
  */
-float random(float seed) {
+float random(int seed) {
     return mod(19 * seed + 3, 100) / 100.0;
 }
 
@@ -23,7 +23,7 @@ shader visualize(
     output color Color = color(0.0)
 ) {
     if (Type == SHADOW || Type == SHADOW_PROPS) {
-        float group, props;
+        int group, props;
         get_this_shadow_group(group, props);
 
         if (Type == SHADOW && group) {
@@ -32,7 +32,7 @@ shader visualize(
             Color = color("hsv", random(props), 1.0, 1.0);
         }
     } else if (Type == TRANSPARENT) {
-        float group;
+        int group;
         get_this_transparent_group(group);
 
         if (group) {
