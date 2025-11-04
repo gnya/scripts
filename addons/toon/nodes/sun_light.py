@@ -5,12 +5,6 @@ class ToonNodeSunLight(ToonNodeLightBase):
     bl_name = 'ToonNodeSunLight'
     bl_label = 'Sun Light'
 
-    def update_object(self, context):
-        name = f'objects["{self.object.name}"]' if self.object else ''
-
-        rotation = self.node_tree.nodes['Attribute Rotation']
-        rotation.attribute_name = f'{name}.rotation_euler' if name else ''
-
     def init_toon_node(self, context, node_tree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
@@ -19,10 +13,11 @@ class ToonNodeSunLight(ToonNodeLightBase):
 
         node_tree.outputs.new('NodeSocketVector', 'Light')
 
+        a = f'objects["{self.object.name}"]' if self.object else ''
         rotation = node_tree.nodes.new('ShaderNodeAttribute')
         rotation.name = 'Attribute Rotation'
         rotation.attribute_type = 'VIEW_LAYER'
-        rotation.attribute_name = ''
+        rotation.attribute_name = f'{a}.rotation_euler' if a else ''
         input = node_tree.nodes.new('NodeGroupInput')
         script = create_script_node(node_tree, 'sun_light')
         node_tree.links.new(rotation.outputs[1], script.inputs[0])

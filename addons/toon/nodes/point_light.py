@@ -5,12 +5,6 @@ class ToonNodePointLight(ToonNodeLightBase):
     bl_name = 'ToonNodePointLight'
     bl_label = 'Point Light'
 
-    def update_object(self, context):
-        name = f'objects["{self.object.name}"]' if self.object else ''
-
-        location = self.node_tree.nodes['Attribute Location']
-        location.attribute_name = f'{name}.location' if name else ''
-
     def init_toon_node(self, context, node_tree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
@@ -24,10 +18,11 @@ class ToonNodePointLight(ToonNodeLightBase):
 
         node_tree.outputs.new('NodeSocketVector', 'Light')
 
+        a = f'objects["{self.object.name}"]' if self.object else ''
         location = node_tree.nodes.new('ShaderNodeAttribute')
         location.name = 'Attribute Location'
         location.attribute_type = 'VIEW_LAYER'
-        location.attribute_name = ''
+        location.attribute_name = f'{a}.location' if a else ''
         input = node_tree.nodes.new('NodeGroupInput')
         script = create_script_node(node_tree, 'point_light')
         node_tree.links.new(location.outputs[1], script.inputs[0])

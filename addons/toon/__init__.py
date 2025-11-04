@@ -1,5 +1,8 @@
 import bpy
 
+from bpy.props import EnumProperty, IntProperty, PointerProperty
+from bpy.types import NodeTree, Operator, Panel, PropertyGroup
+
 from . import nodes
 
 
@@ -15,7 +18,35 @@ bl_info = {
 }
 
 
-class OBJECT_PT_toon(bpy.types.Panel):
+class COLLECTION_OT_toon_add_palette(Operator):
+    bl_idname = 'collection.toon_add_palette'
+    bl_label = 'Add Palette'
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        node_tree = bpy.data.node_groups.new('.Color Palette', 'ShaderNodeTree')
+        context.collection.toon_color_palette = node_tree
+
+        return {'FINISHED'}
+
+
+class COLLECTION_PT_toon(Panel):
+    bl_label = 'Toon'
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = 'collection'
+
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column()
+        col.use_property_split = True
+
+        col.prop(context.collection, 'toon_color_palette', text='Palette')
+        col.operator(COLLECTION_OT_toon_add_palette.bl_idname)
+
+
+class OBJECT_PT_toon(Panel):
     bl_label = 'Toon'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -33,7 +64,7 @@ class OBJECT_PT_toon(bpy.types.Panel):
         col.prop(settings, 'transparent_id', text='Transparent ID')
 
 
-class MATERIAL_PT_toon(bpy.types.Panel):
+class MATERIAL_PT_toon(Panel):
     bl_label = 'Toon'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -78,7 +109,7 @@ def draw_pass_index_warning(self, context):
     warning_box.label(text='Do not modify the pass index number directly.', icon='ERROR')
 
 
-class ToonSettings(bpy.types.PropertyGroup):
+class ToonSettings(PropertyGroup):
     def set_cast_shadows(self, value):
         self.id_data.pass_index = (
             (value << 12) | (self.id_data.pass_index & ~(7 << 12))
@@ -109,19 +140,19 @@ class ToonSettings(bpy.types.PropertyGroup):
         ('2', 'Disable', '')
     ]
 
-    cast_shadows: bpy.props.EnumProperty(
+    cast_shadows: EnumProperty(
         name='Cast Shadows',  # noqa: F722
         default='0', items=shadow_casting_types,
         set=set_cast_shadows, get=get_cast_shadows
     )  # type: ignore
 
-    shadow_id: bpy.props.IntProperty(
+    shadow_id: IntProperty(
         name='Shadow ID',  # noqa: F722
         default=0, min=0, max=63,
         set=set_shadow_id, get=get_shadow_id
     )  # type: ignore
 
-    transparent_id: bpy.props.IntProperty(
+    transparent_id: IntProperty(
         name='Transparent ID',  # noqa: F722
         default=0, min=0, max=63,
         set=set_transparent_id, get=get_transparent_id
@@ -129,13 +160,18 @@ class ToonSettings(bpy.types.PropertyGroup):
 
 
 def register():
-    bpy.utils.register_class(OBJECT_PT_toon)
-    bpy.utils.register_class(MATERIAL_PT_toon)
+    from bpy.utils import register_class
 
-    bpy.utils.register_class(ToonSettings)
+    register_class(COLLECTION_PT_toon)
+    register_class(OBJECT_PT_toon)
+    register_class(MATERIAL_PT_toon)
 
-    bpy.types.Object.toon_settings = bpy.props.PointerProperty(type=ToonSettings)
-    bpy.types.Material.toon_settings = bpy.props.PointerProperty(type=ToonSettings)
+    register_class(ToonSettings)
+    register_class(COLLECTION_OT_toon_add_palette)
+
+    bpy.types.Object.toon_settings = PointerProperty(type=ToonSettings)
+    bpy.types.Material.toon_settings = PointerProperty(type=ToonSettings)
+    bpy.types.Collection.toon_color_palette = PointerProperty(type=NodeTree)
 
     bpy.types.OBJECT_PT_relations.append(draw_pass_index_warning)
     bpy.types.EEVEE_MATERIAL_PT_viewport_settings.append(draw_pass_index_warning)
@@ -145,13 +181,18 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(OBJECT_PT_toon)
-    bpy.utils.unregister_class(MATERIAL_PT_toon)
+    from bpy.utils import unregister_class
 
-    bpy.utils.unregister_class(ToonSettings)
+    unregister_class(COLLECTION_PT_toon)
+    unregister_class(OBJECT_PT_toon)
+    unregister_class(MATERIAL_PT_toon)
+
+    unregister_class(ToonSettings)
+    unregister_class(COLLECTION_OT_toon_add_palette)
 
     del bpy.types.Object.toon_settings
     del bpy.types.Material.toon_settings
+    del bpy.types.Collection.toon_color_palette
 
     bpy.types.OBJECT_PT_relations.remove(draw_pass_index_warning)
     bpy.types.EEVEE_MATERIAL_PT_viewport_settings.remove(draw_pass_index_warning)
