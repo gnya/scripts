@@ -29,6 +29,8 @@ class ToonNodeOutput(ToonNodeBase):
         i.min_value = 0.0
         i.max_value = 1.0
 
+        node_tree.outputs.new('NodeSocketShader', 'Shader')
+
         input = node_tree.nodes.new('NodeGroupInput')
         script = create_script_node(node_tree, 'to_closure')
         node_tree.links.new(input.outputs[0], script.inputs[0])
@@ -37,10 +39,10 @@ class ToonNodeOutput(ToonNodeBase):
         node_tree.links.new(input.outputs[3], script.inputs[3])
         node_tree.links.new(input.outputs[4], script.inputs[4])
 
-        render_output = node_tree.nodes.new('ShaderNodeOutputMaterial')
-        render_output.target = 'CYCLES'
-        node_tree.links.new(script.outputs[0], render_output.inputs[0])
+        mix = node_tree.nodes.new('ShaderNodeMixShader')
+        node_tree.links.new(script.outputs[0], mix.inputs[0])
+        node_tree.links.new(input.outputs[0], mix.inputs[1])
+        node_tree.links.new(script.outputs[1], mix.inputs[2])
 
-        preview_output = node_tree.nodes.new('ShaderNodeOutputMaterial')
-        preview_output.target = 'EEVEE'
-        node_tree.links.new(input.outputs[0], preview_output.inputs[0])
+        output = node_tree.nodes.new('NodeGroupOutput')
+        node_tree.links.new(mix.outputs[0], output.inputs[0])

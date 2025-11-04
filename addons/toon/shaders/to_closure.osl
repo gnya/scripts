@@ -1,5 +1,5 @@
 /*
- * toon shader (0.4.2)
+ * toon shader
  * author: gnya
  */
 
@@ -87,6 +87,13 @@ shader to_closure(
     float Distance = 100.0,
     int Depth = 8,
     float Transparency = 1.0,
+
+    /*
+     * This is a hack necessary to determine whether the currently
+     * used renderer can use OSL and perform fallback processing.
+     */
+    output int IsCycles = 1
+    [[ string widget = "boolean" ]],
 
     output closure color Shader = emission()
 ) {

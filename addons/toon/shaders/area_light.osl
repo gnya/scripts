@@ -1,5 +1,5 @@
 /*
- * toon shader (0.4.2)
+ * toon shader
  * author: gnya
  */
 
