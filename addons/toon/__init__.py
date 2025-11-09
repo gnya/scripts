@@ -1,49 +1,22 @@
 import bpy
 
 from bpy.props import EnumProperty, IntProperty, PointerProperty
-from bpy.types import NodeTree, Operator, Panel, PropertyGroup
+from bpy.types import Context, Panel, PropertyGroup
 
+from . import color
 from . import nodes
 
 
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 0, 3),
+    'version': (0, 0, 6),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '
         'to make the toon shader easier to use. (For my personal project.)',
     'category': 'Material'
 }
-
-
-class COLLECTION_OT_toon_add_palette(Operator):
-    bl_idname = 'collection.toon_add_palette'
-    bl_label = 'Add Palette'
-    bl_options = {'UNDO'}
-
-    def execute(self, context):
-        node_tree = bpy.data.node_groups.new('.Color Palette', 'ShaderNodeTree')
-        context.collection.toon_color_palette = node_tree
-
-        return {'FINISHED'}
-
-
-class COLLECTION_PT_toon(Panel):
-    bl_label = 'Toon'
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = 'collection'
-
-    def draw(self, context):
-        layout = self.layout
-
-        col = layout.column()
-        col.use_property_split = True
-
-        col.prop(context.collection, 'toon_color_palette', text='Palette')
-        col.operator(COLLECTION_OT_toon_add_palette.bl_idname)
 
 
 class OBJECT_PT_toon(Panel):
@@ -90,23 +63,6 @@ class MATERIAL_PT_toon(Panel):
         row = col.row()
         row.prop(settings, 'transparent_id', text='Transparent ID')
         row.active = object_settings.transparent_id == 0
-
-
-def toon_shader_is_available(context):
-    return (
-        context.scene.render.engine == 'CYCLES' and
-        context.scene.cycles.shading_system
-    )
-
-
-def draw_pass_index_warning(self, context):
-    if not toon_shader_is_available(context):
-        return
-
-    layout = self.layout
-    warning_box = layout.box()
-
-    warning_box.label(text='Do not modify the pass index number directly.', icon='ERROR')
 
 
 class ToonSettings(PropertyGroup):
@@ -159,40 +115,48 @@ class ToonSettings(PropertyGroup):
     )  # type: ignore
 
 
+def draw_pass_index_warning(self, context: Context):
+    if (
+        context.scene.render.engine == 'CYCLES' and
+        context.scene.cycles.shading_system
+    ):
+        return
+
+    layout = self.layout
+    warning_box = layout.box()
+
+    warning_box.label(text='Do not modify the pass index number directly.', icon='ERROR')
+
+
 def register():
     from bpy.utils import register_class
 
-    register_class(COLLECTION_PT_toon)
     register_class(OBJECT_PT_toon)
     register_class(MATERIAL_PT_toon)
 
     register_class(ToonSettings)
-    register_class(COLLECTION_OT_toon_add_palette)
 
     bpy.types.Object.toon_settings = PointerProperty(type=ToonSettings)
     bpy.types.Material.toon_settings = PointerProperty(type=ToonSettings)
-    bpy.types.Collection.toon_color_palette = PointerProperty(type=NodeTree)
 
     bpy.types.OBJECT_PT_relations.append(draw_pass_index_warning)
     bpy.types.EEVEE_MATERIAL_PT_viewport_settings.append(draw_pass_index_warning)
     bpy.types.CYCLES_MATERIAL_PT_settings.append(draw_pass_index_warning)
 
+    color.register()
     nodes.register()
 
 
 def unregister():
     from bpy.utils import unregister_class
 
-    unregister_class(COLLECTION_PT_toon)
     unregister_class(OBJECT_PT_toon)
     unregister_class(MATERIAL_PT_toon)
 
     unregister_class(ToonSettings)
-    unregister_class(COLLECTION_OT_toon_add_palette)
 
     del bpy.types.Object.toon_settings
     del bpy.types.Material.toon_settings
-    del bpy.types.Collection.toon_color_palette
 
     bpy.types.OBJECT_PT_relations.remove(draw_pass_index_warning)
     bpy.types.EEVEE_MATERIAL_PT_viewport_settings.remove(draw_pass_index_warning)
@@ -200,6 +164,7 @@ def unregister():
     if hasattr(bpy.types, 'CYCLES_MATERIAL_PT_settings'):
         bpy.types.CYCLES_MATERIAL_PT_settings.remove(draw_pass_index_warning)
 
+    color.unregister()
     nodes.unregister()
 
 
