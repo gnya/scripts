@@ -1,28 +1,34 @@
 from bpy.props import BoolProperty, CollectionProperty, StringProperty
 
-
-def make_unique_name(name: str, names: list[str]) -> str:
-    if name not in names:
-        return name
-
-    split = name.rsplit('.', 1)
-    number = 0
-
-    try:
-        number = int(split[-1])
-        name = split[0]
-    except ValueError:
-        pass
-
-    name = f'{name}.{str(number + 1).zfill(3)}'
-
-    return make_unique_name(name, names)
+from toon.utils import make_unique_name
 
 
 class DataItem:
-    name: StringProperty()
+    def update_name(self, context):
+        if self.disable_update_name:
+            return
+
+        self.disable_update_name = True
+        names = self.parent_keys()
+
+        if names is not None:
+            if names.count(self.name) > 1:
+                self.name = make_unique_name(self.name, names)
+
+        self.on_rename()
+        self.disable_update_name = False
+
+    disable_update_name: BoolProperty(default=False)
+
+    name: StringProperty(update=update_name)
+
+    def parent_keys(self) -> 'DataCollection':
+        raise NotImplementedError()
 
     def compare(self, other) -> int:
+        raise NotImplementedError()
+
+    def on_rename(self) -> None:
         raise NotImplementedError()
 
     def on_add(self) -> None:

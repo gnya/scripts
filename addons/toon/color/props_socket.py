@@ -1,16 +1,11 @@
 from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
-from bpy.props import IntProperty, StringProperty
+from bpy.props import IntProperty
 from typing import Iterator
 
 from .props_base import DataItem
 
 
 class SocketLinkedItemBase(DataItem):
-    def update_name(self, context):
-        self.socket_interface.name = self.name
-
-    name: StringProperty(update=update_name)
-
     socket_id: IntProperty(default=-1)
 
     @property
@@ -46,6 +41,9 @@ class SocketLinkedItemBase(DataItem):
 
     def compare(self, other):
         return self.socket_id - other.socket_id
+
+    def on_rename(self):
+        self.socket_interface.name = self.name
 
     def on_add(self):
         # Add socket.

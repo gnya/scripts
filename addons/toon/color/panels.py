@@ -157,7 +157,7 @@ class VIEW3D_PT_toon_palette(Panel):
         )
 
         for node_tree in bpy.data.node_groups:
-            if node_tree.name.endswith('_COLOR'):
+            if node_tree.toon_palette.is_available:
                 palette = node_tree.toon_palette
                 layout.context_pointer_set('palette', palette)
                 self.draw_palette(layout, palette)

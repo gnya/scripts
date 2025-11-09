@@ -10,6 +10,8 @@ class VIEW3D_OT_toon_add_palette(Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
+        PaletteUI.new('PALETTE')
+
         return {'FINISHED'}
 
 
@@ -19,6 +21,8 @@ class VIEW3D_OT_toon_remove_palette(Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
+        PaletteUI.remove(context.palette)
+
         return {'FINISHED'}
 
 
