@@ -1,6 +1,7 @@
 import bpy
 from . import rules
 
+
 bl_info = {
     'name': 'Formatter',
     'author': 'gnya',

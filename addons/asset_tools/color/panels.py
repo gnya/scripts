@@ -2,6 +2,7 @@ import bpy
 
 from asset_tools import utils
 
+
 UI_CONTENTS = {
     'Light': {
         '$view3d.color_attach_light': ('Attach', 'LIGHT', 0, 1.0)
@@ -33,7 +34,7 @@ def _ui_contents(obj):
     for n in bpy.data.node_groups:
         s = n.name.split('_')
 
-        if s[-1] == 'COLOR' and code.startswith(s[0]):
+        if s[-1] == 'COLOR' and s[0] == code:
             node_trees.add(n)
 
     props = {}
