@@ -38,7 +38,7 @@ class ToonNodeBase(ShaderNodeCustomGroup):
 
 
 class ToonNodeLightBase(ToonNodeBase):
-    last_object_name: StringProperty(default='')  # type: ignore # noqa: F722
+    last_object_name: StringProperty(default='')
 
     def update_object(self, context: Context):
         self.free()
@@ -47,10 +47,9 @@ class ToonNodeLightBase(ToonNodeBase):
         self.last_object_name = self.object.name if self.object else ''
 
     object: PointerProperty(
-        name='Object',  # noqa: F821
-        type=Object,
-        update=lambda self, context: self.update_object(context)
-    )  # type: ignore
+        name='Object', type=Object,
+        update=update_object
+    )
 
     def node_tree_name(self):
         name = super().node_tree_name()

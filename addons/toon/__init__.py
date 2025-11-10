@@ -3,14 +3,14 @@ import bpy
 from bpy.props import EnumProperty, IntProperty, PointerProperty
 from bpy.types import Context, Panel, PropertyGroup
 
-from . import color
+from . import palette
 from . import nodes
 
 
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 0, 7),
+    'version': (0, 0, 8),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '
@@ -97,22 +97,22 @@ class ToonSettings(PropertyGroup):
     ]
 
     cast_shadows: EnumProperty(
-        name='Cast Shadows',  # noqa: F722
+        name='Cast Shadows',
         default='0', items=shadow_casting_types,
         set=set_cast_shadows, get=get_cast_shadows
-    )  # type: ignore
+    )
 
     shadow_id: IntProperty(
-        name='Shadow ID',  # noqa: F722
+        name='Shadow ID',
         default=0, min=0, max=63,
         set=set_shadow_id, get=get_shadow_id
-    )  # type: ignore
+    )
 
     transparent_id: IntProperty(
-        name='Transparent ID',  # noqa: F722
+        name='Transparent ID',
         default=0, min=0, max=63,
         set=set_transparent_id, get=get_transparent_id
-    )  # type: ignore
+    )
 
 
 def draw_pass_index_warning(self, context: Context):
@@ -143,7 +143,7 @@ def register():
     bpy.types.EEVEE_MATERIAL_PT_viewport_settings.append(draw_pass_index_warning)
     bpy.types.CYCLES_MATERIAL_PT_settings.append(draw_pass_index_warning)
 
-    color.register()
+    palette.register()
     nodes.register()
 
 
@@ -164,7 +164,7 @@ def unregister():
     if hasattr(bpy.types, 'CYCLES_MATERIAL_PT_settings'):
         bpy.types.CYCLES_MATERIAL_PT_settings.remove(draw_pass_index_warning)
 
-    color.unregister()
+    palette.unregister()
     nodes.unregister()
 
 

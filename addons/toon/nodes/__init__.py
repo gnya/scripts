@@ -1,4 +1,5 @@
 from .matcap import ToonNodeMatCap
+from .palette import ToonNodePalette
 from .visualize import ToonNodeVisualize
 
 from .material import ToonNodeMaterial
@@ -13,6 +14,7 @@ from .output import ToonNodeOutput
 
 node_classes = (
     ToonNodeMatCap,
+    ToonNodePalette,
     ToonNodeVisualize,
     ToonNodeMaterial,
     ToonNodeAreaLight,

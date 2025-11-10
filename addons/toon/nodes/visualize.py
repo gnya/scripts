@@ -19,10 +19,9 @@ class ToonNodeVisualize(ToonNodeBase):
         self.init(context)
 
     visualize_type: EnumProperty(
-        name='Visualize Type',  # noqa: F722
-        default='0', items=visualize_types,
-        update=lambda self, context: self.update_visualize_type(context)
-    )  # type: ignore
+        items=visualize_types, name='Visualize Type', default='0',
+        update=update_visualize_type
+    )
 
     def node_tree_name(self):
         return f'{super().node_tree_name()}_{self.visualize_type}'
