@@ -1,7 +1,7 @@
 from bpy.types import PropertyGroup
 from bpy.props import CollectionProperty, IntProperty
 
-from .props_palette import PaletteItem, PaletteGroup, Palette
+from .palette import PaletteItem, PaletteGroup, Palette
 
 
 class PalettePointer():

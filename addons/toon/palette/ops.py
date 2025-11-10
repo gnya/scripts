@@ -1,7 +1,7 @@
 from bpy.props import EnumProperty
 from bpy.types import Operator
 
-from .props_ui import PaletteUI
+from .props import PaletteUI
 
 
 class VIEW3D_OT_toon_add_palette(Operator):

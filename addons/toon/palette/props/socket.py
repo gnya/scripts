@@ -2,10 +2,10 @@ from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
 from bpy.props import IntProperty
 from typing import Iterator
 
-from .props_base import DataItem
+from .base import DataItem
 
 
-class SocketLinkedItemBase(DataItem):
+class SocketLinkedItem(DataItem):
     socket_id: IntProperty(default=-1)
 
     @property
@@ -25,7 +25,7 @@ class SocketLinkedItemBase(DataItem):
 
         return output.inputs[self.socket_id]
 
-    def linked_items(self) -> Iterator['SocketLinkedItemBase']:
+    def linked_items(self) -> Iterator['SocketLinkedItem']:
         raise NotImplementedError()
 
     def _next_of_self(self):

@@ -1,9 +1,7 @@
-import bpy
-
 from bpy.props import StringProperty
 from bpy.types import Panel, UILayout, UIList
 
-from .props_ui import PalettePointer, PaletteUIItem, PaletteUI
+from .props import PalettePointer, PaletteUIItem, PaletteUI
 from .ops import (
     VIEW3D_OT_toon_add_palette,
     VIEW3D_OT_toon_remove_palette,
@@ -156,8 +154,6 @@ class VIEW3D_PT_toon_palette(Panel):
             text='Add Palette', icon='ADD'
         )
 
-        for node_tree in bpy.data.node_groups:
-            if node_tree.toon_palette.is_available:
-                palette = node_tree.toon_palette
-                layout.context_pointer_set('palette', palette)
-                self.draw_palette(layout, palette)
+        for palette in PaletteUI.instances():
+            layout.context_pointer_set('palette', palette)
+            self.draw_palette(layout, palette)
