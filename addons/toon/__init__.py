@@ -10,7 +10,7 @@ from . import nodes
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 0, 10),
+    'version': (0, 0, 11),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '
@@ -25,7 +25,7 @@ class OBJECT_PT_toon(Panel):
     bl_region_type = 'WINDOW'
     bl_context = 'object'
 
-    def draw(self, context):
+    def draw(self, context: Context):
         layout = self.layout
 
         settings = context.object.toon_settings
@@ -43,7 +43,7 @@ class MATERIAL_PT_toon(Panel):
     bl_region_type = 'WINDOW'
     bl_context = 'material'
 
-    def draw(self, context):
+    def draw(self, context: Context):
         layout = self.layout
 
         object_settings = context.object.toon_settings
@@ -66,28 +66,28 @@ class MATERIAL_PT_toon(Panel):
 
 
 class ToonSettings(PropertyGroup):
-    def set_cast_shadows(self, value):
+    def _set_cast_shadows(self, value: int):
         self.id_data.pass_index = (
             (value << 12) | (self.id_data.pass_index & ~(7 << 12))
         )
 
-    def set_shadow_id(self, value):
+    def _set_shadow_id(self, value: int):
         self.id_data.pass_index = (
             (value << 0) | (self.id_data.pass_index & ~(63 << 0))
         )
 
-    def set_transparent_id(self, value):
+    def _set_transparent_id(self, value: int):
         self.id_data.pass_index = (
             (value << 6) | (self.id_data.pass_index & ~(63 << 6))
         )
 
-    def get_cast_shadows(self):
+    def _get_cast_shadows(self) -> int:
         return (self.id_data.pass_index >> 12) & 7
 
-    def get_shadow_id(self):
+    def _get_shadow_id(self) -> int:
         return (self.id_data.pass_index >> 0) & 63
 
-    def get_transparent_id(self):
+    def _get_transparent_id(self) -> int:
         return (self.id_data.pass_index >> 6) & 63
 
     shadow_casting_types = [
@@ -99,25 +99,25 @@ class ToonSettings(PropertyGroup):
     cast_shadows: EnumProperty(
         name='Cast Shadows',
         default='0', items=shadow_casting_types,
-        set=set_cast_shadows, get=get_cast_shadows
+        set=_set_cast_shadows, get=_get_cast_shadows
     )
 
     shadow_id: IntProperty(
         name='Shadow ID',
         default=0, min=0, max=63,
-        set=set_shadow_id, get=get_shadow_id
+        set=_set_shadow_id, get=_get_shadow_id
     )
 
     transparent_id: IntProperty(
         name='Transparent ID',
         default=0, min=0, max=63,
-        set=set_transparent_id, get=get_transparent_id
+        set=_set_transparent_id, get=_get_transparent_id
     )
 
 
 def draw_pass_index_warning(self, context: Context):
     if (
-        context.scene.render.engine == 'CYCLES' and
+        context.scene.render.engine == 'CYCLES' and  # type: ignore
         context.scene.cycles.shading_system
     ):
         return

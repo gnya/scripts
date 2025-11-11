@@ -1,5 +1,5 @@
 from bpy.props import EnumProperty
-from bpy.types import Context
+from bpy.types import Context, NodeTree, UILayout
 
 from toon.utils import override
 
@@ -30,7 +30,7 @@ class ToonNodeVisualize(ToonNode):
         return f'{super().node_tree_name()}_{self.visualize_type}'
 
     @override
-    def init_toon_node(self, context, node_tree):
+    def init_toon_node(self, context: Context, node_tree: NodeTree):
         node_tree.outputs.new('NodeSocketColor', 'Color')
 
         script = create_script_node(node_tree, 'visualize')
@@ -39,5 +39,5 @@ class ToonNodeVisualize(ToonNode):
         node_tree.links.new(script.outputs[0], output.inputs[0])
 
     @override
-    def draw_buttons(self, context, layout):
+    def draw_buttons(self, context: Context, layout: UILayout):
         layout.prop(self, 'visualize_type', text='')

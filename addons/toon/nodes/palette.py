@@ -1,7 +1,7 @@
 from bpy.props import StringProperty
-from bpy.types import Context
+from bpy.types import Context, NodeTree, UILayout
 
-from toon.palette.props import PaletteUI, PaletteName
+from toon.palette.props import Palette, PaletteUI, PaletteName
 from toon.utils import override
 
 from .base import ToonNode
@@ -38,22 +38,30 @@ class ToonNodePalette(ToonNode):
         return palette.id_data.name[1:]
 
     @override
-    def init_toon_node(self, context, node_tree):
+    def init_toon_node(self, context: Context, node_tree: NodeTree):
         pass  # Doing anything.
 
     @override
     def free(self):
         pass  # Doing anything.
 
+    def _palette_instance(self):
+        palette = getattr(self.node_tree, Palette.PROP_NAME, None)
+
+        if palette is None:
+            return PaletteUI.instance(self.palette_name)
+        elif palette.name == self.palette_name:
+            return palette
+
     @override
     def update(self):
-        if not self.outputs:
+        if len(self.outputs) == 0:
             return
 
         for output in self.outputs:
             output.enabled = False
 
-        palette = PaletteUI.instance(self.palette_name)
+        palette = self._palette_instance()
 
         if palette is None:
             return
@@ -67,7 +75,7 @@ class ToonNodePalette(ToonNode):
             self.outputs[item.socket_id].enabled = True
 
     @override
-    def draw_buttons(self, context, layout):
+    def draw_buttons(self, context: Context, layout: UILayout):
         layout.prop_search(
             self, 'palette_name',
             PaletteName.prop_data(), PaletteName.PROP_NAME,

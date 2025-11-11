@@ -1,9 +1,9 @@
-from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
+from bpy.types import NodeSocketColor, NodeSocketInterface, NodeTree
 from bpy.props import IntProperty
 from typing import Iterator
 
 from toon.utils import override
-from toon.utils.collection import Entry
+from toon.utils.collection import Entry, EntryBase
 
 
 class SocketEntry(Entry):
@@ -29,18 +29,20 @@ class SocketEntry(Entry):
     def socket_interface(self) -> NodeSocketInterface:
         return self.node_tree().outputs[self.socket_id]
 
-    def socket(self) -> NodeSocket:
+    def socket(self) -> NodeSocketColor:
         node_tree = self.node_tree()
         output = node_tree.nodes.get('Group Output')
 
-        if not output:
+        if output is None:
             output = node_tree.nodes.new('NodeGroupOutput')
 
         return output.inputs[self.socket_id]
 
     @override
-    def compare(self, other):
-        return self.socket_id - other.socket_id
+    def compare(self, other: EntryBase) -> int:
+        other_socket_id = getattr(other, 'socket_id', -1)
+
+        return self.socket_id - other_socket_id
 
     @override
     def on_rename(self):
@@ -71,10 +73,14 @@ class SocketEntry(Entry):
                 item.socket_id -= 1
 
     @override
-    def on_move(self, dst):
-        # Move socket.
+    def on_move(self, dst: EntryBase):
         src_id = self.socket_id
-        dst_id = dst.socket_id
+        dst_id = getattr(dst, 'socket_id', -1)
+
+        if dst_id < 0 or src_id == dst_id:
+            return
+
+        # Move socket.
         node_tree = self.node_tree()
         node_tree.outputs.move(src_id, dst_id)
 

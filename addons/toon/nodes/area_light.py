@@ -1,3 +1,5 @@
+from bpy.types import Context, NodeTree
+
 from toon.utils import override
 
 from .base import ToonNodeLight, create_script_node
@@ -8,7 +10,7 @@ class ToonNodeAreaLight(ToonNodeLight):
     bl_label = 'Area Light'
 
     @override
-    def init_toon_node(self, context, node_tree):
+    def init_toon_node(self, context: Context, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
         i.min_value = 0.0

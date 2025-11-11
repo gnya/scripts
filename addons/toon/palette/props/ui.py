@@ -1,25 +1,18 @@
-from bpy.types import PropertyGroup
 from bpy.props import CollectionProperty, IntProperty
+from bpy.types import PropertyGroup
 
 from .palette import PaletteEntry, PaletteGroup, Palette
 
 
 class PalettePointer():
     def __init__(
-            self, item: PaletteEntry | None, group: PaletteGroup | None,
-            item_id: int = -1, group_id: int = -1
+            self, group: PaletteGroup, item: PaletteEntry | None,
+            group_id: int = -1, item_id: int = -1
     ):
-        self.item = item
         self.group = group
-        self.item_id = item_id
+        self.item = item
         self.group_id = group_id
-
-    # When a pointer is null, it evaluates to False in an if statement.
-    def __bool__(self):
-        return not (
-            self.item is None and self.group is None and
-            self.item_id < 0 and self.group_id < 0
-        )
+        self.item_id = item_id
 
 
 class PaletteSlot(PropertyGroup):
@@ -29,7 +22,7 @@ class PaletteSlot(PropertyGroup):
 
 
 class PaletteUI(Palette, PropertyGroup):
-    def _get_active_slot_id(self):
+    def _get_active_slot_id(self) -> int:
         if (
             self.active_slot_id_value < 0 or
             self.active_slot_id_value >= len(self.slots)
@@ -46,7 +39,7 @@ class PaletteUI(Palette, PropertyGroup):
         else:
             return self.active_slot_id_value - slot.item_id - 1
 
-    def _set_active_slot_id(self, value):
+    def _set_active_slot_id(self, value: int):
         self.active_slot_id_value = value
 
     slots: CollectionProperty(type=PaletteSlot)
@@ -57,24 +50,24 @@ class PaletteUI(Palette, PropertyGroup):
         get=_get_active_slot_id, set=_set_active_slot_id
     )
 
-    def get_item(self, key: PaletteSlot) -> PalettePointer:
+    def get_item(self, key: PaletteSlot) -> PalettePointer | None:
         if key.group_id < 0 or key.group_id >= len(self.items):
-            return PalettePointer(None, None, -1, -1)
+            return None
 
-        group: PaletteGroup = self.items[key.group_id]
+        group = self.items[key.group_id]
 
         if key.item_id < 0 or key.item_id >= len(group.items):
-            return PalettePointer(None, group, -1, key.group_id)
+            return PalettePointer(group, None, key.group_id, -1)
 
-        item: PaletteEntry = group.items[key.item_id]
+        item = group.items[key.item_id]
 
-        return PalettePointer(item, group, key.item_id, key.group_id)
+        return PalettePointer(group, item, key.group_id, key.item_id)
 
-    def active_item(self) -> PalettePointer:
+    def active_item(self) -> PalettePointer | None:
         slot_id = self.active_slot_id
 
         if slot_id < 0 or slot_id >= len(self.slots):
-            return PalettePointer(None, None, -1, -1)
+            return None
 
         return self.get_item(self.slots[slot_id])
 

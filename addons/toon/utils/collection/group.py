@@ -11,7 +11,7 @@ from .naming import make_unique_name
 class Group(GroupBase, Entry, PropertyGroup):
     show_expanded: BoolProperty()
 
-    def _key_to_index(self, key):
+    def _key_to_index(self, key: int | str | EntryBase) -> int:
         if isinstance(key, int):
             if key < 0:
                 return len(self.items) + key
@@ -19,13 +19,11 @@ class Group(GroupBase, Entry, PropertyGroup):
                 return key
         elif isinstance(key, str):
             return self.items.find(key)
-        elif isinstance(key, EntryBase):
+        else:
             return self.items.find(key.name)
 
-        return -1
-
     @override
-    def add(self, name):
+    def add(self, name: str):
         name = make_unique_name(name, self.items.keys())
 
         # Add item.
@@ -36,7 +34,7 @@ class Group(GroupBase, Entry, PropertyGroup):
         return item
 
     @override
-    def remove(self, key):
+    def remove(self, key: int | str | EntryBase):
         index = self._key_to_index(key)
 
         if index < 0 or index >= len(self.items):
@@ -49,7 +47,7 @@ class Group(GroupBase, Entry, PropertyGroup):
         return True
 
     @override
-    def move(self, src_key, dst_key):
+    def move(self, src_key: int | str | EntryBase, dst_key: int | str | EntryBase):
         src_index = self._key_to_index(src_key)
         dst_index = self._key_to_index(dst_key)
 
@@ -67,18 +65,19 @@ class Group(GroupBase, Entry, PropertyGroup):
         return True
 
     @override
-    def compare(self, other: GroupBase):
-        min_len = len(other.items)
+    def compare(self, other: EntryBase) -> int:
+        other_items = getattr(other, 'items', [other])
+        min_len = len(other_items)
         result = 1
 
         if len(self.items) == min_len:
             result = 0
         elif len(self.items) < min_len:
-            min_len = len(other.items)
+            min_len = len(other_items)
             result = -1
 
         for i in range(min_len):
-            r = self.items[i].compare(other.items[i])
+            r = self.items[i].compare(other_items[i])
 
             if r != 0:
                 return r
@@ -91,13 +90,15 @@ class Group(GroupBase, Entry, PropertyGroup):
             item.on_remove()
 
     @override
-    def on_move(self, dst: GroupBase):
-        if self.items and dst.items:
-            dst_item = dst.items[-1]
+    def on_move(self, dst: EntryBase):
+        dst_items = getattr(dst, 'items', [dst])
+
+        if self.items and dst_items:
+            dst_item = dst_items[-1]
             src_item_itr = self.items
 
             if self.items[0].compare(dst_item) > 0:
-                dst_item = dst.items[0]
+                dst_item = dst_items[0]
                 src_item_itr = reversed(self.items)
 
             for src_item in src_item_itr:

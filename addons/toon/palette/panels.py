@@ -1,5 +1,6 @@
 from bpy.props import StringProperty
-from bpy.types import Panel, UILayout, UIList
+from bpy.types import Context, Panel, UILayout, UIList
+from typing import Any
 
 from .props import PalettePointer, PaletteSlot, PaletteUI
 from .ops import (
@@ -19,16 +20,22 @@ class VIEW3D_UL_toon_palette_item(UIList):
     )
 
     def draw_item(
-            self, context, layout: UILayout, palette: PaletteUI,
-            slot: PaletteSlot, icon, active_data, active_property
+            self, context: Context, layout: UILayout, data: PaletteUI | None,
+            item: PaletteSlot | None, icon: int | None, active_data: Any,
+            active_property: str | None, index: int | None = 0, flt_flag: int | None = 0
     ):
+        if data is None or item is None:
+            return
+
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            p = palette.get_item(slot)
+            p = data.get_item(item)
             row = layout.row(align=True)
 
-            if p.item is None:
-                icon = 'DOWNARROW_HLT' if p.group.show_expanded else 'RIGHTARROW'
-                row.prop(p.group, 'show_expanded', text='', emboss=False, icon=icon)
+            if p is None:
+                return
+            elif p.item is None:
+                i = 'DOWNARROW_HLT' if p.group.show_expanded else 'RIGHTARROW'
+                row.prop(p.group, 'show_expanded', text='', emboss=False, icon=i)
                 row.prop(p.group, 'name', text='', emboss=False)
             else:
                 row.separator(factor=3.0)
@@ -43,8 +50,10 @@ class VIEW3D_UL_toon_palette_item(UIList):
         else:
             return filter_name.lower() not in name.lower()
 
-    def _filter_item(self, p: PalettePointer):
-        if p.item is not None:
+    def _filter_item(self, p: PalettePointer | None) -> bool:
+        if p is None:
+            return False
+        elif p.item is not None:
             if not self.filter_name:
                 return p.group.show_expanded
 
@@ -63,7 +72,12 @@ class VIEW3D_UL_toon_palette_item(UIList):
 
         return False
 
-    def filter_items(self, context, data, property):
+    def filter_items(
+            self, context: Context, data: PaletteUI | None, property: str
+    ) -> tuple[list[int], list[int]]:
+        if data is None:
+            return [], []
+
         slots = getattr(data, property)
         filter_flags = [self.bitflag_filter_item] * len(slots)
 
@@ -146,7 +160,7 @@ class VIEW3D_PT_toon_palette(Panel):
             box = col.box()
             self.draw_palette_list(box, palette)
 
-    def draw(self, context):
+    def draw(self, context: Context):
         layout = self.layout
 
         layout.operator(

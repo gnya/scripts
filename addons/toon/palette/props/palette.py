@@ -1,13 +1,13 @@
 import bpy
 
 from bpy.app import handlers, timers
-from bpy.types import NodeTree, PropertyGroup, WindowManager
 from bpy.props import (
     BoolProperty, CollectionProperty, PointerProperty
 )
+from bpy.types import NodeTree, PropertyGroup, Scene, WindowManager
 
 from toon.utils import override
-from toon.utils.collection import Group
+from toon.utils.collection import EntryBase, Group
 
 from .entry import PaletteEntry
 
@@ -34,7 +34,7 @@ class PaletteName(PropertyGroup):
 
     @staticmethod
     @handlers.persistent
-    def _load_post(scene):
+    def _load_post(scene: Scene):
         PaletteName.update()
 
     @staticmethod
@@ -54,7 +54,7 @@ class PaletteName(PropertyGroup):
         delattr(WindowManager, PaletteName.PROP_NAME)
 
         if PaletteName.update in handlers.load_post:
-            handlers.load_post.remove(PaletteName.update)
+            handlers.load_post.remove(PaletteName._load_post)
 
 
 class Palette(Group, PropertyGroup):
@@ -66,7 +66,7 @@ class Palette(Group, PropertyGroup):
     is_available: BoolProperty(default=False)
 
     @override
-    def parent(self):
+    def parent(self) -> tuple[list[str], list[EntryBase]]:
         names = []
         items = []
 
@@ -74,7 +74,7 @@ class Palette(Group, PropertyGroup):
             names.append(palette.name)
             items.append(palette)
 
-        return (names, items)
+        return names, items
 
     @override
     def on_rename(self):
@@ -83,7 +83,7 @@ class Palette(Group, PropertyGroup):
     @staticmethod
     def new_instance(name: str) -> 'Palette':
         node_tree = bpy.data.node_groups.new(
-            Palette.NODE_TREE_NAME, 'ShaderNodeTree'
+            Palette.NODE_TREE_NAME, 'ShaderNodeTree'  # type: ignore
         )
         node_tree.use_fake_user = True
 

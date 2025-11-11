@@ -22,7 +22,7 @@ class ToonNode(ShaderNodeCustomGroup):
         return self.bl_name
 
     def init_toon_node(self, context: Context, node_tree: NodeTree):
-        raise NotImplementedError()
+        pass
 
     @override
     def init(self, context: Context):
@@ -34,8 +34,8 @@ class ToonNode(ShaderNodeCustomGroup):
         name = f'.{name}'
         node_tree = bpy.data.node_groups.get(name)
 
-        if not node_tree:
-            node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
+        if node_tree is None:
+            node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')  # type: ignore
             self.init_toon_node(context, node_tree)
 
         # Assignment to `self.node_tree` must always be done last.

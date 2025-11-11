@@ -1,7 +1,14 @@
 from bpy.props import EnumProperty
-from bpy.types import Operator
+from bpy.types import Context, Operator
+from typing import TYPE_CHECKING
+
+from toon.utils import override
 
 from .props import PaletteUI
+
+# Type check.
+if TYPE_CHECKING:
+    from bpy._typing.rna_enums import OperatorReturnItems
 
 
 class VIEW3D_OT_toon_add_palette(Operator):
@@ -9,7 +16,8 @@ class VIEW3D_OT_toon_add_palette(Operator):
     bl_label = 'Add Palette'
     bl_options = {'UNDO'}
 
-    def execute(self, context):
+    @override
+    def execute(self, context: Context) -> set['OperatorReturnItems']:
         PaletteUI.new_instance('PALETTE')
 
         return {'FINISHED'}
@@ -20,8 +28,10 @@ class VIEW3D_OT_toon_remove_palette(Operator):
     bl_label = 'Remove Palette'
     bl_options = {'UNDO'}
 
-    def execute(self, context):
-        PaletteUI.del_instance(context.palette)
+    @override
+    def execute(self, context: Context) -> set['OperatorReturnItems']:
+        palette: PaletteUI = context.palette
+        PaletteUI.del_instance(palette)
 
         return {'FINISHED'}
 
@@ -31,11 +41,12 @@ class VIEW3D_OT_toon_add_palette_group(Operator):
     bl_label = 'Add Group'
     bl_options = {'UNDO'}
 
-    def execute(self, context):
+    @override
+    def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
         p = palette.active_item()
 
-        if not p:
+        if p is None:
             palette.add('Group')
             palette.update_slots()
 
@@ -55,11 +66,12 @@ class VIEW3D_OT_toon_remove_palette_group(Operator):
     bl_label = 'Remove Group'
     bl_options = {'UNDO'}
 
-    def execute(self, context):
+    @override
+    def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
         p = palette.active_item()
 
-        if p and p.item is None:
+        if p is not None and p.item is None:
             palette.remove(p.group_id)
             palette.update_slots()
 
@@ -74,14 +86,14 @@ class VIEW3D_OT_toon_add_palette_item(Operator):
     bl_label = 'Add Item'
     bl_options = {'UNDO'}
 
-    def execute(self, context):
+    @override
+    def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
         p = palette.active_item()
 
-        if not p:
+        if p is None:
             return {'FINISHED'}
-
-        if p.item is None:
+        elif p.item is None:
             item = p.group.add('Item')
             item.color = (1.0, 1.0, 1.0, 1.0)
             palette.update_slots()
@@ -104,11 +116,12 @@ class VIEW3D_OT_toon_remove_palette_item(Operator):
     bl_label = 'Remove Item'
     bl_options = {'UNDO'}
 
-    def execute(self, context):
+    @override
+    def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
         p = palette.active_item()
 
-        if p and p.item is not None:
+        if p is not None and p.item is not None:
             p.group.remove(p.item_id)
             palette.update_slots()
 
@@ -130,16 +143,15 @@ class VIEW3D_OT_toon_move_palette_slot(Operator):
 
     direction: EnumProperty(items=direction_types)
 
-    def execute(self, context):
+    @override
+    def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
         p = palette.active_item()
-
-        if not p:
-            return {'FINISHED'}
-
         offset = -1 if self.direction == 'UP' else 1
 
-        if p.item is None:
+        if p is None:
+            return {'FINISHED'}
+        elif p.item is None:
             if p.group_id + offset < 0:
                 return {'FINISHED'}
 

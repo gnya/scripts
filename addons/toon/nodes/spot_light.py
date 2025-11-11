@@ -1,3 +1,4 @@
+from bpy.types import Context, NodeTree
 import math
 
 from toon.utils import override
@@ -10,7 +11,7 @@ class ToonNodeSpotLight(ToonNodeLight):
     bl_label = 'Spot Light'
 
     @override
-    def init_toon_node(self, context, node_tree):
+    def init_toon_node(self, context: Context, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
         i.min_value = 0.0

@@ -1,5 +1,5 @@
-from bpy.types import PropertyGroup
 from bpy.props import EnumProperty, FloatVectorProperty
+from bpy.types import Context, PropertyGroup
 
 from toon.utils import override
 
@@ -13,10 +13,10 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         ('MIX', 'Mix', '')
     ]
 
-    def _update_type(self, context):
+    def _update_type(self, context: Context):
         pass
 
-    def _update_color(self, context):
+    def _update_color(self, context: Context):
         self.socket().default_value = self.color
 
     type: EnumProperty(
