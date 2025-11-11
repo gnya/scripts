@@ -1,12 +1,15 @@
 import math
 
-from .base import ToonNodeLightBase, create_script_node
+from toon.utils import override
+
+from .base import ToonNodeLight, create_script_node
 
 
-class ToonNodeSpotLight(ToonNodeLightBase):
+class ToonNodeSpotLight(ToonNodeLight):
     bl_name = 'ToonNodeSpotLight'
     bl_label = 'Spot Light'
 
+    @override
     def init_toon_node(self, context, node_tree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0

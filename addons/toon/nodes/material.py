@@ -1,10 +1,13 @@
-from .base import ToonNodeBase, create_script_node
+from toon.utils import override
+
+from .base import ToonNode, create_script_node
 
 
-class ToonNodeMaterial(ToonNodeBase):
+class ToonNodeMaterial(ToonNode):
     bl_name = 'ToonNodeMaterial'
     bl_label = 'Material'
 
+    @override
     def init_toon_node(self, context, node_tree):
         i = node_tree.inputs.new('NodeSocketVector', 'Light')
         i.default_value = (0.0, 0.0, 1.0)

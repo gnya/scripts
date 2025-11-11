@@ -1,44 +1,40 @@
 from bpy.types import PropertyGroup
 from bpy.props import EnumProperty, FloatVectorProperty
 
-from .socket import SocketLinkedItem
+from toon.utils import override
+
+from .socket import SocketEntry
 
 
-class PaletteItem(SocketLinkedItem, PropertyGroup):
+class PaletteEntry(SocketEntry, PropertyGroup):
     item_types = [
         ('COLOR', 'Color', ''),
         ('TEXTURE', 'Texture', ''),
         ('MIX', 'Mix', '')
     ]
 
-    def update_type(self, context):
+    def _update_type(self, context):
         pass
 
-    def update_color(self, context):
-        self.socket.default_value = self.color
+    def _update_color(self, context):
+        self.socket().default_value = self.color
 
     type: EnumProperty(
         items=item_types, default='COLOR',
-        update=update_type
+        update=_update_type
     )
 
     color: FloatVectorProperty(
         subtype='COLOR', size=4,
-        default=(1.0, 1.0, 1.0, 1.0),
         soft_min=0.0, soft_max=1.0,
-        update=update_color
+        update=_update_color
     )
 
-    @property
+    @override
     def node_tree(self):
         return self.id_data
 
-    def parent_keys(self):
-        path = self.path_from_id().rsplit('.', 1)[0]
-        group = self.id_data.path_resolve(path)
-
-        return group.items.keys()
-
+    @override
     def linked_items(self):
         path = self.path_from_id().rsplit('.', 2)[0]
         palette = self.id_data.path_resolve(path)

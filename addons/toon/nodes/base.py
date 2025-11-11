@@ -1,12 +1,15 @@
 import bpy
 
-from bpy.types import Context, NodeTree, Object, ShaderNodeCustomGroup
+from bpy.types import (
+    Context, Node, NodeTree, Object, ShaderNodeCustomGroup, UILayout
+)
 from bpy.props import PointerProperty, StringProperty
 
 from toon.shaders import script_abs_path
+from toon.utils import override
 
 
-def create_script_node(node_tree: NodeTree, script_name: str):
+def create_script_node(node_tree: NodeTree, script_name: str) -> Node:
     script = node_tree.nodes.new('ShaderNodeScript')
     script.mode = 'EXTERNAL'
     script.filepath = script_abs_path(script_name)
@@ -14,15 +17,21 @@ def create_script_node(node_tree: NodeTree, script_name: str):
     return script
 
 
-class ToonNodeBase(ShaderNodeCustomGroup):
-    def node_tree_name(self):
+class ToonNode(ShaderNodeCustomGroup):
+    def node_tree_name(self) -> str:
         return self.bl_name
 
     def init_toon_node(self, context: Context, node_tree: NodeTree):
         raise NotImplementedError()
 
-    def init(self, context):
-        name = f'.{self.node_tree_name()}'
+    @override
+    def init(self, context: Context):
+        name = self.node_tree_name()
+
+        if not name:
+            return
+
+        name = f'.{name}'
         node_tree = bpy.data.node_groups.get(name)
 
         if not node_tree:
@@ -32,15 +41,18 @@ class ToonNodeBase(ShaderNodeCustomGroup):
         # Assignment to `self.node_tree` must always be done last.
         self.node_tree = node_tree
 
+    @override
     def free(self):
-        if self.node_tree.users == 1:
-            bpy.data.node_groups.remove(self.node_tree)
+        node_tree = self.node_tree
+
+        if node_tree is not None and node_tree.users == 1:
+            bpy.data.node_groups.remove(node_tree)
 
 
-class ToonNodeLightBase(ToonNodeBase):
+class ToonNodeLight(ToonNode):
     last_object_name: StringProperty(default='')
 
-    def update_object(self, context: Context):
+    def _update_object(self, context: Context):
         self.free()
         self.init(context)
 
@@ -48,15 +60,17 @@ class ToonNodeLightBase(ToonNodeBase):
 
     object: PointerProperty(
         name='Object', type=Object,
-        update=update_object
+        update=_update_object
     )
 
-    def node_tree_name(self):
+    @override
+    def node_tree_name(self) -> str:
         name = super().node_tree_name()
 
         return f'{name}_{self.object.name}' if self.object else name
 
-    def draw_buttons(self, context, layout):
+    @override
+    def draw_buttons(self, context: Context, layout: UILayout):
         if self.object and self.object.name != self.last_object_name:
             layout.alert = True
 

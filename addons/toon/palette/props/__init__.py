@@ -1,21 +1,18 @@
-from .base import DataItem, DataCollection
-from .socket import SocketLinkedItem
+from .socket import SocketEntry
 
-from .item import PaletteItem
+from .entry import PaletteEntry
 from .palette import PaletteGroup, PaletteName, Palette
-from .ui import PalettePointer, PaletteUIItem, PaletteUI
+from .ui import PalettePointer, PaletteSlot, PaletteUI
 
 
 __all__ = [
-    DataItem,
-    DataCollection,
-    SocketLinkedItem,
-    PaletteItem,
+    SocketEntry,
+    PaletteEntry,
     PaletteGroup,
     PaletteName,
     Palette,
     PalettePointer,
-    PaletteUIItem,
+    PaletteSlot,
     PaletteUI
 ]
 
@@ -23,18 +20,18 @@ __all__ = [
 def register():
     from bpy.utils import register_class
 
-    register_class(PaletteItem)
+    register_class(PaletteEntry)
     register_class(PaletteGroup)
     register_class(PaletteName)
-    register_class(PaletteUIItem)
+    register_class(PaletteSlot)
     register_class(PaletteUI)
 
 
 def unregister():
     from bpy.utils import unregister_class
 
-    unregister_class(PaletteItem)
+    unregister_class(PaletteEntry)
     unregister_class(PaletteGroup)
     unregister_class(PaletteName)
-    unregister_class(PaletteUIItem)
+    unregister_class(PaletteSlot)
     unregister_class(PaletteUI)

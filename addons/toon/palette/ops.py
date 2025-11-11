@@ -10,7 +10,7 @@ class VIEW3D_OT_toon_add_palette(Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        PaletteUI.new('PALETTE')
+        PaletteUI.new_instance('PALETTE')
 
         return {'FINISHED'}
 
@@ -21,7 +21,7 @@ class VIEW3D_OT_toon_remove_palette(Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        PaletteUI.remove(context.palette)
+        PaletteUI.del_instance(context.palette)
 
         return {'FINISHED'}
 
@@ -37,15 +37,15 @@ class VIEW3D_OT_toon_add_palette_group(Operator):
 
         if not p:
             palette.add('Group')
-            palette.update()
+            palette.update_slots()
 
-            palette.active_ui_index = 0
+            palette.active_slot_id = 0
         else:
             palette.add(p.group.name)
             palette.move(-1, p.group_id + 1)
-            palette.update()
+            palette.update_slots()
 
-            palette.active_ui_index += len(p.group.items) - p.item_id
+            palette.active_slot_id += len(p.group.items) - p.item_id
 
         return {'FINISHED'}
 
@@ -61,10 +61,10 @@ class VIEW3D_OT_toon_remove_palette_group(Operator):
 
         if p and p.item is None:
             palette.remove(p.group_id)
-            palette.update()
+            palette.update_slots()
 
-            if palette.active_ui_index >= len(palette.ui_items):
-                palette.active_ui_index -= 1
+            if palette.active_slot_id >= len(palette.slots):
+                palette.active_slot_id -= 1
 
         return {'FINISHED'}
 
@@ -82,17 +82,19 @@ class VIEW3D_OT_toon_add_palette_item(Operator):
             return {'FINISHED'}
 
         if p.item is None:
-            p.group.add('Item')
-            palette.update()
+            item = p.group.add('Item')
+            item.color = (1.0, 1.0, 1.0, 1.0)
+            palette.update_slots()
 
-            palette.active_ui_index += len(p.group.items)
+            palette.active_slot_id += len(p.group.items)
             p.group.show_expanded = True
         else:
-            p.group.add(p.item.name)
+            item = p.group.add(p.item.name)
+            item.color = p.item.color
             p.group.move(-1, p.item_id + 1)
-            palette.update()
+            palette.update_slots()
 
-            palette.active_ui_index += 1
+            palette.active_slot_id += 1
 
         return {'FINISHED'}
 
@@ -108,10 +110,10 @@ class VIEW3D_OT_toon_remove_palette_item(Operator):
 
         if p and p.item is not None:
             p.group.remove(p.item_id)
-            palette.update()
+            palette.update_slots()
 
             if p.item_id >= len(p.group.items):
-                palette.active_ui_index -= 1
+                palette.active_slot_id -= 1
 
         return {'FINISHED'}
 
@@ -144,10 +146,10 @@ class VIEW3D_OT_toon_move_palette_slot(Operator):
             result = palette.move(p.group_id, p.group_id + offset)
 
             if result:
-                palette.update()
+                palette.update_slots()
 
                 o = len(palette.items[p.group_id].items) + 1
-                palette.active_ui_index += o * offset
+                palette.active_slot_id += o * offset
         else:
             if p.item_id + offset < 0:
                 return {'FINISHED'}
@@ -155,8 +157,8 @@ class VIEW3D_OT_toon_move_palette_slot(Operator):
             result = p.group.move(p.item_id, p.item_id + offset)
 
             if result:
-                palette.update()
+                palette.update_slots()
 
-                palette.active_ui_index += offset
+                palette.active_slot_id += offset
 
         return {'FINISHED'}

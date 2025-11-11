@@ -1,5 +1,5 @@
-from .utils_name import make_unique_name
+from .utils_typing import override
 
 __all__ = [
-    make_unique_name
+    override
 ]

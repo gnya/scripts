@@ -1,10 +1,13 @@
-from .base import ToonNodeLightBase, create_script_node
+from toon.utils import override
+
+from .base import ToonNodeLight, create_script_node
 
 
-class ToonNodePointLight(ToonNodeLightBase):
+class ToonNodePointLight(ToonNodeLight):
     bl_name = 'ToonNodePointLight'
     bl_label = 'Point Light'
 
+    @override
     def init_toon_node(self, context, node_tree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0

@@ -6,22 +6,14 @@ from bpy.props import (
     BoolProperty, CollectionProperty, PointerProperty
 )
 
-from toon.utils import make_unique_name
+from toon.utils import override
+from toon.utils.collection import Group
 
-from .base import DataCollection
-from .item import PaletteItem
+from .entry import PaletteEntry
 
 
-class PaletteGroup(DataCollection, PropertyGroup):
-    items: CollectionProperty(type=PaletteItem)
-
-    def parent_keys(self):
-        palette = getattr(self.id_data, Palette.PROP_NAME)
-
-        return palette.items.keys()
-
-    def on_rename(self):
-        pass
+class PaletteGroup(Group, PropertyGroup):
+    items: CollectionProperty(type=PaletteEntry)
 
 
 class PaletteName(PropertyGroup):
@@ -52,17 +44,20 @@ class PaletteName(PropertyGroup):
             CollectionProperty(type=PaletteName)
         )
 
-        handlers.load_post.append(PaletteName._load_post)
+        if PaletteName.update not in handlers.load_post:
+            handlers.load_post.append(PaletteName._load_post)
+
         timers.register(PaletteName.update, first_interval=0.1)
 
     @staticmethod
     def unregister():
         delattr(WindowManager, PaletteName.PROP_NAME)
 
-        handlers.load_post.remove(PaletteName.update)
+        if PaletteName.update in handlers.load_post:
+            handlers.load_post.remove(PaletteName.update)
 
 
-class Palette(DataCollection, PropertyGroup):
+class Palette(Group, PropertyGroup):
     NODE_TREE_NAME = '.TOON_PALETTE'
     PROP_NAME = 'toon_palette'
 
@@ -70,35 +65,38 @@ class Palette(DataCollection, PropertyGroup):
 
     is_available: BoolProperty(default=False)
 
-    def parent_keys(self):
+    @override
+    def parent(self):
         names = []
+        items = []
 
         for palette in Palette.instances():
             names.append(palette.name)
+            items.append(palette)
 
-        return names
+        return (names, items)
 
+    @override
     def on_rename(self):
         PaletteName.update()
 
     @staticmethod
-    def new(name: str) -> 'Palette':
+    def new_instance(name: str) -> 'Palette':
         node_tree = bpy.data.node_groups.new(
             Palette.NODE_TREE_NAME, 'ShaderNodeTree'
         )
         node_tree.use_fake_user = True
 
         palette = getattr(node_tree, Palette.PROP_NAME)
-        name = make_unique_name(name, palette.parent_keys())
-        palette.name = name
         palette.is_available = True
+        palette.name = name
 
         PaletteName.update()
 
         return palette
 
     @staticmethod
-    def remove(palette: 'Palette'):
+    def del_instance(palette: 'Palette'):
         bpy.data.node_groups.remove(palette.id_data)
 
         PaletteName.update()
@@ -111,6 +109,14 @@ class Palette(DataCollection, PropertyGroup):
             if palette.is_available:
                 yield palette
 
+    @staticmethod
+    def instance(name: str):
+        for palette in Palette.instances():
+            if palette.name == name:
+                return palette
+
+        return None
+
     @classmethod
     def register(cls):
         setattr(
@@ -119,5 +125,5 @@ class Palette(DataCollection, PropertyGroup):
         )
 
     @staticmethod
-    def unregister(cls):
+    def unregister():
         delattr(NodeTree, Palette.PROP_NAME)

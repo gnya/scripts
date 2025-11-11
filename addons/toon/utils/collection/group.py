@@ -1,49 +1,14 @@
-from bpy.props import BoolProperty, CollectionProperty, StringProperty
+from bpy.props import BoolProperty
+from bpy.types import PropertyGroup
 
-from toon.utils import make_unique_name
+from toon.utils import override
 
-
-class DataItem:
-    def update_name(self, context):
-        if self.disable_update_name:
-            return
-
-        self.disable_update_name = True
-        names = self.parent_keys()
-
-        if names is not None:
-            if names.count(self.name) > 1:
-                self.name = make_unique_name(self.name, names)
-
-        self.on_rename()
-        self.disable_update_name = False
-
-    disable_update_name: BoolProperty(default=False)
-
-    name: StringProperty(update=update_name)
-
-    def parent_keys(self) -> 'DataCollection':
-        raise NotImplementedError()
-
-    def compare(self, other) -> int:
-        raise NotImplementedError()
-
-    def on_rename(self) -> None:
-        raise NotImplementedError()
-
-    def on_add(self) -> None:
-        raise NotImplementedError()
-
-    def on_remove(self) -> None:
-        raise NotImplementedError()
-
-    def on_move(self, dst) -> None:
-        raise NotImplementedError()
+from .base import EntryBase, GroupBase
+from .entry import Entry
+from .naming import make_unique_name
 
 
-class DataCollection(DataItem):
-    items: CollectionProperty()
-
+class Group(GroupBase, Entry, PropertyGroup):
     show_expanded: BoolProperty()
 
     def _key_to_index(self, key):
@@ -54,12 +19,13 @@ class DataCollection(DataItem):
                 return key
         elif isinstance(key, str):
             return self.items.find(key)
-        elif isinstance(key, DataItem):
+        elif isinstance(key, EntryBase):
             return self.items.find(key.name)
 
         return -1
 
-    def add(self, name: str) -> DataItem:
+    @override
+    def add(self, name):
         name = make_unique_name(name, self.items.keys())
 
         # Add item.
@@ -69,7 +35,8 @@ class DataCollection(DataItem):
 
         return item
 
-    def remove(self, key: int | str | DataItem) -> bool:
+    @override
+    def remove(self, key):
         index = self._key_to_index(key)
 
         if index < 0 or index >= len(self.items):
@@ -81,7 +48,8 @@ class DataCollection(DataItem):
 
         return True
 
-    def move(self, src_key: int | str | DataItem, dst_key: int | str | DataItem) -> bool:
+    @override
+    def move(self, src_key, dst_key):
         src_index = self._key_to_index(src_key)
         dst_index = self._key_to_index(dst_key)
 
@@ -98,7 +66,8 @@ class DataCollection(DataItem):
 
         return True
 
-    def compare(self, other):
+    @override
+    def compare(self, other: GroupBase):
         min_len = len(other.items)
         result = 1
 
@@ -116,14 +85,13 @@ class DataCollection(DataItem):
 
         return result
 
-    def on_add(self):
-        pass
-
+    @override
     def on_remove(self):
         for item in reversed(self.items):
             item.on_remove()
 
-    def on_move(self, dst):
+    @override
+    def on_move(self, dst: GroupBase):
         if self.items and dst.items:
             dst_item = dst.items[-1]
             src_item_itr = self.items

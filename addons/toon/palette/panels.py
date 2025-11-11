@@ -1,7 +1,7 @@
 from bpy.props import StringProperty
 from bpy.types import Panel, UILayout, UIList
 
-from .props import PalettePointer, PaletteUIItem, PaletteUI
+from .props import PalettePointer, PaletteSlot, PaletteUI
 from .ops import (
     VIEW3D_OT_toon_add_palette,
     VIEW3D_OT_toon_remove_palette,
@@ -20,10 +20,10 @@ class VIEW3D_UL_toon_palette_item(UIList):
 
     def draw_item(
             self, context, layout: UILayout, palette: PaletteUI,
-            ui_item: PaletteUIItem, icon, active_data, active_property
+            slot: PaletteSlot, icon, active_data, active_property
     ):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            p = palette.get_item(ui_item)
+            p = palette.get_item(slot)
             row = layout.row(align=True)
 
             if p.item is None:
@@ -64,11 +64,11 @@ class VIEW3D_UL_toon_palette_item(UIList):
         return False
 
     def filter_items(self, context, data, property):
-        ui_items = getattr(data, property)
-        filter_flags = [self.bitflag_filter_item] * len(ui_items)
+        slots = getattr(data, property)
+        filter_flags = [self.bitflag_filter_item] * len(slots)
 
-        for i, ui_item in enumerate(ui_items):
-            flag = self._filter_item(data.get_item(ui_item))
+        for i, slot in enumerate(slots):
+            flag = self._filter_item(data.get_item(slot))
 
             if not (flag ^ self.use_filter_invert):
                 filter_flags[i] = ~self.bitflag_filter_item
@@ -82,12 +82,12 @@ class VIEW3D_PT_toon_palette(Panel):
     bl_region_type = 'UI'
     bl_category = 'Toon'
 
-    def draw_palette_ui_list(self, layout: UILayout, palette: PaletteUI):
+    def draw_palette_list(self, layout: UILayout, palette: PaletteUI):
         row = layout.row()
 
         row.template_list(
             'VIEW3D_UL_toon_palette_item', palette.name,
-            palette, 'ui_items', palette, 'active_ui_index',
+            palette, 'slots', palette, 'active_slot_id',
             rows=12, sort_lock=True
         )
 
@@ -144,7 +144,7 @@ class VIEW3D_PT_toon_palette(Panel):
 
         if palette.show_expanded:
             box = col.box()
-            self.draw_palette_ui_list(box, palette)
+            self.draw_palette_list(box, palette)
 
     def draw(self, context):
         layout = self.layout
