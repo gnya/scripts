@@ -1,29 +1,29 @@
 from . import palette
 
+from .ops_convert import VIEW3D_OT_toon_convert_palette
 from .ops import (
     VIEW3D_OT_toon_add_palette,
     VIEW3D_OT_toon_remove_palette,
     VIEW3D_OT_toon_add_palette_group,
     VIEW3D_OT_toon_remove_palette_group,
-    VIEW3D_OT_toon_add_palette_item,
-    VIEW3D_OT_toon_remove_palette_item,
+    VIEW3D_OT_toon_add_palette_entry,
+    VIEW3D_OT_toon_remove_palette_entry,
     VIEW3D_OT_toon_move_palette_slot
 )
-from .panels import (
-    VIEW3D_UL_toon_palette_item,
-    VIEW3D_PT_toon_palette
-)
+from .panels import VIEW3D_UL_toon_palette_entry
+from .panels import VIEW3D_PT_toon_palette
 
 
 classes = (
+    VIEW3D_OT_toon_convert_palette,
     VIEW3D_OT_toon_add_palette,
     VIEW3D_OT_toon_remove_palette,
     VIEW3D_OT_toon_add_palette_group,
     VIEW3D_OT_toon_remove_palette_group,
-    VIEW3D_OT_toon_add_palette_item,
-    VIEW3D_OT_toon_remove_palette_item,
+    VIEW3D_OT_toon_add_palette_entry,
+    VIEW3D_OT_toon_remove_palette_entry,
     VIEW3D_OT_toon_move_palette_slot,
-    VIEW3D_UL_toon_palette_item,
+    VIEW3D_UL_toon_palette_entry,
     VIEW3D_PT_toon_palette,
 )
 

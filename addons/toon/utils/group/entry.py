@@ -16,7 +16,7 @@ class Entry(EntryBase, PropertyGroup):
         elif isinstance(parent, tuple):
             return parent[0]
         else:
-            return parent.items.keys()
+            return parent.entries.keys()
 
     def _update_name(self, context: Context):
         if self.disable_update_name:

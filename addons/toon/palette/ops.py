@@ -44,7 +44,7 @@ class VIEW3D_OT_toon_add_palette_group(Operator):
     @override
     def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
-        p = palette.active_item()
+        p = palette.active_entry()
 
         if p is None:
             palette.add('Group')
@@ -56,7 +56,7 @@ class VIEW3D_OT_toon_add_palette_group(Operator):
             palette.move(-1, p.group_id + 1)
             palette.update_slots()
 
-            palette.active_slot_id += len(p.group.items) - p.item_id
+            palette.active_slot_id += len(p.group.entries) - p.entry_id
 
         return {'FINISHED'}
 
@@ -69,9 +69,9 @@ class VIEW3D_OT_toon_remove_palette_group(Operator):
     @override
     def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
-        p = palette.active_item()
+        p = palette.active_entry()
 
-        if p is not None and p.item is None:
+        if p is not None and p.entry is None:
             palette.remove(p.group_id)
             palette.update_slots()
 
@@ -81,29 +81,29 @@ class VIEW3D_OT_toon_remove_palette_group(Operator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_add_palette_item(Operator):
-    bl_idname = 'view3d.toon_add_palette_item'
-    bl_label = 'Add Item'
+class VIEW3D_OT_toon_add_palette_entry(Operator):
+    bl_idname = 'view3d.toon_add_palette_entry'
+    bl_label = 'Add Entry'
     bl_options = {'UNDO'}
 
     @override
     def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
-        p = palette.active_item()
+        p = palette.active_entry()
 
         if p is None:
             return {'FINISHED'}
-        elif p.item is None:
-            item = p.group.add('Item')
-            item.color = (1.0, 1.0, 1.0, 1.0)
+        elif p.entry is None:
+            entry = p.group.add('Entry')
+            entry.color = (1.0, 1.0, 1.0, 1.0)
             palette.update_slots()
 
-            palette.active_slot_id += len(p.group.items)
+            palette.active_slot_id += len(p.group.entries)
             p.group.show_expanded = True
         else:
-            item = p.group.add(p.item.name)
-            item.color = p.item.color
-            p.group.move(-1, p.item_id + 1)
+            entry = p.group.add(p.entry.name)
+            entry.color = p.entry.color
+            p.group.move(-1, p.entry_id + 1)
             palette.update_slots()
 
             palette.active_slot_id += 1
@@ -111,21 +111,21 @@ class VIEW3D_OT_toon_add_palette_item(Operator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_remove_palette_item(Operator):
-    bl_idname = 'view3d.toon_remove_palette_item'
-    bl_label = 'Remove Item'
+class VIEW3D_OT_toon_remove_palette_entry(Operator):
+    bl_idname = 'view3d.toon_remove_palette_entry'
+    bl_label = 'Remove Entry'
     bl_options = {'UNDO'}
 
     @override
     def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
-        p = palette.active_item()
+        p = palette.active_entry()
 
-        if p is not None and p.item is not None:
-            p.group.remove(p.item_id)
+        if p is not None and p.entry is not None:
+            p.group.remove(p.entry_id)
             palette.update_slots()
 
-            if p.item_id >= len(p.group.items):
+            if p.entry_id >= len(p.group.entries):
                 palette.active_slot_id -= 1
 
         return {'FINISHED'}
@@ -146,27 +146,22 @@ class VIEW3D_OT_toon_move_palette_slot(Operator):
     @override
     def execute(self, context: Context) -> set['OperatorReturnItems']:
         palette: PaletteUI = context.palette
-        p = palette.active_item()
+        p = palette.active_entry()
         offset = -1 if self.direction == 'UP' else 1
 
         if p is None:
             return {'FINISHED'}
-        elif p.item is None:
-            if p.group_id + offset < 0:
-                return {'FINISHED'}
-
+        elif p.entry is None and p.group_id + offset >= 0:
+            last_slot_id = palette.active_slot_id
             result = palette.move(p.group_id, p.group_id + offset)
 
             if result:
                 palette.update_slots()
 
-                o = len(palette.items[p.group_id].items) + 1
-                palette.active_slot_id += o * offset
-        else:
-            if p.item_id + offset < 0:
-                return {'FINISHED'}
-
-            result = p.group.move(p.item_id, p.item_id + offset)
+                offset_size = len(palette.entries[p.group_id].entries) + 1
+                palette.active_slot_id = last_slot_id + offset_size * offset
+        elif p.entry_id + offset >= 0:
+            result = p.group.move(p.entry_id, p.entry_id + offset)
 
             if result:
                 palette.update_slots()

@@ -12,18 +12,18 @@ class SocketEntry(Entry):
     def _next_of_self(self):
         find_self = False
 
-        for item in self.linked_items():
-            if item == self:
+        for entry in self.linked_entries():
+            if entry == self:
                 find_self = True
             elif find_self:
-                return item
+                return entry
 
         return None
 
     def node_tree(self) -> NodeTree:
         raise NotImplementedError()
 
-    def linked_items(self) -> Iterator['SocketEntry']:
+    def linked_entries(self) -> Iterator['SocketEntry']:
         raise NotImplementedError()
 
     def socket_interface(self) -> NodeSocketInterface:
@@ -56,8 +56,8 @@ class SocketEntry(Entry):
         self.socket_id = len(node_tree.outputs) - 1
 
         # Reposition the socket from the end to the proper location.
-        if (dst_item := self._next_of_self()) is not None:
-            self.on_move(dst_item)
+        if (dst_entry := self._next_of_self()) is not None:
+            self.on_move(dst_entry)
 
     @override
     def on_remove(self):
@@ -68,9 +68,9 @@ class SocketEntry(Entry):
         node_tree.outputs.remove(socket)
 
         # Adjust the socket_id for consistency.
-        for item in self.linked_items():
-            if item.socket_id > socket_id:
-                item.socket_id -= 1
+        for entry in self.linked_entries():
+            if entry.socket_id > socket_id:
+                entry.socket_id -= 1
 
     @override
     def on_move(self, dst: EntryBase):
@@ -94,10 +94,10 @@ class SocketEntry(Entry):
             max_id = src_id
             offset = 1
 
-        for item in self.linked_items():
-            socket_id = item.socket_id
+        for entry in self.linked_entries():
+            socket_id = entry.socket_id
 
             if socket_id > min_id and socket_id < max_id:
-                item.socket_id += offset
+                entry.socket_id += offset
 
         self.socket_id = dst_id

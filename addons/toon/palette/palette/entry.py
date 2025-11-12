@@ -7,7 +7,7 @@ from .base import SocketEntry
 
 
 class PaletteEntry(SocketEntry, PropertyGroup):
-    item_types = [
+    entry_types = [
         ('COLOR', 'Color', ''),
         ('TEXTURE', 'Texture', ''),
         ('MIX', 'Mix', '')
@@ -20,7 +20,7 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         self.socket().default_value = self.color
 
     type: EnumProperty(
-        items=item_types, default='COLOR',
+        items=entry_types, default='COLOR',
         update=_update_type
     )
 
@@ -35,10 +35,10 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         return self.id_data
 
     @override
-    def linked_items(self):
+    def linked_entries(self):
         path = self.path_from_id().rsplit('.', 2)[0]
         palette = self.id_data.path_resolve(path)
 
-        for group in palette.items:
-            for item in group.items:
-                yield item
+        for group in palette.entries:
+            for entry in group.entries:
+                yield entry

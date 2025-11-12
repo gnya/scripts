@@ -10,7 +10,7 @@ from . import nodes
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 0, 11),
+    'version': (0, 0, 12),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '
@@ -147,7 +147,9 @@ def register():
 
     bpy.types.OBJECT_PT_relations.append(draw_pass_index_warning)
     bpy.types.EEVEE_MATERIAL_PT_viewport_settings.append(draw_pass_index_warning)
-    bpy.types.CYCLES_MATERIAL_PT_settings.append(draw_pass_index_warning)
+
+    if hasattr(bpy.types, 'CYCLES_MATERIAL_PT_settings'):
+        bpy.types.CYCLES_MATERIAL_PT_settings.append(draw_pass_index_warning)
 
     palette.register()
     nodes.register()

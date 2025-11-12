@@ -52,6 +52,9 @@ class ToonNode(ShaderNodeCustomGroup):
 class ToonNodeLight(ToonNode):
     last_object_name: StringProperty(default='')
 
+    def _poll_object(self, object: Object):
+        return object.type in {'LIGHT', 'EMPTY'}
+
     def _update_object(self, context: Context):
         self.free()
         self.init(context)
@@ -60,6 +63,7 @@ class ToonNodeLight(ToonNode):
 
     object: PointerProperty(
         name='Object', type=Object,
+        poll=_poll_object,
         update=_update_object
     )
 

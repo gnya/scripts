@@ -24,7 +24,7 @@ class EntryBase():
 
 
 class GroupBase(EntryBase):
-    items: MutableSequence[EntryBase]
+    entries: MutableSequence[EntryBase]
 
     show_expanded: bool
 

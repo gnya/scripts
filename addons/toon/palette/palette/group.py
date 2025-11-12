@@ -13,7 +13,7 @@ from .entry import PaletteEntry
 
 
 class PaletteGroup(Group, PropertyGroup):
-    items: CollectionProperty(type=PaletteEntry)
+    entries: CollectionProperty(type=PaletteEntry)
 
 
 class PaletteName(PropertyGroup):
@@ -61,20 +61,20 @@ class Palette(Group, PropertyGroup):
     NODE_TREE_NAME = '.TOON_PALETTE'
     PROP_NAME = 'toon_palette'
 
-    items: CollectionProperty(type=PaletteGroup)
+    entries: CollectionProperty(type=PaletteGroup)
 
     is_available: BoolProperty(default=False)
 
     @override
     def parent(self) -> tuple[list[str], list[EntryBase]]:
         names = []
-        items = []
+        entries = []
 
         for palette in Palette.instances():
             names.append(palette.name)
-            items.append(palette)
+            entries.append(palette)
 
-        return names, items
+        return names, entries
 
     @override
     def on_rename(self):

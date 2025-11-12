@@ -14,35 +14,35 @@ class Group(GroupBase, Entry, PropertyGroup):
     def _key_to_index(self, key: int | str | EntryBase) -> int:
         if isinstance(key, int):
             if key < 0:
-                return len(self.items) + key
+                return len(self.entries) + key
             else:
                 return key
         elif isinstance(key, str):
-            return self.items.find(key)
+            return self.entries.find(key)
         else:
-            return self.items.find(key.name)
+            return self.entries.find(key.name)
 
     @override
     def add(self, name: str) -> EntryBase:
-        name = make_unique_name(name, self.items.keys())
+        name = make_unique_name(name, self.entries.keys())
 
-        # Add item.
-        item: EntryBase = self.items.add()
-        item.on_add()
-        item.name = name
+        # Add entry.
+        entry: EntryBase = self.entries.add()
+        entry.on_add()
+        entry.name = name
 
-        return item
+        return entry
 
     @override
     def remove(self, key: int | str | EntryBase):
         index = self._key_to_index(key)
 
-        if index < 0 or index >= len(self.items):
+        if index < 0 or index >= len(self.entries):
             return False
 
-        # Remove item.
-        self.items[index].on_remove()
-        self.items.remove(index)
+        # Remove entry.
+        self.entries[index].on_remove()
+        self.entries.remove(index)
 
         return True
 
@@ -53,31 +53,31 @@ class Group(GroupBase, Entry, PropertyGroup):
 
         if src_index == dst_index:
             return False
-        elif src_index < 0 or src_index >= len(self.items):
+        elif src_index < 0 or src_index >= len(self.entries):
             return False
-        elif dst_index < 0 or dst_index >= len(self.items):
+        elif dst_index < 0 or dst_index >= len(self.entries):
             return False
 
-        # Move item.
-        self.items[src_index].on_move(self.items[dst_index])
-        self.items.move(src_index, dst_index)
+        # Move entry.
+        self.entries[src_index].on_move(self.entries[dst_index])
+        self.entries.move(src_index, dst_index)
 
         return True
 
     @override
     def compare(self, other: EntryBase) -> int:
-        other_items = getattr(other, 'items', [other])
-        min_len = len(other_items)
+        other_entries = getattr(other, 'entries', [other])
+        min_len = len(other_entries)
         result = 1
 
-        if len(self.items) == min_len:
+        if len(self.entries) == min_len:
             result = 0
-        elif len(self.items) < min_len:
-            min_len = len(other_items)
+        elif len(self.entries) < min_len:
+            min_len = len(other_entries)
             result = -1
 
         for i in range(min_len):
-            r = self.items[i].compare(other_items[i])
+            r = self.entries[i].compare(other_entries[i])
 
             if r != 0:
                 return r
@@ -86,21 +86,21 @@ class Group(GroupBase, Entry, PropertyGroup):
 
     @override
     def on_remove(self):
-        for item in reversed(self.items):
-            item.on_remove()
+        for entry in reversed(self.entries):
+            entry.on_remove()
 
     @override
     def on_move(self, dst: EntryBase):
-        dst_items = getattr(dst, 'items', [dst])
+        dst_entries = getattr(dst, 'entries', [dst])
 
-        if self.items and dst_items:
-            dst_item = dst_items[-1]
-            src_item_itr = self.items
+        if self.entries and dst_entries:
+            dst_entry = dst_entries[-1]
+            src_entry_itr = self.entries
 
-            if self.items[0].compare(dst_item) > 0:
-                dst_item = dst_items[0]
-                src_item_itr = reversed(self.items)
+            if self.entries[0].compare(dst_entry) > 0:
+                dst_entry = dst_entries[0]
+                src_entry_itr = reversed(self.entries)
 
-            for src_item in src_item_itr:
-                src_item.on_move(dst_item)
-                dst_item = src_item
+            for src_entry in src_entry_itr:
+                src_entry.on_move(dst_entry)
+                dst_entry = src_entry

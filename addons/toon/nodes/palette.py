@@ -31,10 +31,10 @@ class ToonNodePalette(ToonNode):
     def palette(self) -> PaletteUI | None:
         palette = getattr(self.node_tree, PaletteUI.PROP_NAME, None)
 
-        if palette is None:
-            return PaletteUI.instance(self.palette_name)
-        elif palette.name == self.palette_name:
-            return palette
+        if palette is None or palette.name != self.palette_name:
+            palette = PaletteUI.instance(self.palette_name)
+
+        return palette
 
     @override
     def node_tree_name(self) -> str:
@@ -54,21 +54,21 @@ class ToonNodePalette(ToonNode):
         if len(self.outputs) == 0:
             return
 
-        for output in self.outputs:
-            output.enabled = False
+        for o in self.outputs:
+            o.enabled = False
 
         palette = self.palette()
 
         if palette is None:
             return
 
-        group = palette.items.get(self.palette_group_name)
+        group = palette.entries.get(self.palette_group_name)
 
         if group is None:
             return
 
-        for item in group.items:
-            self.outputs[item.socket_id].enabled = True
+        for entry in group.entries:
+            self.outputs[entry.socket_id].enabled = True
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):
@@ -83,6 +83,6 @@ class ToonNodePalette(ToonNode):
         if palette is not None:
             layout.prop_search(
                 self, 'palette_group_name',
-                palette, 'items',
+                palette, 'entries',
                 text='', icon='GROUP'
             )

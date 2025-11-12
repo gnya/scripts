@@ -8,17 +8,17 @@ from .group import Palette
 
 class PalettePointer():
     def __init__(
-            self, group: EntryBase, item: GroupBase | None,
-            group_id: int = -1, item_id: int = -1
+            self, group: GroupBase, entry: EntryBase | None,
+            group_id: int = -1, entry_id: int = -1
     ):
         self.group = group
-        self.item = item
+        self.entry = entry
         self.group_id = group_id
-        self.item_id = item_id
+        self.entry_id = entry_id
 
 
 class PaletteSlot(PropertyGroup):
-    item_id: IntProperty()
+    entry_id: IntProperty()
 
     group_id: IntProperty()
 
@@ -33,13 +33,10 @@ class PaletteUI(Palette, PropertyGroup):
 
         slot = self.slots[self.active_slot_id_value]
 
-        if slot.item_id < 0:
-            return self.active_slot_id_value
-
-        if self.items[slot.group_id].show_expanded:
+        if self.entries[slot.group_id].show_expanded:
             return self.active_slot_id_value
         else:
-            return self.active_slot_id_value - slot.item_id - 1
+            return self.active_slot_id_value - slot.entry_id - 1
 
     def _set_active_slot_id(self, value: int):
         self.active_slot_id_value = value
@@ -52,36 +49,36 @@ class PaletteUI(Palette, PropertyGroup):
         get=_get_active_slot_id, set=_set_active_slot_id
     )
 
-    def get_item(self, key: PaletteSlot) -> PalettePointer | None:
-        if key.group_id < 0 or key.group_id >= len(self.items):
+    def get_entry(self, key: PaletteSlot) -> PalettePointer | None:
+        if key.group_id < 0 or key.group_id >= len(self.entries):
             return None
 
-        group = self.items[key.group_id]
+        group = self.entries[key.group_id]
 
-        if key.item_id < 0 or key.item_id >= len(group.items):
+        if key.entry_id < 0 or key.entry_id >= len(group.entries):
             return PalettePointer(group, None, key.group_id, -1)
 
-        item = group.items[key.item_id]
+        entry = group.entries[key.entry_id]
 
-        return PalettePointer(group, item, key.group_id, key.item_id)
+        return PalettePointer(group, entry, key.group_id, key.entry_id)
 
-    def active_item(self) -> PalettePointer | None:
+    def active_entry(self) -> PalettePointer | None:
         slot_id = self.active_slot_id
 
         if slot_id < 0 or slot_id >= len(self.slots):
             return None
 
-        return self.get_item(self.slots[slot_id])
+        return self.get_entry(self.slots[slot_id])
 
     def update_slots(self):
         self.slots.clear()
 
-        for group_id, group in enumerate(self.items):
+        for group_id, group in enumerate(self.entries):
             slot = self.slots.add()
-            slot.item_id = -1
+            slot.entry_id = -1
             slot.group_id = group_id
 
-            for item_id in range(len(group.items)):
+            for entry_id in range(len(group.entries)):
                 slot = self.slots.add()
-                slot.item_id = item_id
+                slot.entry_id = entry_id
                 slot.group_id = group_id
