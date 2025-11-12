@@ -14,8 +14,8 @@ class VIEW3D_OT_rig_snap_ik_to_fk(bpy.types.Operator):
     bl_description = 'Snap IK to FK'
     bl_options = {'UNDO'}
 
-    bone_group: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
-    bone_lr: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    bone_group: bpy.props.StringProperty(default='')
+    bone_lr: bpy.props.StringProperty(default='')
 
     def execute(self, context):
         bones, missing = ik_fk_bones(context.snap_target, self.bone_group, self.bone_lr)
@@ -43,8 +43,8 @@ class VIEW3D_OT_rig_snap_fk_to_ik(bpy.types.Operator):
     bl_description = 'Snap FK to IK'
     bl_options = {'UNDO'}
 
-    bone_group: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
-    bone_lr: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    bone_group: bpy.props.StringProperty(default='')
+    bone_lr: bpy.props.StringProperty(default='')
 
     def execute(self, context):
         bones, missing = ik_fk_bones(context.snap_target, self.bone_group, self.bone_lr)
@@ -72,17 +72,17 @@ class VIEW3D_OT_rig_set_ik_parent(bpy.types.Operator):
     bl_description = 'Set IK Controller\'s parent'
     bl_options = {'UNDO'}
 
-    bone_group: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
-    bone_lr: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    bone_group: bpy.props.StringProperty(default='')
+    bone_lr: bpy.props.StringProperty(default='')
 
     type: bpy.props.EnumProperty(
         items=[
-            ('0', 'Root', ''),  # noqa: F722 F821
-            ('1', 'Torso', ''),  # noqa: F722 F821
-            ('2', 'Chest', '')  # noqa: F722 F821
+            ('0', 'Root', ''),
+            ('1', 'Torso', ''),
+            ('2', 'Chest', '')
         ],
-        translation_context='Operator'  # noqa: F821
-    )  # type: ignore
+        translation_context='Operator'
+    )
 
     def execute(self, context):
         if not context.props_body:

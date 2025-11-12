@@ -3,7 +3,7 @@ from mathutils import Vector, Matrix
 
 def _set_matrix(bone, location, rotation, scale):
     l, r, s = bone.matrix.decompose()
-    l = location if location else l  # noqa: E741
+    l = location if location else l
     r = rotation if rotation else r
     s = scale if scale else s
     bone.matrix = Matrix.LocRotScale(l, r, s)

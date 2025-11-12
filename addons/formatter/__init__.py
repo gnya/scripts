@@ -15,8 +15,8 @@ bl_info = {
 
 
 class FormatterReport(bpy.types.PropertyGroup):
-    title: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
-    description: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    title: bpy.props.StringProperty(default='')
+    description: bpy.props.StringProperty(default='')
 
 
 class VIEW3D_OT_format_project(bpy.types.Operator):

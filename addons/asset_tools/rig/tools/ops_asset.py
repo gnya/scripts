@@ -10,8 +10,8 @@ class VIEW3D_OT_rig_update_asset(bpy.types.Operator):
     bl_description = 'Update asset data'
     bl_options = {'UNDO'}
 
-    latest_path: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
-    latest_file: bpy.props.StringProperty(default='')  # type: ignore # noqa: F722
+    latest_path: bpy.props.StringProperty(default='')
+    latest_file: bpy.props.StringProperty(default='')
 
     @classmethod
     def poll(cls, context):

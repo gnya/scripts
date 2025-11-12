@@ -1,7 +1,9 @@
 import bpy
 
+from bpy.types import Object
 
-def is_rig(obj):
+
+def is_rig(obj: Object):
     if obj and (s := obj.name.split('_')):
         col_name = f'{s[0]}_RIGS'
 

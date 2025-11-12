@@ -5,7 +5,7 @@ import re
 class ShowBonesOperator(bpy.types.Operator):
     bl_options = {'UNDO'}
 
-    only_visible: bpy.props.BoolProperty(default=True)  # type: ignore
+    only_visible: bpy.props.BoolProperty(default=True)
 
     @classmethod
     def poll_armature(cls, armature, mode):
@@ -113,13 +113,13 @@ class VIEW3D_OT_rig_show_prefix_bones(ShowBonesOperator):
 
     type: bpy.props.EnumProperty(
         items=[
-            ('CTR', 'Control Bones', ''),  # noqa: F722 F821
-            ('DEF', 'Deform Bones', ''),  # noqa: F722 F821
-            ('MCH', 'Mechanical Bones', ''),  # noqa: F722 F821
-            ('CSP', 'Custom Shape Bones', '')  # noqa: F722 F821
+            ('CTR', 'Control Bones', ''),
+            ('DEF', 'Deform Bones', ''),
+            ('MCH', 'Mechanical Bones', ''),
+            ('CSP', 'Custom Shape Bones', '')
         ],
-        translation_context='Operator'  # noqa: F821
-    )  # type: ignore
+        translation_context='Operator'
+    )
 
     @classmethod
     def poll_armature(cls, armature, mode):
