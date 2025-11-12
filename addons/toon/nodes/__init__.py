@@ -26,6 +26,7 @@ node_classes = (
 
 
 def register():
+    from bpy.types import Context
     from bpy.utils import register_class
     from nodeitems_utils import NodeItem, NodeCategory, register_node_categories
 
@@ -39,7 +40,7 @@ def register():
 
     class ToonNodeCategory(NodeCategory):
         @classmethod
-        def poll(cls, context):
+        def poll(cls, context: Context) -> bool:
             return (
                 context.space_data.type == 'NODE_EDITOR' and
                 context.space_data.tree_type == 'ShaderNodeTree' and

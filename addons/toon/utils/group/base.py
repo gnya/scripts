@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, MutableSequence
 
 
 class EntryBase():
@@ -24,7 +24,9 @@ class EntryBase():
 
 
 class GroupBase(EntryBase):
-    items: Any
+    items: MutableSequence[EntryBase]
+
+    show_expanded: bool
 
     def add(self, name: str) -> EntryBase:
         raise NotImplementedError()

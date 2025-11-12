@@ -23,11 +23,11 @@ class Group(GroupBase, Entry, PropertyGroup):
             return self.items.find(key.name)
 
     @override
-    def add(self, name: str):
+    def add(self, name: str) -> EntryBase:
         name = make_unique_name(name, self.items.keys())
 
         # Add item.
-        item = self.items.add()
+        item: EntryBase = self.items.add()
         item.on_add()
         item.name = name
 

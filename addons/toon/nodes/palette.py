@@ -1,7 +1,7 @@
 from bpy.props import StringProperty
-from bpy.types import Context, NodeTree, UILayout
+from bpy.types import Context, UILayout
 
-from toon.palette.props import Palette, PaletteUI, PaletteName
+from toon.palette.palette import PaletteUI, PaletteName
 from toon.utils import override
 
 from .base import ToonNode
@@ -28,9 +28,17 @@ class ToonNodePalette(ToonNode):
         update=_update_palette_group_name
     )
 
+    def palette(self) -> PaletteUI | None:
+        palette = getattr(self.node_tree, PaletteUI.PROP_NAME, None)
+
+        if palette is None:
+            return PaletteUI.instance(self.palette_name)
+        elif palette.name == self.palette_name:
+            return palette
+
     @override
-    def node_tree_name(self):
-        palette = PaletteUI.instance(self.palette_name)
+    def node_tree_name(self) -> str:
+        palette = self.palette()
 
         if palette is None:
             return ''
@@ -38,20 +46,8 @@ class ToonNodePalette(ToonNode):
         return palette.id_data.name[1:]
 
     @override
-    def init_toon_node(self, context: Context, node_tree: NodeTree):
-        pass  # Doing anything.
-
-    @override
     def free(self):
         pass  # Doing anything.
-
-    def _palette_instance(self):
-        palette = getattr(self.node_tree, Palette.PROP_NAME, None)
-
-        if palette is None:
-            return PaletteUI.instance(self.palette_name)
-        elif palette.name == self.palette_name:
-            return palette
 
     @override
     def update(self):
@@ -61,7 +57,7 @@ class ToonNodePalette(ToonNode):
         for output in self.outputs:
             output.enabled = False
 
-        palette = self._palette_instance()
+        palette = self.palette()
 
         if palette is None:
             return
@@ -82,7 +78,7 @@ class ToonNodePalette(ToonNode):
             text='', icon='COLOR'
         )
 
-        palette = PaletteUI.instance(self.palette_name)
+        palette = self.palette()
 
         if palette is not None:
             layout.prop_search(

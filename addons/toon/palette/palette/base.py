@@ -3,7 +3,7 @@ from bpy.props import IntProperty
 from typing import Iterator
 
 from toon.utils import override
-from toon.utils.collection import Entry, EntryBase
+from toon.utils.group import Entry, EntryBase
 
 
 class SocketEntry(Entry):

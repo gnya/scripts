@@ -3,7 +3,7 @@ from bpy.types import Context, PropertyGroup
 
 from toon.utils import override
 
-from .socket import SocketEntry
+from .base import SocketEntry
 
 
 class PaletteEntry(SocketEntry, PropertyGroup):

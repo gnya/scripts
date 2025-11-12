@@ -35,7 +35,7 @@ class ToonNode(ShaderNodeCustomGroup):
         node_tree = bpy.data.node_groups.get(name)
 
         if node_tree is None:
-            node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')  # type: ignore
+            node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
             self.init_toon_node(context, node_tree)
 
         # Assignment to `self.node_tree` must always be done last.

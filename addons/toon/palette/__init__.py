@@ -1,4 +1,4 @@
-from . import props
+from . import palette
 
 from .ops import (
     VIEW3D_OT_toon_add_palette,
@@ -15,35 +15,32 @@ from .panels import (
 )
 
 
+classes = (
+    VIEW3D_OT_toon_add_palette,
+    VIEW3D_OT_toon_remove_palette,
+    VIEW3D_OT_toon_add_palette_group,
+    VIEW3D_OT_toon_remove_palette_group,
+    VIEW3D_OT_toon_add_palette_item,
+    VIEW3D_OT_toon_remove_palette_item,
+    VIEW3D_OT_toon_move_palette_slot,
+    VIEW3D_UL_toon_palette_item,
+    VIEW3D_PT_toon_palette,
+)
+
+
 def register():
     from bpy.utils import register_class
 
-    register_class(VIEW3D_OT_toon_add_palette)
-    register_class(VIEW3D_OT_toon_remove_palette)
-    register_class(VIEW3D_OT_toon_add_palette_group)
-    register_class(VIEW3D_OT_toon_remove_palette_group)
-    register_class(VIEW3D_OT_toon_add_palette_item)
-    register_class(VIEW3D_OT_toon_remove_palette_item)
-    register_class(VIEW3D_OT_toon_move_palette_slot)
+    palette.register()
 
-    register_class(VIEW3D_UL_toon_palette_item)
-    register_class(VIEW3D_PT_toon_palette)
-
-    props.register()
+    for c in classes:
+        register_class(c)
 
 
 def unregister():
     from bpy.utils import unregister_class
 
-    unregister_class(VIEW3D_OT_toon_add_palette)
-    unregister_class(VIEW3D_OT_toon_remove_palette)
-    unregister_class(VIEW3D_OT_toon_add_palette_group)
-    unregister_class(VIEW3D_OT_toon_remove_palette_group)
-    unregister_class(VIEW3D_OT_toon_add_palette_item)
-    unregister_class(VIEW3D_OT_toon_remove_palette_item)
-    unregister_class(VIEW3D_OT_toon_move_palette_slot)
+    palette.unregister()
 
-    unregister_class(VIEW3D_UL_toon_palette_item)
-    unregister_class(VIEW3D_PT_toon_palette)
-
-    props.unregister()
+    for c in classes:
+        unregister_class(c)

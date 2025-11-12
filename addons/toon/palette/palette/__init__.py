@@ -1,16 +1,12 @@
-from .socket import SocketEntry
-
 from .entry import PaletteEntry
-from .palette import PaletteGroup, PaletteName, Palette
-from .ui import PalettePointer, PaletteSlot, PaletteUI
+from .group import PaletteGroup, PaletteName
+from .palette import PalettePointer, PaletteSlot, PaletteUI
 
 
 __all__ = [
-    SocketEntry,
     PaletteEntry,
     PaletteGroup,
     PaletteName,
-    Palette,
     PalettePointer,
     PaletteSlot,
     PaletteUI

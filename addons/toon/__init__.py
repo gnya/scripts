@@ -28,6 +28,9 @@ class OBJECT_PT_toon(Panel):
     def draw(self, context: Context):
         layout = self.layout
 
+        if context.object is None:
+            return
+
         settings = context.object.toon_settings
 
         col = layout.column()
@@ -45,6 +48,9 @@ class MATERIAL_PT_toon(Panel):
 
     def draw(self, context: Context):
         layout = self.layout
+
+        if context.object is None or context.material is None:
+            return
 
         object_settings = context.object.toon_settings
         settings = context.material.toon_settings
@@ -115,9 +121,9 @@ class ToonSettings(PropertyGroup):
     )
 
 
-def draw_pass_index_warning(self, context: Context):
+def draw_pass_index_warning(self: Panel, context: Context):
     if (
-        context.scene.render.engine == 'CYCLES' and  # type: ignore
+        context.scene.render.engine == 'CYCLES' and
         context.scene.cycles.shading_system
     ):
         return

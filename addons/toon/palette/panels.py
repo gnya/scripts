@@ -2,7 +2,7 @@ from bpy.props import StringProperty
 from bpy.types import Context, Panel, UILayout, UIList
 from typing import Any
 
-from .props import PalettePointer, PaletteSlot, PaletteUI
+from .palette import PalettePointer, PaletteSlot, PaletteUI
 from .ops import (
     VIEW3D_OT_toon_add_palette,
     VIEW3D_OT_toon_remove_palette,

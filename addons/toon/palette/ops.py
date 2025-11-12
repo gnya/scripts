@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from toon.utils import override
 
-from .props import PaletteUI
+from .palette import PaletteUI
 
 # Type check.
 if TYPE_CHECKING:

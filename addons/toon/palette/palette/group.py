@@ -7,7 +7,7 @@ from bpy.props import (
 from bpy.types import NodeTree, PropertyGroup, Scene, WindowManager
 
 from toon.utils import override
-from toon.utils.collection import EntryBase, Group
+from toon.utils.group import EntryBase, Group
 
 from .entry import PaletteEntry
 
@@ -83,7 +83,7 @@ class Palette(Group, PropertyGroup):
     @staticmethod
     def new_instance(name: str) -> 'Palette':
         node_tree = bpy.data.node_groups.new(
-            Palette.NODE_TREE_NAME, 'ShaderNodeTree'  # type: ignore
+            Palette.NODE_TREE_NAME, 'ShaderNodeTree'
         )
         node_tree.use_fake_user = True
 

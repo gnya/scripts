@@ -1,12 +1,14 @@
 from bpy.props import CollectionProperty, IntProperty
 from bpy.types import PropertyGroup
 
-from .palette import PaletteEntry, PaletteGroup, Palette
+from toon.utils.group import EntryBase, GroupBase
+
+from .group import Palette
 
 
 class PalettePointer():
     def __init__(
-            self, group: PaletteGroup, item: PaletteEntry | None,
+            self, group: EntryBase, item: GroupBase | None,
             group_id: int = -1, item_id: int = -1
     ):
         self.group = group
