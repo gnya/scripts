@@ -51,7 +51,7 @@ class VIEW3D_OT_toon_move_palette_slot(Operator):
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         palette: Palette = context.palette
-        p = palette.active_entry()
+        p = palette.active_pointer()
         offset = -1 if self.direction == 'UP' else 1
 
         if p is None:

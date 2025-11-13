@@ -59,7 +59,7 @@ class Palette(Group, PropertyGroup):
         get=_get_active_slot_id, set=_set_active_slot_id
     )
 
-    def get_entry(self, key: PaletteSlot) -> PalettePointer | None:
+    def get_pointer(self, key: PaletteSlot) -> PalettePointer | None:
         if key.group_id < 0 or key.group_id >= len(self.entries):
             return None
 
@@ -72,13 +72,13 @@ class Palette(Group, PropertyGroup):
 
         return PalettePointer(group, entry, key.group_id, key.entry_id)
 
-    def active_entry(self) -> PalettePointer | None:
+    def active_pointer(self) -> PalettePointer | None:
         slot_id = self.active_slot_id
 
         if slot_id < 0 or slot_id >= len(self.slots):
             return None
 
-        return self.get_entry(self.slots[slot_id])
+        return self.get_pointer(self.slots[slot_id])
 
     def update_slots(self):
         self.slots.clear()

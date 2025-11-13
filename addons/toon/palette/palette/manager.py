@@ -8,16 +8,16 @@ from bpy.app.handlers import persistent
 from bpy.props import CollectionProperty, StringProperty
 from bpy.types import NodeTree, PropertyGroup
 
-from toon.utils.group import EntryBase
+from toon.utils.group import Entry, EntryBase, Group
 
 from .group import Palette
 
 
-class PaletteName(PropertyGroup):
+class PaletteName(Entry, PropertyGroup):
     node_tree_name: StringProperty()
 
 
-class PaletteManager(PropertyGroup):
+class PaletteManager(Group, PropertyGroup):
     NODE_TREE_NAME = '.TOON_PALETTE'
     PROP_NAME = 'toon_palette_manager'
     PROP_PALETTE_NAME = 'toon_palette'
@@ -36,85 +36,63 @@ class PaletteManager(PropertyGroup):
 
             yield getattr(node_tree, PaletteManager.PROP_PALETTE_NAME)
 
-    def _key_to_index(self, key: int | str | Palette) -> int:
-        if isinstance(key, int):
-            if key < 0:
-                return len(self.entries) + key
-            else:
-                return key
-        elif isinstance(key, str):
-            return self.entries.find(key)
-        else:
-            return self.entries.find(key.name)
+    def get_entry(self, key: int | str | EntryBase | NodeTree) -> Palette | None:
+        if not isinstance(key, NodeTree):
+            result = super().get_entry(key)
 
-    def find(self, key: str | Palette) -> int:
-        return self._key_to_index(key)
+            if result is None:
+                return None
 
+            node_tree = bpy.data.node_groups.get(result.node_tree_name)
+
+            if node_tree is None:
+                return None
+
+            key = node_tree
+
+        palette = getattr(key, PaletteManager.PROP_PALETTE_NAME)
+
+        return palette if palette.is_available else None
+
+    @override
     def add(self, name: str) -> Palette:
+        result = super().add(name)
+
         node_tree = bpy.data.node_groups.new(
             PaletteManager.NODE_TREE_NAME, 'ShaderNodeTree'
         )
         node_tree.use_fake_user = True
+        result.node_tree_name = node_tree.name
 
-        entry = self.entries.add()
-        entry.name = name
-        entry.node_tree_name = node_tree.name
-
-        palette = getattr(
-            node_tree, PaletteManager.PROP_PALETTE_NAME
-        )
+        palette = getattr(node_tree, PaletteManager.PROP_PALETTE_NAME)
         palette.is_available = True
-        palette.order = len(self.entries)
-        palette.name = name  # This line calls `PaletteManager.init()`.
+        palette.order = len(self.entries) - 1
+        palette.name = result.name
 
         return palette
 
-    def remove(self, key: int | str | Palette):
-        index = self._key_to_index(key)
+    @override
+    def remove(self, key: int | str | EntryBase):
+        palette = self.get_entry(key)
+        result = super().remove(key)
 
-        if index < 0 or index >= len(self.entries):
-            return False
+        if result and palette is not None:
+            bpy.data.node_groups.remove(palette.id_data)
 
-        self.entries.remove(index)
+            for i, palette in enumerate(self.palettes()):
+                palette.order = i
 
-        bpy.data.node_groups.remove(key.id_data)
+        return result
 
-        return True
+    @override
+    def move(self, src_key: int | str | EntryBase, dst_key: int | str | EntryBase):
+        result = super().move(src_key, dst_key)
 
-    def move(self, src_key: int | str | Palette, dst_key: int | str | Palette):
-        src_index = self._key_to_index(src_key)
-        dst_index = self._key_to_index(dst_key)
+        if result:
+            for i, palette in enumerate(self.palettes()):
+                palette.order = i
 
-        if src_index == dst_index:
-            return False
-        elif src_index < 0 or src_index >= len(self.entries):
-            return False
-        elif dst_index < 0 or dst_index >= len(self.entries):
-            return False
-
-        self.entries.move(src_index, dst_index)
-
-        i = 0
-
-        for palette in self.palettes():
-            palette.order = i
-            i += 1
-
-        return True
-
-    def get_entry(self, key: str | NodeTree) -> Palette | None:
-        if isinstance(key, NodeTree):
-            palette = getattr(
-                key, PaletteManager.PROP_PALETTE_NAME
-            )
-
-            return palette if palette.is_available else None
-
-        for palette in self.palettes():
-            if palette.name == key:
-                return palette
-
-        return None
+        return result
 
     @staticmethod
     @persistent

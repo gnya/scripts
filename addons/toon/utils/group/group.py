@@ -23,6 +23,19 @@ class Group(GroupBase, Entry, PropertyGroup):
             return self.entries.find(key.name)
 
     @override
+    def get_entry(self, key: int | str | EntryBase) -> EntryBase | None:
+        index = self._key_to_index(key)
+
+        if index < 0 or index >= len(self.entries):
+            return None
+
+        return self.entries[index]
+
+    @override
+    def find(self, key: str | EntryBase) -> int:
+        return self._key_to_index(key)
+
+    @override
     def add(self, name: str) -> EntryBase:
         name = make_unique_name(name, self.entries.keys())
 

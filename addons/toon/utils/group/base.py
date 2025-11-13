@@ -29,6 +29,12 @@ class GroupBase(EntryBase):
 
     show_expanded: bool
 
+    def get_entry(self, key: int | str | EntryBase) -> EntryBase | None:
+        raise NotImplementedError()
+
+    def find(self, key: str | EntryBase) -> int:
+        raise NotImplementedError()
+
     def add(self, name: str) -> EntryBase:
         raise NotImplementedError()
 

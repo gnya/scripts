@@ -44,7 +44,7 @@ class VIEW3D_OT_toon_add_palette_group(Operator):
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         palette: Palette = context.palette
-        p = palette.active_entry()
+        p = palette.active_pointer()
 
         if p is None:
             palette.add('Group')
@@ -69,7 +69,7 @@ class VIEW3D_OT_toon_remove_palette_group(Operator):
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         palette: Palette = context.palette
-        p = palette.active_entry()
+        p = palette.active_pointer()
 
         if p is not None and p.entry is None:
             palette.remove(p.group_id)
@@ -89,7 +89,7 @@ class VIEW3D_OT_toon_add_palette_entry(Operator):
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         palette: Palette = context.palette
-        p = palette.active_entry()
+        p = palette.active_pointer()
 
         if p is None:
             return {'FINISHED'}
@@ -119,7 +119,7 @@ class VIEW3D_OT_toon_remove_palette_entry(Operator):
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         palette: Palette = context.palette
-        p = palette.active_entry()
+        p = palette.active_pointer()
 
         if p is not None and p.entry is not None:
             p.group.remove(p.entry_id)

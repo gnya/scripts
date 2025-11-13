@@ -37,7 +37,7 @@ class VIEW3D_UL_toon_palette_entry(UIList):
             return
 
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            p = data.get_entry(item)
+            p = data.get_pointer(item)
             row = layout.row(align=True)
 
             if p is None:
@@ -92,7 +92,7 @@ class VIEW3D_UL_toon_palette_entry(UIList):
         filter_flags = [self.bitflag_filter_item] * len(slots)
 
         for i, slot in enumerate(slots):
-            flag = self._filter_item(data.get_entry(slot))
+            flag = self._filter_item(data.get_pointer(slot))
 
             if not (flag ^ self.use_filter_invert):
                 filter_flags[i] = ~self.bitflag_filter_item
