@@ -1,8 +1,9 @@
+from toon.utils import override
+
 from bpy.props import StringProperty
 from bpy.types import Context, UILayout
 
-from toon.palette.palette import PaletteUI, PaletteName
-from toon.utils import override
+from toon.palette.palette import Palette, PaletteManager
 
 from .base import ToonNode
 
@@ -28,11 +29,11 @@ class ToonNodePalette(ToonNode):
         update=_update_palette_group_name
     )
 
-    def palette(self) -> PaletteUI | None:
-        palette = getattr(self.node_tree, PaletteUI.PROP_NAME, None)
+    def palette(self) -> Palette | None:
+        palette = PaletteManager.get_entry(self.node_tree)
 
         if palette is None or palette.name != self.palette_name:
-            palette = PaletteUI.instance(self.palette_name)
+            palette = PaletteManager.get_entry(self.palette_name)
 
         return palette
 
@@ -72,9 +73,11 @@ class ToonNodePalette(ToonNode):
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):
+        manager = PaletteManager.instance()
+
         layout.prop_search(
             self, 'palette_name',
-            PaletteName.prop_data(), PaletteName.PROP_NAME,
+            manager, 'names',
             text='', icon='COLOR'
         )
 

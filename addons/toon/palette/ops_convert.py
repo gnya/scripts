@@ -1,16 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from toon.utils import override
+
+if TYPE_CHECKING:
+    from bpy._typing.rna_enums import OperatorReturnItems
+
 from bpy.props import PointerProperty
 from bpy.types import (
     Context, Event, NodeSocketInterfaceColor, NodeTree, Operator, WindowManager
 )
-from typing import TYPE_CHECKING
 
-from toon.utils import override
-
-from .palette import PaletteUI
-
-# Type check.
-if TYPE_CHECKING:
-    from bpy._typing.rna_enums import OperatorReturnItems
+from .palette import PaletteManager
 
 
 class VIEW3D_OT_toon_convert_palette(Operator):
@@ -21,7 +21,7 @@ class VIEW3D_OT_toon_convert_palette(Operator):
     PROP_NAME = 'toon_temp_selected_node_tree'
 
     @override
-    def execute(self, context: Context) -> set['OperatorReturnItems']:
+    def execute(self, context: Context) -> set[OperatorReturnItems]:
         node_tree = getattr(
             context.window_manager,
             VIEW3D_OT_toon_convert_palette.PROP_NAME,
@@ -31,7 +31,7 @@ class VIEW3D_OT_toon_convert_palette(Operator):
         if node_tree is None:
             return {'CANCELLED'}
 
-        palette = PaletteUI.new_instance(node_tree.name)
+        palette = PaletteManager.add(node_tree.name)
 
         outputs = node_tree.outputs
         output_node = node_tree.nodes.get('Group Output')
@@ -66,7 +66,7 @@ class VIEW3D_OT_toon_convert_palette(Operator):
         return {'FINISHED'}
 
     @override
-    def invoke(self, context: Context, event: Event) -> set['OperatorReturnItems']:
+    def invoke(self, context: Context, event: Event) -> set[OperatorReturnItems]:
         return context.window_manager.invoke_props_dialog(self)
 
     @override

@@ -1,7 +1,7 @@
+from toon.utils import override
+
 from bpy.props import EnumProperty, FloatVectorProperty
 from bpy.types import Context, PropertyGroup
-
-from toon.utils import override
 
 from .base import SocketEntry
 

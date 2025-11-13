@@ -1,7 +1,7 @@
+from toon.utils import override
+
 from bpy.props import EnumProperty
 from bpy.types import Context, NodeTree, UILayout
-
-from toon.utils import override
 
 from .base import ToonNode, create_script_node
 

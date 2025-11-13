@@ -1,3 +1,5 @@
+from toon.utils import override
+
 import bpy
 
 from bpy.types import (
@@ -6,7 +8,6 @@ from bpy.types import (
 from bpy.props import PointerProperty, StringProperty
 
 from toon.shaders import script_abs_path
-from toon.utils import override
 
 
 def create_script_node(node_tree: NodeTree, script_name: str) -> Node:

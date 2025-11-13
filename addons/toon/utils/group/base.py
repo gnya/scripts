@@ -1,13 +1,14 @@
-from typing import Any, MutableSequence
+from __future__ import annotations
+from typing import MutableSequence
 
 
 class EntryBase():
     name: str
 
-    def parent(self) -> Any | None:
+    def parent(self) -> GroupBase | tuple[list[str], list[EntryBase]] | None:
         raise NotImplementedError()
 
-    def compare(self, other: 'EntryBase') -> int:
+    def compare(self, other: EntryBase) -> int:
         raise NotImplementedError()
 
     def on_rename(self):
@@ -19,7 +20,7 @@ class EntryBase():
     def on_remove(self):
         pass
 
-    def on_move(self, dst: 'EntryBase'):
+    def on_move(self, dst: EntryBase):
         pass
 
 

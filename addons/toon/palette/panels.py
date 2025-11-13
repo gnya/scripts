@@ -1,30 +1,35 @@
-from bpy.props import StringProperty
-from bpy.types import Context, Panel, UILayout, UIList
 from typing import Any
-
 from toon.utils import override
 
-from .palette import PalettePointer, PaletteSlot, PaletteUI
-from .ops_convert import VIEW3D_OT_toon_convert_palette
-from .ops import (
+from bpy.props import StringProperty
+from bpy.types import Context, Menu, Panel, UILayout, UIList
+
+from .ops_add_remove import (
     VIEW3D_OT_toon_add_palette,
     VIEW3D_OT_toon_remove_palette,
     VIEW3D_OT_toon_add_palette_group,
     VIEW3D_OT_toon_remove_palette_group,
     VIEW3D_OT_toon_add_palette_entry,
-    VIEW3D_OT_toon_remove_palette_entry,
-    VIEW3D_OT_toon_move_palette_slot
+    VIEW3D_OT_toon_remove_palette_entry
 )
+from .ops_convert import VIEW3D_OT_toon_convert_palette
+from .ops_copy_paste import VIEW3D_OT_toon_copy_palette
+from .ops_copy_paste import VIEW3D_OT_toon_paste_palette
+from .ops_move import VIEW3D_OT_toon_move_palette
+from .ops_move import VIEW3D_OT_toon_move_palette_slot
+from .palette import Palette, PalettePointer, PaletteSlot, PaletteManager
 
 
 class VIEW3D_UL_toon_palette_entry(UIList):
+    bl_idname = 'VIEW3D_UL_toon_palette_entry'
+
     filter_name: StringProperty(
         default='', options={'TEXTEDIT_UPDATE'}
     )
 
     @override
     def draw_item(
-            self, context: Context, layout: UILayout, data: PaletteUI | None,
+            self, context: Context, layout: UILayout, data: Palette | None,
             item: PaletteSlot | None, icon: int | None, active_data: Any,
             active_property: str | None, index: int | None = 0, flt_flag: int | None = 0
     ):
@@ -78,7 +83,7 @@ class VIEW3D_UL_toon_palette_entry(UIList):
 
     @override
     def filter_items(
-            self, context: Context, data: PaletteUI | None, property: str
+            self, context: Context, data: Palette | None, property: str
     ) -> tuple[list[int], list[int]]:
         if data is None:
             return [], []
@@ -95,17 +100,48 @@ class VIEW3D_UL_toon_palette_entry(UIList):
         return filter_flags, []
 
 
+class VIEW3D_MT_toon_palette_menu(Menu):
+    bl_idname = 'VIEW3D_MT_toon_palette_menu'
+    bl_label = 'Palette Specials'
+
+    @override
+    def draw(self, context: Context):
+        layout = self.layout
+
+        layout.operator(
+            VIEW3D_OT_toon_copy_palette.bl_idname,
+            text='Copy Palette', icon='COPYDOWN'
+        )
+        layout.operator(
+            VIEW3D_OT_toon_paste_palette.bl_idname,
+            text='Paste Palette', icon='PASTEDOWN'
+        )
+        layout.separator()
+        o = layout.operator(
+            VIEW3D_OT_toon_move_palette.bl_idname,
+            text='Move Palette', icon='TRIA_UP'
+        )
+        o.direction = 'UP'
+        o = layout.operator(
+            VIEW3D_OT_toon_move_palette.bl_idname,
+            text='Move Palette', icon='TRIA_DOWN'
+        )
+        o.direction = 'DOWN'
+
+
 class VIEW3D_PT_toon_palette(Panel):
+    bl_idname = 'VIEW3D_PT_toon_palette'
     bl_label = 'Palette'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Toon'
 
-    def _draw_palette_list(self, layout: UILayout, palette: PaletteUI):
+    def _draw_palette_list(self, layout: UILayout, palette: Palette):
         row = layout.row()
 
         row.template_list(
-            'VIEW3D_UL_toon_palette_entry', palette.name,
+            VIEW3D_UL_toon_palette_entry.bl_idname,
+            palette.name,
             palette, 'slots', palette, 'active_slot_id',
             rows=12, sort_lock=True
         )
@@ -143,7 +179,7 @@ class VIEW3D_PT_toon_palette(Panel):
         )
         o.direction = 'DOWN'
 
-    def _draw_palette_header(self, layout: UILayout, palette: PaletteUI):
+    def _draw_palette_header(self, layout: UILayout, palette: Palette):
         row = layout.row()
 
         sub_row = row.row(align=True)
@@ -153,6 +189,10 @@ class VIEW3D_PT_toon_palette(Panel):
 
         sub_row = row.row(align=True)
         sub_row.prop(palette, 'name', text='')
+        sub_row.menu(
+            VIEW3D_MT_toon_palette_menu.bl_idname,
+            text='', icon='DOWNARROW_HLT'
+        )
 
         sub_row = row.row(align=True)
         sub_row.operator(
@@ -160,7 +200,7 @@ class VIEW3D_PT_toon_palette(Panel):
             text='', emboss=False, icon='X'
         )
 
-    def _draw_palette(self, layout: UILayout, palette: PaletteUI):
+    def _draw_palette(self, layout: UILayout, palette: Palette):
         col = layout.column(align=True)
 
         box = col.box()
@@ -184,6 +224,6 @@ class VIEW3D_PT_toon_palette(Panel):
             text='', icon='NODETREE'
         )
 
-        for palette in PaletteUI.instances():
+        for palette in PaletteManager.entries():
             layout.context_pointer_set('palette', palette)
             self._draw_palette(layout, palette)

@@ -1,8 +1,10 @@
+from __future__ import annotations
+from typing import Iterator
+from toon.utils import override
+
 from bpy.types import NodeSocketColor, NodeSocketInterface, NodeTree
 from bpy.props import IntProperty
-from typing import Iterator
 
-from toon.utils import override
 from toon.utils.group import Entry, EntryBase
 
 
@@ -23,7 +25,7 @@ class SocketEntry(Entry):
     def node_tree(self) -> NodeTree:
         raise NotImplementedError()
 
-    def linked_entries(self) -> Iterator['SocketEntry']:
+    def linked_entries(self) -> Iterator[SocketEntry]:
         raise NotImplementedError()
 
     def socket_interface(self) -> NodeSocketInterface:

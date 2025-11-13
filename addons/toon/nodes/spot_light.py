@@ -1,7 +1,7 @@
+from toon.utils import override
+
 from bpy.types import Context, NodeTree
 import math
-
-from toon.utils import override
 
 from .base import ToonNodeLight, create_script_node
 

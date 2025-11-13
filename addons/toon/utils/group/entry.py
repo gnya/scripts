@@ -1,7 +1,7 @@
+from toon.utils import override
+
 from bpy.props import BoolProperty, StringProperty
 from bpy.types import Context, PropertyGroup
-
-from toon.utils import override
 
 from .base import EntryBase, GroupBase
 from .naming import make_unique_name

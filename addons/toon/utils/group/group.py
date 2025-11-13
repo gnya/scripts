@@ -1,7 +1,7 @@
+from toon.utils import override
+
 from bpy.props import BoolProperty
 from bpy.types import PropertyGroup
-
-from toon.utils import override
 
 from .base import EntryBase, GroupBase
 from .entry import Entry
@@ -9,7 +9,7 @@ from .naming import make_unique_name
 
 
 class Group(GroupBase, Entry, PropertyGroup):
-    show_expanded: BoolProperty()
+    show_expanded: BoolProperty(default=True)
 
     def _key_to_index(self, key: int | str | EntryBase) -> int:
         if isinstance(key, int):

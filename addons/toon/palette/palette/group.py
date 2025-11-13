@@ -1,13 +1,7 @@
-import bpy
+from bpy.props import BoolProperty, CollectionProperty, IntProperty
+from bpy.types import PropertyGroup
 
-from bpy.app import handlers, timers
-from bpy.props import (
-    BoolProperty, CollectionProperty, PointerProperty
-)
-from bpy.types import NodeTree, PropertyGroup, Scene, WindowManager
-
-from toon.utils import override
-from toon.utils.group import EntryBase, Group
+from toon.utils.group import EntryBase, Group, GroupBase
 
 from .entry import PaletteEntry
 
@@ -16,114 +10,83 @@ class PaletteGroup(Group, PropertyGroup):
     entries: CollectionProperty(type=PaletteEntry)
 
 
-class PaletteName(PropertyGroup):
-    PROP_NAME = 'toon_palette_names'
+class PalettePointer():
+    def __init__(
+            self, group: GroupBase, entry: EntryBase | None,
+            group_id: int = -1, entry_id: int = -1
+    ):
+        self.group = group
+        self.entry = entry
+        self.group_id = group_id
+        self.entry_id = entry_id
 
-    @staticmethod
-    def prop_data():
-        return bpy.context.window_manager
 
-    @staticmethod
-    def update():
-        data = PaletteName.prop_data()
-        names = getattr(data, PaletteName.PROP_NAME)
-        names.clear()
+class PaletteSlot(PropertyGroup):
+    entry_id: IntProperty()
 
-        for palette in Palette.instances():
-            names.add().name = palette.name
-
-    @staticmethod
-    @handlers.persistent
-    def _load_post(scene: Scene):
-        PaletteName.update()
-
-    @staticmethod
-    def register():
-        setattr(
-            WindowManager, PaletteName.PROP_NAME,
-            CollectionProperty(type=PaletteName)
-        )
-
-        if PaletteName.update not in handlers.load_post:
-            handlers.load_post.append(PaletteName._load_post)
-
-        timers.register(PaletteName.update, first_interval=0.1)
-
-    @staticmethod
-    def unregister():
-        delattr(WindowManager, PaletteName.PROP_NAME)
-
-        if PaletteName.update in handlers.load_post:
-            handlers.load_post.remove(PaletteName._load_post)
+    group_id: IntProperty()
 
 
 class Palette(Group, PropertyGroup):
-    NODE_TREE_NAME = '.TOON_PALETTE'
-    PROP_NAME = 'toon_palette'
+    def _get_active_slot_id(self) -> int:
+        if (
+            self.active_slot_id_value < 0 or
+            self.active_slot_id_value >= len(self.slots)
+        ):
+            return self.active_slot_id_value
+
+        slot = self.slots[self.active_slot_id_value]
+
+        if self.entries[slot.group_id].show_expanded:
+            return self.active_slot_id_value
+        else:
+            return self.active_slot_id_value - slot.entry_id - 1
+
+    def _set_active_slot_id(self, value: int):
+        self.active_slot_id_value = value
 
     entries: CollectionProperty(type=PaletteGroup)
 
     is_available: BoolProperty(default=False)
 
-    @override
-    def parent(self) -> tuple[list[str], list[EntryBase]]:
-        names = []
-        entries = []
+    slots: CollectionProperty(type=PaletteSlot)
 
-        for palette in Palette.instances():
-            names.append(palette.name)
-            entries.append(palette)
+    active_slot_id_value: IntProperty(default=-1)
 
-        return names, entries
+    active_slot_id: IntProperty(
+        get=_get_active_slot_id, set=_set_active_slot_id
+    )
 
-    @override
-    def on_rename(self):
-        PaletteName.update()
+    def get_entry(self, key: PaletteSlot) -> PalettePointer | None:
+        if key.group_id < 0 or key.group_id >= len(self.entries):
+            return None
 
-    @staticmethod
-    def new_instance(name: str) -> 'Palette':
-        node_tree = bpy.data.node_groups.new(
-            Palette.NODE_TREE_NAME, 'ShaderNodeTree'
-        )
-        node_tree.use_fake_user = True
+        group = self.entries[key.group_id]
 
-        palette = getattr(node_tree, Palette.PROP_NAME)
-        palette.is_available = True
-        palette.name = name
+        if key.entry_id < 0 or key.entry_id >= len(group.entries):
+            return PalettePointer(group, None, key.group_id, -1)
 
-        PaletteName.update()
+        entry = group.entries[key.entry_id]
 
-        return palette
+        return PalettePointer(group, entry, key.group_id, key.entry_id)
 
-    @staticmethod
-    def del_instance(palette: 'Palette'):
-        bpy.data.node_groups.remove(palette.id_data)
+    def active_entry(self) -> PalettePointer | None:
+        slot_id = self.active_slot_id
 
-        PaletteName.update()
+        if slot_id < 0 or slot_id >= len(self.slots):
+            return None
 
-    @staticmethod
-    def instances():
-        for node_tree in bpy.data.node_groups:
-            palette = getattr(node_tree, Palette.PROP_NAME)
+        return self.get_entry(self.slots[slot_id])
 
-            if palette.is_available:
-                yield palette
+    def update_slots(self):
+        self.slots.clear()
 
-    @staticmethod
-    def instance(name: str):
-        for palette in Palette.instances():
-            if palette.name == name:
-                return palette
+        for group_id, group in enumerate(self.entries):
+            slot = self.slots.add()
+            slot.entry_id = -1
+            slot.group_id = group_id
 
-        return None
-
-    @classmethod
-    def register(cls):
-        setattr(
-            NodeTree, Palette.PROP_NAME,
-            PointerProperty(type=cls)
-        )
-
-    @staticmethod
-    def unregister():
-        delattr(NodeTree, Palette.PROP_NAME)
+            for entry_id in range(len(group.entries)):
+                slot = self.slots.add()
+                slot.entry_id = entry_id
+                slot.group_id = group_id
