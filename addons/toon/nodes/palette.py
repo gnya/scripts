@@ -30,10 +30,11 @@ class ToonNodePalette(ToonNode):
     )
 
     def palette(self) -> Palette | None:
-        palette = PaletteManager.get_entry(self.node_tree)
+        manager = PaletteManager.instance()
+        palette = manager.get_entry(self.node_tree)
 
         if palette is None or palette.name != self.palette_name:
-            palette = PaletteManager.get_entry(self.palette_name)
+            palette = manager.get_entry(self.palette_name)
 
         return palette
 
@@ -77,7 +78,7 @@ class ToonNodePalette(ToonNode):
 
         layout.prop_search(
             self, 'palette_name',
-            manager, 'names',
+            manager, 'entries',
             text='', icon='COLOR'
         )
 

@@ -49,6 +49,8 @@ class Palette(Group, PropertyGroup):
 
     is_available: BoolProperty(default=False)
 
+    order: IntProperty(default=-1)
+
     slots: CollectionProperty(type=PaletteSlot)
 
     active_slot_id_value: IntProperty(default=-1)

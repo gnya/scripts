@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from bpy.props import EnumProperty
 from bpy.types import Context, Operator
 
-from .palette import Palette
+from .palette import Palette, PaletteManager
 
 
 class VIEW3D_OT_toon_move_palette(Operator):
@@ -25,6 +25,14 @@ class VIEW3D_OT_toon_move_palette(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
+        palette: Palette = context.palette
+        manager = PaletteManager.instance()
+        i = manager.find(palette)
+        offset = -1 if self.direction == 'UP' else 1
+
+        if i + offset >= 0:
+            manager.move(i, i + offset)
+
         return {'FINISHED'}
 
 

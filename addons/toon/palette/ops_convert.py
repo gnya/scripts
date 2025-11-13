@@ -31,7 +31,8 @@ class VIEW3D_OT_toon_convert_palette(Operator):
         if node_tree is None:
             return {'CANCELLED'}
 
-        palette = PaletteManager.add(node_tree.name)
+        manager = PaletteManager.instance()
+        palette = manager.add(node_tree.name)
 
         outputs = node_tree.outputs
         output_node = node_tree.nodes.get('Group Output')

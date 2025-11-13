@@ -224,6 +224,8 @@ class VIEW3D_PT_toon_palette(Panel):
             text='', icon='NODETREE'
         )
 
-        for palette in PaletteManager.entries():
+        manager = PaletteManager.instance()
+
+        for palette in manager.palettes():
             layout.context_pointer_set('palette', palette)
             self._draw_palette(layout, palette)

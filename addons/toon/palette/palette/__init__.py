@@ -20,31 +20,29 @@ def register():
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import register_class
 
-    from .manager import make_palette_class
+    from .manager import ManagablePalette
 
     register_class(PaletteEntry)
     register_class(PaletteGroup)
     register_class(PaletteSlot)
     register_class(PaletteName)
+
+    register_class(ManagablePalette)
+    setattr(
+        NodeTree, PaletteManager.PROP_PALETTE_NAME,
+        PointerProperty(type=ManagablePalette)
+    )
+
     register_class(PaletteManager)
-
-    if not hasattr(PaletteManager, 'PaletteType'):
-        PaletteManager.PaletteType = make_palette_class()
-        register_class(PaletteManager.PaletteType)
-        setattr(
-            NodeTree, PaletteManager.PROP_PALETTE_NAME,
-            PointerProperty(type=PaletteManager.PaletteType)
-        )
-
     setattr(
         WindowManager, PaletteManager.PROP_NAME,
         PointerProperty(type=PaletteManager)
     )
 
-    if PaletteManager.update not in load_post:
-        load_post.append(PaletteManager.update)
+    if PaletteManager.init not in load_post:
+        load_post.append(PaletteManager.init)
 
-    timers.register(PaletteManager.update, first_interval=0.1)
+    timers.register(PaletteManager.init, first_interval=0.1)
 
 
 def unregister():
@@ -52,19 +50,18 @@ def unregister():
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import unregister_class
 
+    from .manager import ManagablePalette
+
     unregister_class(PaletteEntry)
     unregister_class(PaletteGroup)
     unregister_class(PaletteSlot)
     unregister_class(PaletteName)
+
+    unregister_class(ManagablePalette)
+    delattr(NodeTree, PaletteManager.PROP_PALETTE_NAME)
+
     unregister_class(PaletteManager)
-
-    if hasattr(PaletteManager, 'PaletteType'):
-        unregister_class(PaletteManager.PaletteType)
-        delattr(
-            NodeTree, PaletteManager.PROP_PALETTE_NAME
-        )
-
     delattr(WindowManager, PaletteManager.PROP_NAME)
 
-    if PaletteManager.update in load_post:
-        load_post.remove(PaletteManager.update)
+    if PaletteManager.init in load_post:
+        load_post.remove(PaletteManager.init)

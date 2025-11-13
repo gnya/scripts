@@ -17,7 +17,8 @@ class VIEW3D_OT_toon_add_palette(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        PaletteManager.add('PALETTE')
+        manager = PaletteManager.instance()
+        manager.add('PALETTE')
 
         return {'FINISHED'}
 
@@ -29,7 +30,8 @@ class VIEW3D_OT_toon_remove_palette(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        PaletteManager.remove(context.palette)
+        manager = PaletteManager.instance()
+        manager.remove(context.palette)
 
         return {'FINISHED'}
 
