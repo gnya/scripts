@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Iterator
 from toon.utils import override
 
-from bpy.types import NodeSocketColor, NodeSocketInterface, NodeTree
+from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
 from bpy.props import IntProperty
 
 from toon.utils.group import Entry, EntryBase
@@ -31,7 +31,7 @@ class SocketEntry(Entry):
     def socket_interface(self) -> NodeSocketInterface:
         return self.node_tree().outputs[self.socket_id]
 
-    def socket(self) -> NodeSocketColor:
+    def socket(self) -> NodeSocket:
         node_tree = self.node_tree()
         output = node_tree.nodes.get('Group Output')
 

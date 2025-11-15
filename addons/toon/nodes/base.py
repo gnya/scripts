@@ -20,7 +20,7 @@ def create_script_node(node_tree: NodeTree, script_name: str) -> Node:
 
 class ToonNode(ShaderNodeCustomGroup):
     def node_tree_name(self) -> str:
-        return self.bl_name
+        return f'.{self.bl_name}'
 
     def init_toon_node(self, context: Context, node_tree: NodeTree):
         pass
@@ -32,7 +32,6 @@ class ToonNode(ShaderNodeCustomGroup):
         if not name:
             return
 
-        name = f'.{name}'
         node_tree = bpy.data.node_groups.get(name)
 
         if node_tree is None:

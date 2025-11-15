@@ -48,7 +48,14 @@ class VIEW3D_UL_toon_palette_entry(UIList):
                 row.prop(p.group, 'name', text='', emboss=False)
             else:
                 row.separator(factor=3.0)
-                row.prop(p.entry, 'color', text='')
+
+                if p.entry.type == 'COLOR':
+                    row.row().prop(p.entry, 'color', text='')
+                elif p.entry.type == 'TEXTURE':
+                    row.row().prop(p.entry, 'texture_image', text='')
+                elif p.entry.type == 'MIX':
+                    row.row().prop(p.entry, 'mix_factor', text='', slider=True)
+
                 row.prop(p.entry, 'name', text='', emboss=False)
         elif self.layout_type in {'GRID'}:
             pass
@@ -129,6 +136,24 @@ class VIEW3D_MT_toon_palette_menu(Menu):
         o.direction = 'DOWN'
 
 
+class VIEW3D_MT_toon_palette_group_menu(Menu):
+    bl_idname = 'VIEW3D_MT_toon_palette_group_menu'
+    bl_label = 'Palette Specials'
+
+    @override
+    def draw(self, context: Context):
+        layout = self.layout
+
+        layout.operator(
+            VIEW3D_OT_toon_add_palette_group.bl_idname,
+            text='Add Group', icon='ADD'
+        )
+        layout.operator(
+            VIEW3D_OT_toon_remove_palette_group.bl_idname,
+            text='Remove Group', icon='REMOVE'
+        )
+
+
 class VIEW3D_PT_toon_palette(Panel):
     bl_idname = 'VIEW3D_PT_toon_palette'
     bl_label = 'Palette'
@@ -148,17 +173,6 @@ class VIEW3D_PT_toon_palette(Panel):
 
         col = row.column()
         sub_col = col.column(align=True)
-        sub_col.label(icon='GROUP')
-        sub_col.operator(
-            VIEW3D_OT_toon_add_palette_group.bl_idname,
-            text='', icon='ADD'
-        )
-        sub_col.operator(
-            VIEW3D_OT_toon_remove_palette_group.bl_idname,
-            text='', icon='REMOVE'
-        )
-        sub_col.separator()
-        sub_col.label(icon='COLOR')
         sub_col.operator(
             VIEW3D_OT_toon_add_palette_entry.bl_idname,
             text='', icon='ADD'
@@ -168,16 +182,23 @@ class VIEW3D_PT_toon_palette(Panel):
             text='', icon='REMOVE'
         )
         sub_col.separator()
-        o = sub_col.operator(
-            VIEW3D_OT_toon_move_palette_slot.bl_idname,
-            text='', icon='TRIA_UP'
+        sub_col.menu(
+            VIEW3D_MT_toon_palette_group_menu.bl_idname,
+            text='', icon='DOWNARROW_HLT'
         )
-        o.direction = 'UP'
-        o = sub_col.operator(
-            VIEW3D_OT_toon_move_palette_slot.bl_idname,
-            text='', icon='TRIA_DOWN'
-        )
-        o.direction = 'DOWN'
+
+        if len(palette.slots) > 1:
+            sub_col.separator()
+            o = sub_col.operator(
+                VIEW3D_OT_toon_move_palette_slot.bl_idname,
+                text='', icon='TRIA_UP'
+            )
+            o.direction = 'UP'
+            o = sub_col.operator(
+                VIEW3D_OT_toon_move_palette_slot.bl_idname,
+                text='', icon='TRIA_DOWN'
+            )
+            o.direction = 'DOWN'
 
     def _draw_palette_header(self, layout: UILayout, palette: Palette):
         row = layout.row()
@@ -200,6 +221,36 @@ class VIEW3D_PT_toon_palette(Panel):
             text='', emboss=False, icon='X'
         )
 
+    def _draw_palette_props(self, layout: UILayout, palette: Palette):
+        pointer = palette.active_pointer()
+
+        if pointer is not None and pointer.entry is not None:
+            row = layout.row()
+            row.prop(pointer.entry, 'type', expand=True)
+
+            col = layout.column()
+            col.use_property_split = True
+            col.use_property_decorate = False
+
+            if pointer.entry.type == 'COLOR':
+                col.prop(pointer.entry, 'color', text='Color')
+            elif pointer.entry.type == 'TEXTURE':
+                col.template_ID(pointer.entry, 'texture_image', open='image.open')
+            elif pointer.entry.type == 'MIX':
+                col.prop(pointer.entry, 'mix_factor', text='Mix Factor', slider=True)
+                col.prop_search(
+                    pointer.entry, 'mix_source_a',
+                    pointer.group, 'entries',
+                    text='Mix Source A'
+                )
+                col.prop_search(
+                    pointer.entry, 'mix_source_b',
+                    pointer.group, 'entries',
+                    text='Mix Source B'
+                )
+
+            col.separator()
+
     def _draw_palette(self, layout: UILayout, palette: Palette):
         col = layout.column(align=True)
 
@@ -209,6 +260,7 @@ class VIEW3D_PT_toon_palette(Panel):
         if palette.show_expanded:
             box = col.box()
             self._draw_palette_list(box, palette)
+            self._draw_palette_props(box, palette)
 
     @override
     def draw(self, context: Context):

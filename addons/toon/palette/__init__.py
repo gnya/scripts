@@ -15,6 +15,7 @@ from .ops_move import VIEW3D_OT_toon_move_palette
 from .ops_move import VIEW3D_OT_toon_move_palette_slot
 from .panels import VIEW3D_UL_toon_palette_entry
 from .panels import VIEW3D_MT_toon_palette_menu
+from .panels import VIEW3D_MT_toon_palette_group_menu
 from .panels import VIEW3D_PT_toon_palette
 
 
@@ -32,6 +33,7 @@ classes = (
     VIEW3D_OT_toon_move_palette_slot,
     VIEW3D_UL_toon_palette_entry,
     VIEW3D_MT_toon_palette_menu,
+    VIEW3D_MT_toon_palette_group_menu,
     VIEW3D_PT_toon_palette
 )
 

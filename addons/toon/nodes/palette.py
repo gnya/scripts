@@ -30,8 +30,14 @@ class ToonNodePalette(ToonNode):
     )
 
     def palette(self) -> Palette | None:
+        if not self.palette_name:
+            return None
+
         manager = PaletteManager.instance()
-        palette = manager.get_entry(self.node_tree)
+        palette = None
+
+        if self.node_tree is not None:
+            palette = manager.get_entry(self.node_tree)
 
         if palette is None or palette.name != self.palette_name:
             palette = manager.get_entry(self.palette_name)
@@ -45,7 +51,7 @@ class ToonNodePalette(ToonNode):
         if palette is None:
             return ''
 
-        return palette.id_data.name[1:]
+        return palette.id_data.name
 
     @override
     def free(self):

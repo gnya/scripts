@@ -10,7 +10,7 @@ from . import nodes
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 0, 14),
+    'version': (0, 0, 15),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '

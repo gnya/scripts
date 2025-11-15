@@ -10,6 +10,85 @@ from bpy.types import Context, Operator
 from .palette import Palette, PaletteManager
 
 
+def _add_group(palette: Palette):
+    pointer = palette.active_pointer()
+    name, group_id, slot_id = 'Group', -1, 0
+
+    if pointer is not None:
+        name = pointer.group.name
+        group_id = pointer.group_id + 1
+        offset_slot_id = len(pointer.group.entries) - pointer.entry_id
+        slot_id = palette.active_slot_id + offset_slot_id
+
+    palette.add(name)
+    palette.move(-1, group_id)
+    palette.update_slots()
+
+    palette.active_slot_id = slot_id
+
+
+def _remove_group(palette: Palette):
+    pointer = palette.active_pointer()
+
+    if pointer is None:
+        return
+
+    slot_id = -1
+
+    if pointer.group_id > 0:
+        previous_group = palette.entries[pointer.group_id - 1]
+        offset_slot_id = len(previous_group.entries) + pointer.entry_id + 2
+        slot_id = palette.active_slot_id - offset_slot_id
+
+    palette.remove(pointer.group_id)
+    palette.update_slots()
+
+    palette.active_slot_id = slot_id
+
+
+def _add_entry(palette: Palette):
+    pointer = palette.active_pointer()
+
+    if pointer is None:
+        return
+
+    name = 'Entry'
+    color = (1.0, 1.0, 1.0, 1.0)
+    entry_id = -1
+    offset_slot_id = len(pointer.group.entries) + 1
+
+    if pointer.entry is not None:
+        name = pointer.entry.name
+        color = pointer.entry.color
+        entry_id = pointer.entry_id + 1
+        offset_slot_id = 1
+
+    entry = pointer.group.add(name)
+    entry.color = color
+    pointer.group.move(-1, entry_id)
+    palette.update_slots()
+
+    palette.active_slot_id += offset_slot_id
+    pointer.group.show_expanded = True
+
+
+def _remove_entry(palette: Palette):
+    pointer = palette.active_pointer()
+
+    if pointer is None or pointer.entry is None:
+        return
+
+    offset_slot_id = 0
+
+    if pointer.entry_id >= len(pointer.group.entries) - 1:
+        offset_slot_id = -1
+
+    pointer.group.remove(pointer.entry_id)
+    palette.update_slots()
+
+    palette.active_slot_id += offset_slot_id
+
+
 class VIEW3D_OT_toon_add_palette(Operator):
     bl_idname = 'view3d.toon_add_palette'
     bl_label = 'Add Palette'
@@ -43,20 +122,7 @@ class VIEW3D_OT_toon_add_palette_group(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
-        p = palette.active_pointer()
-
-        if p is None:
-            palette.add('Group')
-            palette.update_slots()
-
-            palette.active_slot_id = 0
-        else:
-            palette.add(p.group.name)
-            palette.move(-1, p.group_id + 1)
-            palette.update_slots()
-
-            palette.active_slot_id += len(p.group.entries) - p.entry_id
+        _add_group(context.palette)
 
         return {'FINISHED'}
 
@@ -68,15 +134,7 @@ class VIEW3D_OT_toon_remove_palette_group(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
-        p = palette.active_pointer()
-
-        if p is not None and p.entry is None:
-            palette.remove(p.group_id)
-            palette.update_slots()
-
-            if palette.active_slot_id >= len(palette.slots):
-                palette.active_slot_id -= 1
+        _remove_group(context.palette)
 
         return {'FINISHED'}
 
@@ -88,25 +146,10 @@ class VIEW3D_OT_toon_add_palette_entry(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
-        p = palette.active_pointer()
+        if len(context.palette.entries) == 0:
+            _add_group(context.palette)
 
-        if p is None:
-            return {'FINISHED'}
-        elif p.entry is None:
-            entry = p.group.add('Entry')
-            entry.color = (1.0, 1.0, 1.0, 1.0)
-            palette.update_slots()
-
-            palette.active_slot_id += len(p.group.entries)
-            p.group.show_expanded = True
-        else:
-            entry = p.group.add(p.entry.name)
-            entry.color = p.entry.color
-            p.group.move(-1, p.entry_id + 1)
-            palette.update_slots()
-
-            palette.active_slot_id += 1
+        _add_entry(context.palette)
 
         return {'FINISHED'}
 
@@ -118,14 +161,6 @@ class VIEW3D_OT_toon_remove_palette_entry(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
-        p = palette.active_pointer()
-
-        if p is not None and p.entry is not None:
-            p.group.remove(p.entry_id)
-            palette.update_slots()
-
-            if p.entry_id >= len(p.group.entries):
-                palette.active_slot_id -= 1
+        _remove_entry(context.palette)
 
         return {'FINISHED'}
