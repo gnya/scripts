@@ -3,7 +3,7 @@ from bpy.types import PropertyGroup
 
 from toon.utils.group import EntryBase, Group, GroupBase
 
-from .entry import PaletteEntry
+from .palette_entry import PaletteEntry
 
 
 class PaletteGroup(Group, PropertyGroup):

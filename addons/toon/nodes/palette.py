@@ -3,7 +3,8 @@ from toon.utils import override
 from bpy.props import StringProperty
 from bpy.types import Context, UILayout
 
-from toon.palette.palette import Palette, PaletteManager
+from toon.manager import PaletteManager
+from toon.props import Palette
 
 from .base import ToonNode
 

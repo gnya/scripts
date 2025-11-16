@@ -8,7 +8,7 @@ from bpy.props import (
 )
 from bpy.types import Context, NodeSocket, NodeTree, PropertyGroup
 
-from .base import SocketEntry
+from .socket_entry import SocketEntry
 
 
 class PaletteEntry(SocketEntry, PropertyGroup):
@@ -28,8 +28,8 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         self._init_branch()
 
     def _update_color(self, context: Context):
-        rgb_output = self._root().links[0].from_socket
-        rgb_output.default_value = self.color
+        rgb = self._root().links[0].from_node
+        rgb.outputs[0].default_value = self.color
 
     def _update_texture(self, context: Context):
         tex = self._root().links[0].from_node

@@ -4,7 +4,7 @@ from toon.utils import override
 from bpy.props import StringProperty
 from bpy.types import Context, Menu, Panel, UILayout, UIList
 
-from .ops_add_remove import (
+from .op_add_remove import (
     VIEW3D_OT_toon_add_palette,
     VIEW3D_OT_toon_remove_palette,
     VIEW3D_OT_toon_add_palette_group,
@@ -12,12 +12,14 @@ from .ops_add_remove import (
     VIEW3D_OT_toon_add_palette_entry,
     VIEW3D_OT_toon_remove_palette_entry
 )
-from .ops_convert import VIEW3D_OT_toon_convert_palette
-from .ops_copy_paste import VIEW3D_OT_toon_copy_palette
-from .ops_copy_paste import VIEW3D_OT_toon_paste_palette
-from .ops_move import VIEW3D_OT_toon_move_palette
-from .ops_move import VIEW3D_OT_toon_move_palette_slot
-from .palette import Palette, PalettePointer, PaletteSlot, PaletteManager
+from .op_convert import VIEW3D_OT_toon_convert_palette
+from .op_copy_paste import VIEW3D_OT_toon_copy_palette
+from .op_copy_paste import VIEW3D_OT_toon_paste_palette
+from .op_move import VIEW3D_OT_toon_move_palette
+from .op_move import VIEW3D_OT_toon_move_palette_slot
+
+from toon.manager import PaletteManager
+from toon.props import Palette, PalettePointer, PaletteSlot
 
 
 class VIEW3D_UL_toon_palette_entry(UIList):

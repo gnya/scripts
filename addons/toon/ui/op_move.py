@@ -8,7 +8,8 @@ if TYPE_CHECKING:
 from bpy.props import EnumProperty
 from bpy.types import Context, Operator
 
-from .palette import Palette, PaletteManager
+from toon.manager import PaletteManager
+from toon.props import Palette
 
 
 class VIEW3D_OT_toon_move_palette(Operator):

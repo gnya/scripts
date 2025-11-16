@@ -7,7 +7,7 @@ from bpy.types import (
 )
 from bpy.props import PointerProperty, StringProperty
 
-from toon.shaders import script_abs_path
+from .shaders import script_abs_path
 
 
 def create_script_node(node_tree: NodeTree, script_name: str) -> Node:

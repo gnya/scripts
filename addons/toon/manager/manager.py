@@ -8,9 +8,9 @@ from bpy.app.handlers import persistent
 from bpy.props import CollectionProperty, StringProperty
 from bpy.types import NodeTree, PropertyGroup
 
+from toon.json import decode_palette, encode_node_tree
+from toon.props import Palette
 from toon.utils.group import Entry, EntryBase, Group
-
-from .group import Palette
 
 
 class PaletteName(Entry, PropertyGroup):
@@ -68,6 +68,15 @@ class PaletteManager(Group, PropertyGroup):
         palette.is_available = True
         palette.order = len(self.entries) - 1
         palette.name = result.name
+
+        return palette
+
+    def add_by_node_tree(self, node_tree: NodeTree) -> Palette:
+        palette = self.add(node_tree.name)
+
+        data = encode_node_tree(node_tree)
+        decode_palette(data, palette)
+        palette.update_slots()
 
         return palette
 

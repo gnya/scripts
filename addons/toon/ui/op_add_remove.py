@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 
 from bpy.types import Context, Operator
 
-from .palette import Palette, PaletteManager
+from toon.manager import PaletteManager
+from toon.props import Palette
 
 
 def _add_group(palette: Palette):

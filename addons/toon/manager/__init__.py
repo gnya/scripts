@@ -1,15 +1,9 @@
-from .group import Palette, PaletteEntry, PaletteGroup, PalettePointer, PaletteSlot
 from .manager import PaletteName, PaletteManager
 
 
 __all__ = [
-    Palette,
-    PaletteEntry,
-    PaletteGroup,
     PaletteName,
-    PaletteManager,
-    PalettePointer,
-    PaletteSlot
+    PaletteManager
 ]
 
 
@@ -19,6 +13,8 @@ def register():
     from bpy.props import PointerProperty
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import register_class
+
+    from toon.props import PaletteEntry, PaletteGroup, PaletteSlot
 
     from .manager import ManagablePalette
 
@@ -49,6 +45,8 @@ def unregister():
     from bpy.app.handlers import load_post
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import unregister_class
+
+    from toon.props import PaletteEntry, PaletteGroup, PaletteSlot
 
     from .manager import ManagablePalette
 
