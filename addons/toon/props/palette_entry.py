@@ -1,12 +1,10 @@
 from toon.utils import override
 
-import bpy
-
 from bpy.props import (
     EnumProperty, FloatProperty,
-    FloatVectorProperty, PointerProperty, StringProperty
+    FloatVectorProperty, StringProperty
 )
-from bpy.types import Context, NodeSocket, NodeTree, PropertyGroup
+from bpy.types import Context, Node, NodeSocket, NodeTree, PropertyGroup
 
 from .socket_entry import SocketEntry
 
@@ -22,22 +20,22 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         self._remove_branch(self._root())
 
         if self.type == 'MIX':
-            self._remove_branch(self.socket(), force=True)
+            self._remove_branch(self.socket(), forced=True)
             self._init_root()
 
         self._init_branch()
 
     def _update_color(self, context: Context):
-        rgb = self._root().links[0].from_node
-        rgb.outputs[0].default_value = self.color
+        rgb = self.node()
 
-    def _update_texture(self, context: Context):
-        tex = self._root().links[0].from_node
-        tex.image = self.texture_image
+        if rgb is not None:
+            rgb.outputs[0].default_value = self.color
 
     def _update_mix_factor(self, context: Context):
-        mix = self._root().links[0].from_node
-        mix.inputs[0].default_value = self.mix_factor
+        mix = self.node()
+
+        if mix is not None:
+            mix.inputs[0].default_value = self.mix_factor
 
     def _update_mix_source(self, context: Context):
         self._remove_branch(self._root())
@@ -51,11 +49,6 @@ class PaletteEntry(SocketEntry, PropertyGroup):
     color: FloatVectorProperty(
         subtype='COLOR', size=4, soft_min=0.0, soft_max=1.0,
         update=_update_color
-    )
-
-    texture_image: PointerProperty(
-        type=bpy.types.Image,
-        update=_update_texture
     )
 
     mix_factor: FloatProperty(
@@ -85,7 +78,6 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         elif self.type == 'TEXTURE':
             tex = node_tree.nodes.new('ShaderNodeTexImage')
             tex.interpolation = 'Closest'
-            tex.image = self.texture_image
             node_tree.links.new(tex.outputs[0], self._root())
         elif self.type == 'MIX':
             mix = node_tree.nodes.new('ShaderNodeMixRGB')
@@ -105,14 +97,14 @@ class PaletteEntry(SocketEntry, PropertyGroup):
                     output = b.socket().links[0].from_socket
                     node_tree.links.new(output, mix.inputs[2])
 
-    def _remove_branch(self, root: NodeSocket, force: bool = False):
+    def _remove_branch(self, root: NodeSocket, forced: bool = False):
         if len(root.links) == 0:
             return
 
         link = root.links[0]
         output = link.from_socket
 
-        if not force and len(output.links) > 1:
+        if not forced and len(output.links) > 1:
             return
 
         node = link.from_node
@@ -135,6 +127,14 @@ class PaletteEntry(SocketEntry, PropertyGroup):
             for entry in group.entries:
                 yield entry
 
+    def node(self) -> Node | None:
+        root = self._root()
+
+        if root is None or len(root.links) == 0:
+            return None
+
+        return root.links[0].from_node
+
     @override
     def on_add(self):
         super().on_add()
@@ -147,6 +147,6 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         if self.type == 'MIX':
             self._remove_branch(self.socket())
         else:
-            self._remove_branch(self.socket(), force=True)
+            self._remove_branch(self.socket(), forced=True)
 
         super().on_remove()

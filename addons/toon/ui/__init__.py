@@ -1,11 +1,9 @@
-from .op_add_remove import (
-    VIEW3D_OT_toon_add_palette,
-    VIEW3D_OT_toon_remove_palette,
-    VIEW3D_OT_toon_add_palette_group,
-    VIEW3D_OT_toon_remove_palette_group,
-    VIEW3D_OT_toon_add_palette_entry,
-    VIEW3D_OT_toon_remove_palette_entry
-)
+from .op_add_remove import VIEW3D_OT_toon_add_palette
+from .op_add_remove import VIEW3D_OT_toon_remove_palette
+from .op_add_remove import VIEW3D_OT_toon_add_palette_group
+from .op_add_remove import VIEW3D_OT_toon_remove_palette_group
+from .op_add_remove import VIEW3D_OT_toon_add_palette_entry
+from .op_add_remove import VIEW3D_OT_toon_remove_palette_entry
 from .op_convert import VIEW3D_OT_toon_convert_palette
 from .op_copy_paste import VIEW3D_OT_toon_copy_palette
 from .op_copy_paste import VIEW3D_OT_toon_paste_palette
@@ -43,24 +41,12 @@ classes = (
 def register():
     from bpy.utils import register_class
 
-    from toon import manager
-    from toon.props import ToonSettings
-
-    manager.register()
-    register_class(ToonSettings)
-
     for c in classes:
         register_class(c)
 
 
 def unregister():
     from bpy.utils import unregister_class
-
-    from toon import manager
-    from toon.props import ToonSettings
-
-    manager.unregister()
-    unregister_class(ToonSettings)
 
     for c in classes:
         unregister_class(c)

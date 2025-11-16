@@ -60,6 +60,11 @@ class Group(GroupBase, Entry, PropertyGroup):
         return True
 
     @override
+    def clear(self) -> None:
+        for i in range(len(self.entries)):
+            self.remove(i)
+
+    @override
     def move(self, src_key: int | str | EntryBase, dst_key: int | str | EntryBase):
         src_index = self._key_to_index(src_key)
         dst_index = self._key_to_index(dst_key)

@@ -52,22 +52,22 @@ class VIEW3D_OT_toon_move_palette_slot(Operator):
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         palette: Palette = context.palette
-        p = palette.active_pointer()
+        pointer = palette.active_pointer()
         offset = -1 if self.direction == 'UP' else 1
 
-        if p is None:
+        if pointer is None:
             return {'FINISHED'}
-        elif p.entry is None and p.group_id + offset >= 0:
+        elif pointer.entry is None and pointer.group_id + offset >= 0:
             last_slot_id = palette.active_slot_id
-            result = palette.move(p.group_id, p.group_id + offset)
+            result = palette.move(pointer.group_id, pointer.group_id + offset)
 
             if result:
                 palette.update_slots()
 
-                offset_size = len(palette.entries[p.group_id].entries) + 1
+                offset_size = len(palette.entries[pointer.group_id].entries) + 1
                 palette.active_slot_id = last_slot_id + offset_size * offset
-        elif p.entry_id + offset >= 0:
-            result = p.group.move(p.entry_id, p.entry_id + offset)
+        elif pointer.entry_id + offset >= 0:
+            result = pointer.group.move(pointer.entry_id, pointer.entry_id + offset)
 
             if result:
                 palette.update_slots()

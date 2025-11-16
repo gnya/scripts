@@ -14,13 +14,8 @@ def register():
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import register_class
 
-    from toon.props import PaletteEntry, PaletteGroup, PaletteSlot
-
     from .manager import ManagablePalette
 
-    register_class(PaletteEntry)
-    register_class(PaletteGroup)
-    register_class(PaletteSlot)
     register_class(PaletteName)
 
     register_class(ManagablePalette)
@@ -46,13 +41,8 @@ def unregister():
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import unregister_class
 
-    from toon.props import PaletteEntry, PaletteGroup, PaletteSlot
-
     from .manager import ManagablePalette
 
-    unregister_class(PaletteEntry)
-    unregister_class(PaletteGroup)
-    unregister_class(PaletteSlot)
     unregister_class(PaletteName)
 
     unregister_class(ManagablePalette)

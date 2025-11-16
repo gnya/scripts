@@ -39,26 +39,26 @@ class VIEW3D_UL_toon_palette_entry(UIList):
             return
 
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            p = data.get_pointer(item)
+            pointer = data.get_pointer(item)
             row = layout.row(align=True)
 
-            if p is None:
+            if pointer is None:
                 return
-            elif p.entry is None:
-                i = 'DOWNARROW_HLT' if p.group.show_expanded else 'RIGHTARROW'
-                row.prop(p.group, 'show_expanded', text='', emboss=False, icon=i)
-                row.prop(p.group, 'name', text='', emboss=False)
+            elif pointer.entry is None:
+                i = 'DOWNARROW_HLT' if pointer.group.show_expanded else 'RIGHTARROW'
+                row.prop(pointer.group, 'show_expanded', text='', emboss=False, icon=i)
+                row.prop(pointer.group, 'name', text='', emboss=False)
             else:
                 row.separator(factor=3.0)
 
-                if p.entry.type == 'COLOR':
-                    row.row().prop(p.entry, 'color', text='')
-                elif p.entry.type == 'TEXTURE':
-                    row.row().prop(p.entry, 'texture_image', text='')
-                elif p.entry.type == 'MIX':
-                    row.row().prop(p.entry, 'mix_factor', text='', slider=True)
+                if pointer.entry.type == 'COLOR':
+                    row.row().prop(pointer.entry, 'color', text='')
+                elif pointer.entry.type == 'TEXTURE':
+                    row.row().prop(pointer.entry.node(), 'image', text='')
+                elif pointer.entry.type == 'MIX':
+                    row.row().prop(pointer.entry, 'mix_factor', text='', slider=True)
 
-                row.prop(p.entry, 'name', text='', emboss=False)
+                row.prop(pointer.entry, 'name', text='', emboss=False)
         elif self.layout_type in {'GRID'}:
             pass
 
@@ -68,23 +68,23 @@ class VIEW3D_UL_toon_palette_entry(UIList):
         else:
             return filter_name.lower() not in name.lower()
 
-    def _filter_item(self, p: PalettePointer | None) -> bool:
-        if p is None:
+    def _filter_item(self, pointer: PalettePointer | None) -> bool:
+        if pointer is None:
             return False
-        elif p.entry is not None:
+        elif pointer.entry is not None:
             if not self.filter_name:
-                return p.group.show_expanded
+                return pointer.group.show_expanded
 
-            if self._filter_name(p.entry.name, self.filter_name):
-                return p.group.show_expanded
+            if self._filter_name(pointer.entry.name, self.filter_name):
+                return pointer.group.show_expanded
         else:
             if not self.filter_name:
                 return True
 
-            if self._filter_name(p.group.name, self.filter_name):
+            if self._filter_name(pointer.group.name, self.filter_name):
                 return True
 
-            for child in p.group.entries:
+            for child in pointer.group.entries:
                 if self._filter_name(child.name, self.filter_name):
                     return True
 
@@ -237,7 +237,10 @@ class VIEW3D_PT_toon_palette(Panel):
             if pointer.entry.type == 'COLOR':
                 col.prop(pointer.entry, 'color', text='Color')
             elif pointer.entry.type == 'TEXTURE':
-                col.template_ID(pointer.entry, 'texture_image', open='image.open')
+                col.template_ID(
+                    pointer.entry.node(), 'image',
+                    new='image.new', open='image.open'
+                )
             elif pointer.entry.type == 'MIX':
                 col.prop(pointer.entry, 'mix_factor', text='Mix Factor', slider=True)
                 col.prop_search(

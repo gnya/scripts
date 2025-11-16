@@ -20,7 +20,9 @@ def encode_entry(entry: PaletteEntry) -> EntryData:
     if entry.type == 'COLOR':
         data['color'] = list(entry.color)
     elif entry.type == 'TEXTURE':
-        data['texture_image'] = encode_image(entry.texture_image)
+        node = entry.node()
+        image = None if node is None else node.image
+        data['texture_image'] = encode_image(image)
     elif entry.type == 'MIX':
         data['mix_factor'] = entry.mix_factor
         data['mix_source_a'] = entry.mix_source_a
@@ -35,8 +37,10 @@ def decode_entry(data: EntryData, entry: PaletteEntry):
     if entry.type == 'COLOR':
         entry.color = data.get('color', (1.0, 1.0, 1.0, 1.0))
     elif entry.type == 'TEXTURE':
-        image_data = data.get('texture_image', {})
-        entry.texture_image = decode_image(image_data)
+        node = entry.node()
+
+        if node is not None:
+            node.image = decode_image(data.get('texture_image', {}))
     elif entry.type == 'MIX':
         entry.mix_factor = data.get('mix_factor', 0.0)
         entry.mix_source_a = data.get('mix_source_a', '')
@@ -52,9 +56,16 @@ def encode_group(group: PaletteGroup) -> GroupData:
     return data
 
 
-def decode_group(data: GroupData, group: PaletteGroup):
+def decode_group(data: GroupData, group: PaletteGroup, forced: bool = False):
+    if forced:
+        group.clear()
+
     for entry_name, entry_data in data.items():
-        entry = group.add(entry_name)
+        entry = group.get_entry(entry_name)
+
+        if entry is None:
+            entry = group.add(entry_name)
+
         decode_entry(entry_data, entry)
 
     # Solve `MIX` type entry.
@@ -73,7 +84,14 @@ def encode_palette(palette: Palette) -> PaletteData:
     return data
 
 
-def decode_palette(data: PaletteData, palette: Palette):
+def decode_palette(data: PaletteData, palette: Palette, forced: bool = False):
+    if forced:
+        palette.clear()
+
     for group_name, group_data in data.items():
-        group = palette.add(group_name)
-        decode_group(group_data, group)
+        group = palette.get_entry(group_name)
+
+        if group is None:
+            group = palette.add(group_name)
+
+        decode_group(group_data, group, forced)

@@ -1,8 +1,7 @@
 from bpy.props import BoolProperty, CollectionProperty, IntProperty
 from bpy.types import PropertyGroup
 
-from toon.utils.group import EntryBase, Group, GroupBase
-
+from .group import EntryBase, Group, GroupBase
 from .palette_entry import PaletteEntry
 
 

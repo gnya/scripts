@@ -10,6 +10,7 @@ from bpy.types import (
     Context, Event, NodeSocketInterfaceColor, NodeTree, Operator, WindowManager
 )
 
+from toon.json import decode_palette, encode_node_tree
 from toon.manager import PaletteManager
 
 
@@ -32,7 +33,10 @@ class VIEW3D_OT_toon_convert_palette(Operator):
             return {'FINISHED'}
 
         manager = PaletteManager.instance()
-        manager.add_by_node_tree(node_tree)
+        palette = manager.add(node_tree.name)
+        data = encode_node_tree(node_tree)
+        decode_palette(data, palette)
+        palette.update_slots()
 
         return {'FINISHED'}
 

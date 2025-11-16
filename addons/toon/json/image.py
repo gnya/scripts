@@ -22,7 +22,10 @@ def _realpath(path: str) -> str:
     return realpath(abspath(path))
 
 
-def encode_image(image: Image) -> dict[str, Any]:
+def encode_image(image: Image | None) -> dict[str, Any]:
+    if image is None:
+        return {}
+
     data = {'name': image.name}
 
     for prop_name in _IMAGE_PROPS:

@@ -41,5 +41,8 @@ class GroupBase(EntryBase):
     def remove(self, key: int | str | EntryBase) -> bool:
         raise NotImplementedError()
 
+    def clear(self) -> None:
+        raise NotImplementedError()
+
     def move(self, src_key: int | str | EntryBase, dst_key: int | str | EntryBase) -> bool:
         raise NotImplementedError()
