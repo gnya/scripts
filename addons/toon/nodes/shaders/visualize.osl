@@ -5,17 +5,11 @@
 
 #include "group_id.h"
 
-#define SHADOW 0
-#define TRANSPARENT 1
-#define SHADOW_PROPS 2
+#define SHADOW              0
+#define TRANSPARENT         1
+#define SHADOW_PROPS        2
 
-/*
- * Linear congruential generator (m=100, a=19, c=3)
- * ref: https://en.wikipedia.org/wiki/Linear_congruential_generator
- */
-float random(int seed) {
-    return mod(19 * seed + 3, 100) / 100.0;
-}
+#define RANDOM(seed)        hashnoise((float) seed)
 
 shader visualize(
     int Type = 0,
@@ -27,16 +21,16 @@ shader visualize(
         get_this_shadow_group(group, props);
 
         if (Type == SHADOW && group) {
-            Color = color("hsv", random(group), 1.0, 1.0);
+            Color = color("hsv", RANDOM(group), 1.0, 1.0);
         } else if (Type == SHADOW_PROPS && props) {
-            Color = color("hsv", random(props), 1.0, 1.0);
+            Color = color("hsv", RANDOM(props), 1.0, 1.0);
         }
     } else if (Type == TRANSPARENT) {
         int group;
         get_this_transparent_group(group);
 
         if (group) {
-            Color = color("hsv", random(group), 1.0, 1.0);
+            Color = color("hsv", RANDOM(group), 1.0, 1.0);
         }
     }
 }

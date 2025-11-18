@@ -179,6 +179,82 @@
 
   プロパティの値によって色分けされた結果
 
+### `uv_pixel_snap.osl`
+
+#### Inputs
+* UV
+
+  元のUV
+
+* Width
+
+  幅方向の解像度
+
+* Height
+
+  高さ方向の解像度
+
+#### Outputs
+* UV
+
+  離散化されたUV
+
+### `hsv_jitter.osl`
+
+#### Inputs
+* Seed
+
+  乱数のシード値
+
+* Hue Jitter
+
+  色相の振れ幅
+
+* Saturation Jitter
+
+  彩度の振れ幅
+
+* Value Jitter
+
+  明度の振れ幅
+
+* Fac Jitter
+
+  係数の振れ幅
+
+* Hue
+
+  色相
+
+* Saturation
+
+  彩度
+
+* Value
+
+  明度
+
+* Fac
+
+  係数
+
+#### Outputs
+* Hue
+
+  色相
+
+* Saturation
+
+  彩度
+
+* Value
+
+  明度
+
+* Fac
+
+  係数
+
 ## プロパティ
 オブジェクトインデックスとマテリアルインデックスに設定する値によって<br>
 影や透過などの処理を行う際の挙動を設定することができます

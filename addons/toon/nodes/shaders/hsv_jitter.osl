@@ -1,0 +1,32 @@
+/*
+ * toon shader
+ * author: gnya
+ */
+
+shader hsv_jitter(
+    float Seed = 0.0,
+    float HueJitter = 0.0,
+    float SaturationJitter = 0.0,
+    float ValueJitter = 0.0,
+    float FacJitter = 0.0,
+
+    float HueIn = 0.5,
+    float SaturationIn = 1.0,
+    float ValueIn = 1.0,
+    float FacIn = 1.0,
+
+    output float HueOut = 0.5,
+    output float SaturationOut = 1.0,
+    output float ValueOut = 1.0,
+    output float FacOut = 1.0
+) {
+    float H = hashnoise(Seed + 0.0) * 2.0 - 1.0;
+    float S = hashnoise(Seed + 1.0) * 2.0 - 1.0;
+    float V = hashnoise(Seed + 2.0) * 2.0 - 1.0;
+    float F = hashnoise(Seed + 3.0) * 2.0 - 1.0;
+
+    HueOut = HueIn + HueJitter * H;
+    SaturationOut = SaturationIn + SaturationJitter * S;
+    ValueOut = ValueIn + ValueJitter * V;
+    FacOut = FacIn + FacJitter * F;
+}

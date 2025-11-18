@@ -94,4 +94,4 @@ def decode_palette(data: PaletteData, palette: Palette, forced: bool = False):
         if group is None:
             group = palette.add(group_name)
 
-        decode_group(group_data, group, forced)
+        decode_group(group_data, group, forced=forced)

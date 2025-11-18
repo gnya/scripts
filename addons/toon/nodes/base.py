@@ -6,16 +6,28 @@ from bpy.types import (
     Context, Node, NodeTree, Object, ShaderNodeCustomGroup, UILayout
 )
 from bpy.props import PointerProperty, StringProperty
+from nodeitems_utils import NodeCategory
 
-from .shaders import script_abs_path
+from .shaders import script_path
 
 
 def create_script_node(node_tree: NodeTree, script_name: str) -> Node:
     script = node_tree.nodes.new('ShaderNodeScript')
     script.mode = 'EXTERNAL'
-    script.filepath = script_abs_path(script_name)
+    script.filepath = script_path(script_name)
 
     return script
+
+
+class ToonNodeCategory(NodeCategory):
+    @classmethod
+    def poll(cls, context: Context) -> bool:
+        return (
+            context.space_data.type == 'NODE_EDITOR' and
+            context.space_data.tree_type == 'ShaderNodeTree' and
+            context.scene.render.engine == 'CYCLES' and
+            context.scene.cycles.shading_system
+        )
 
 
 class ToonNode(ShaderNodeCustomGroup):

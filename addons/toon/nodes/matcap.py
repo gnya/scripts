@@ -11,7 +11,8 @@ class ToonNodeMatCap(ToonNode):
 
     @override
     def init_toon_node(self, context: Context, node_tree: NodeTree):
+        node_tree.outputs.new('NodeSocketVector', 'UV')
+
         script = create_script_node(node_tree, 'matcap')
         output = node_tree.nodes.new('NodeGroupOutput')
-        node_tree.outputs.new('NodeSocketVector', 'UV')
         node_tree.links.new(script.outputs[0], output.inputs[0])

@@ -2,6 +2,8 @@ from .matcap import ToonNodeMatCap
 from .palette import ToonNodePalette
 from .visualize import ToonNodeVisualize
 
+from .hsv_jitter import ToonNodeHSVJitter
+from .uv_pixel_snap import ToonNodeUVPixelSnap
 from .material import ToonNodeMaterial
 
 from .area_light import ToonNodeAreaLight
@@ -16,6 +18,8 @@ node_classes = (
     ToonNodeMatCap,
     ToonNodePalette,
     ToonNodeVisualize,
+    ToonNodeHSVJitter,
+    ToonNodeUVPixelSnap,
     ToonNodeMaterial,
     ToonNodeAreaLight,
     ToonNodePointLight,
@@ -26,9 +30,10 @@ node_classes = (
 
 
 def register():
-    from bpy.types import Context
     from bpy.utils import register_class
-    from nodeitems_utils import NodeItem, NodeCategory, register_node_categories
+    from nodeitems_utils import NodeItem, register_node_categories
+
+    from .base import ToonNodeCategory
 
     for c in node_classes:
         register_class(c)
@@ -37,16 +42,6 @@ def register():
 
     for c in node_classes:
         toon_nodes.append(NodeItem(c.__name__))
-
-    class ToonNodeCategory(NodeCategory):
-        @classmethod
-        def poll(cls, context: Context) -> bool:
-            return (
-                context.space_data.type == 'NODE_EDITOR' and
-                context.space_data.tree_type == 'ShaderNodeTree' and
-                context.scene.render.engine == 'CYCLES' and
-                context.scene.cycles.shading_system
-            )
 
     cat = ToonNodeCategory('TOON', 'Toon', items=toon_nodes)
     register_node_categories('TOON', [cat])

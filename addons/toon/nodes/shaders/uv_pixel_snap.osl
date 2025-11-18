@@ -1,0 +1,17 @@
+/*
+ * toon shader
+ * author: gnya
+ */
+
+shader uv_pixel_snap(
+    vector UVIn = vector(0.0, 0.0, 0.0),
+    int Width = 1024,
+    int Height = 1024,
+
+    output vector UVOut = vector(0.0, 0.0, 0.0)
+) {
+    float U = floor(UVIn[0] * Width) / Width;
+    float V = floor(UVIn[1] * Height) / Height;
+
+    UVOut = vector(U, V, 0.0);
+}
