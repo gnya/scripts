@@ -17,7 +17,7 @@ from toon.props import Palette
 class VIEW3D_OT_toon_copy_palette(Operator):
     bl_idname = 'view3d.toon_copy_palette'
     bl_label = 'Copy Palette'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -31,7 +31,7 @@ class VIEW3D_OT_toon_copy_palette(Operator):
 class VIEW3D_OT_toon_paste_palette(Operator):
     bl_idname = 'view3d.toon_paste_palette'
     bl_label = 'Paste Palette'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:

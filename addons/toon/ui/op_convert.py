@@ -17,7 +17,7 @@ from toon.manager import PaletteManager
 class VIEW3D_OT_toon_convert_palette(Operator):
     bl_idname = 'view3d.toon_convert_palette'
     bl_label = 'Convert NodeTree to Palette'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     PROP_NAME = 'toon_temp_selected_node_tree'
 

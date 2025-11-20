@@ -13,7 +13,7 @@ from toon.props.group import Entry, EntryBase, Group
 
 
 class PaletteName(Entry, PropertyGroup):
-    node_tree_name: StringProperty()
+    id_name: StringProperty()
 
 
 class PaletteManager(Group, PropertyGroup):
@@ -31,25 +31,37 @@ class PaletteManager(Group, PropertyGroup):
 
     def palettes(self) -> Iterator[Palette]:
         for name in self.entries:
-            node_tree = bpy.data.node_groups.get(name.node_tree_name)
+            node_tree = bpy.data.node_groups.get(name.id_name)
 
             yield getattr(node_tree, PaletteManager.PROP_PALETTE_NAME)
 
-    def get_entry(self, key: int | str | EntryBase | NodeTree) -> Palette | None:
-        if not isinstance(key, NodeTree):
-            result = super().get_entry(key)
+    @override
+    def _key_to_index(self, key: int | str | EntryBase | Palette) -> int:
+        if not isinstance(key, Palette):
+            return super()._key_to_index(key)
+        else:
+            for i, palette in enumerate(self.palettes()):
+                if palette == key:
+                    return i
 
-            if result is None:
-                return None
+            return -1
 
-            node_tree = bpy.data.node_groups.get(result.node_tree_name)
+    @override
+    def first(self, key: int | str | EntryBase) -> Palette | None:
+        if not isinstance(key, EntryBase):
+            result = super().first(key)
+        else:
+            result = key
 
-            if node_tree is None:
-                return None
+        if result is None:
+            return None
 
-            key = node_tree
+        node_tree = bpy.data.node_groups.get(result.id_name)
 
-        palette = getattr(key, PaletteManager.PROP_PALETTE_NAME)
+        if node_tree is None:
+            return None
+
+        palette = getattr(node_tree, PaletteManager.PROP_PALETTE_NAME)
 
         return palette if palette.is_available else None
 
@@ -61,7 +73,7 @@ class PaletteManager(Group, PropertyGroup):
             PaletteManager.NODE_TREE_NAME, 'ShaderNodeTree'
         )
         node_tree.use_fake_user = True
-        result.node_tree_name = node_tree.name
+        result.id_name = node_tree.name
 
         palette = getattr(node_tree, PaletteManager.PROP_PALETTE_NAME)
         palette.is_available = True
@@ -71,8 +83,12 @@ class PaletteManager(Group, PropertyGroup):
         return palette
 
     @override
-    def remove(self, key: int | str | EntryBase):
-        palette = self.get_entry(key)
+    def remove(self, key: int | str | EntryBase | Palette):
+        if not isinstance(key, Palette):
+            palette = self.first(key)
+        else:
+            palette = key
+
         result = super().remove(key)
 
         if result and palette is not None:
@@ -84,7 +100,10 @@ class PaletteManager(Group, PropertyGroup):
         return result
 
     @override
-    def move(self, src_key: int | str | EntryBase, dst_key: int | str | EntryBase):
+    def move(
+        self, src_key: int | str | EntryBase | Palette,
+        dst_key: int | str | EntryBase | Palette
+    ):
         result = super().move(src_key, dst_key)
 
         if result:
@@ -97,21 +116,21 @@ class PaletteManager(Group, PropertyGroup):
     @persistent
     def init(dummy: Any = None):
         manager = PaletteManager.instance()
-        orders: list[tuple[int, str, str]] = []
+        orders: list[tuple[Palette, NodeTree]] = []
 
         for node_tree in bpy.data.node_groups:
             palette = getattr(node_tree, PaletteManager.PROP_PALETTE_NAME)
 
             if palette.is_available:
-                orders.append((palette.order, palette.name, node_tree.name))
+                orders.append((palette, node_tree))
 
         manager.entries.clear()
-        orders = sorted(orders, key=lambda o: o[0])
+        orders = sorted(orders, key=lambda o: int(o[0].order))
 
-        for _, name, node_tree_name in orders:
+        for palette, node_tree in orders:
             n = manager.entries.add()
-            n.name = name
-            n.node_tree_name = node_tree_name
+            n.name = palette.name
+            n.id_name = node_tree.name
 
 
 class ManagablePalette(Palette):

@@ -15,7 +15,7 @@ from toon.props import Palette
 class VIEW3D_OT_toon_move_palette(Operator):
     bl_idname = 'view3d.toon_move_palette'
     bl_label = 'Move Palette'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     direction_types = [
         ('UP', 'Up', ''),
@@ -40,7 +40,7 @@ class VIEW3D_OT_toon_move_palette(Operator):
 class VIEW3D_OT_toon_move_palette_slot(Operator):
     bl_idname = 'view3d.toon_move_up_palette'
     bl_label = 'Move Palette Slot'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     direction_types = [
         ('UP', 'Up', ''),

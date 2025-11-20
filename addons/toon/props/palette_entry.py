@@ -86,8 +86,8 @@ class PaletteEntry(SocketEntry, PropertyGroup):
             parent = self.parent()
 
             if parent is not None:
-                a = parent.get_entry(self.mix_source_a)
-                b = parent.get_entry(self.mix_source_b)
+                a = parent.first(self.mix_source_a)
+                b = parent.first(self.mix_source_b)
 
                 if a is not None and a.type != 'MIX':
                     output = a.socket().links[0].from_socket

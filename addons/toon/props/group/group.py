@@ -9,7 +9,10 @@ from .naming import make_unique_name
 
 
 class Group(GroupBase, Entry, PropertyGroup):
-    show_expanded: BoolProperty(default=True)
+    show_expanded: BoolProperty(
+        default=True,
+        options={'LIBRARY_EDITABLE'}
+    )
 
     def _key_to_index(self, key: int | str | EntryBase) -> int:
         if isinstance(key, int):
@@ -20,10 +23,14 @@ class Group(GroupBase, Entry, PropertyGroup):
         elif isinstance(key, str):
             return self.entries.find(key)
         else:
-            return self.entries.find(key.name)
+            for i, entry in enumerate(self.entries):
+                if entry == key:
+                    return i
+
+            return -1
 
     @override
-    def get_entry(self, key: int | str | EntryBase) -> EntryBase | None:
+    def first(self, key: int | str) -> EntryBase | None:
         index = self._key_to_index(key)
 
         if index < 0 or index >= len(self.entries):

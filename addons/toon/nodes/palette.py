@@ -35,15 +35,8 @@ class ToonNodePalette(ToonNode):
             return None
 
         manager = PaletteManager.instance()
-        palette = None
 
-        if self.node_tree is not None:
-            palette = manager.get_entry(self.node_tree)
-
-        if palette is None or palette.name != self.palette_name:
-            palette = manager.get_entry(self.palette_name)
-
-        return palette
+        return manager.first(self.palette_name)
 
     @override
     def node_tree_name(self) -> str:

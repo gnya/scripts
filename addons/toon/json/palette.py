@@ -61,7 +61,7 @@ def decode_group(data: GroupData, group: PaletteGroup, forced: bool = False):
         group.clear()
 
     for entry_name, entry_data in data.items():
-        entry = group.get_entry(entry_name)
+        entry = group.first(entry_name)
 
         if entry is None:
             entry = group.add(entry_name)
@@ -89,7 +89,7 @@ def decode_palette(data: PaletteData, palette: Palette, forced: bool = False):
         palette.clear()
 
     for group_name, group_data in data.items():
-        group = palette.get_entry(group_name)
+        group = palette.first(group_name)
 
         if group is None:
             group = palette.add(group_name)

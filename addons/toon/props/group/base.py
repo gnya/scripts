@@ -29,7 +29,7 @@ class GroupBase(EntryBase):
 
     show_expanded: bool
 
-    def get_entry(self, key: int | str | EntryBase) -> EntryBase | None:
+    def first(self, key: int | str) -> EntryBase | None:
         raise NotImplementedError()
 
     def find(self, key: str | EntryBase) -> int:

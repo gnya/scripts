@@ -93,7 +93,7 @@ def _remove_entry(palette: Palette):
 class VIEW3D_OT_toon_add_palette(Operator):
     bl_idname = 'view3d.toon_add_palette'
     bl_label = 'Add Palette'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -106,7 +106,7 @@ class VIEW3D_OT_toon_add_palette(Operator):
 class VIEW3D_OT_toon_remove_palette(Operator):
     bl_idname = 'view3d.toon_remove_palette'
     bl_label = 'Remove Palette'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -119,7 +119,7 @@ class VIEW3D_OT_toon_remove_palette(Operator):
 class VIEW3D_OT_toon_add_palette_group(Operator):
     bl_idname = 'view3d.toon_add_palette_group'
     bl_label = 'Add Palette Group'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -131,7 +131,7 @@ class VIEW3D_OT_toon_add_palette_group(Operator):
 class VIEW3D_OT_toon_remove_palette_group(Operator):
     bl_idname = 'view3d.toon_remove_palette_group'
     bl_label = 'Remove Palette Group'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -143,7 +143,7 @@ class VIEW3D_OT_toon_remove_palette_group(Operator):
 class VIEW3D_OT_toon_add_palette_entry(Operator):
     bl_idname = 'view3d.toon_add_palette_entry'
     bl_label = 'Add Palette Entry'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -158,7 +158,7 @@ class VIEW3D_OT_toon_add_palette_entry(Operator):
 class VIEW3D_OT_toon_remove_palette_entry(Operator):
     bl_idname = 'view3d.toon_remove_palette_entry'
     bl_label = 'Remove Palette Entry'
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
