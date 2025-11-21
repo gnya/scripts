@@ -10,6 +10,8 @@ from bpy.types import Context, Operator
 from toon.manager import PaletteManager
 from toon.props import Palette
 
+from .op_base import PaletteOperator
+
 
 def _add_group(palette: Palette):
     pointer = palette.active_pointer()
@@ -103,65 +105,90 @@ class VIEW3D_OT_toon_add_palette(Operator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_remove_palette(Operator):
+class VIEW3D_OT_toon_remove_palette(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette'
     bl_label = 'Remove Palette'
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
+    def poll_operator(cls, palette: Palette) -> bool:
+        return palette.id_data.library is None
+
+    @override
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
         manager = PaletteManager.instance()
-        manager.remove(context.palette)
+        manager.remove(palette)
 
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_add_palette_group(Operator):
+class VIEW3D_OT_toon_add_palette_group(PaletteOperator):
     bl_idname = 'view3d.toon_add_palette_group'
     bl_label = 'Add Palette Group'
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        _add_group(context.palette)
+    def poll_operator(cls, palette: Palette) -> bool:
+        return palette.id_data.library is None
+
+    @override
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
+        _add_group(palette)
 
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_remove_palette_group(Operator):
+class VIEW3D_OT_toon_remove_palette_group(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette_group'
     bl_label = 'Remove Palette Group'
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        _remove_group(context.palette)
+    def poll_operator(cls, palette: Palette) -> bool:
+        return palette.id_data.library is None
+
+    @override
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
+        _remove_group(palette)
 
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_add_palette_entry(Operator):
+class VIEW3D_OT_toon_add_palette_entry(PaletteOperator):
     bl_idname = 'view3d.toon_add_palette_entry'
     bl_label = 'Add Palette Entry'
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        if len(context.palette.entries) == 0:
-            _add_group(context.palette)
+    def poll_operator(cls, palette: Palette) -> bool:
+        return palette.id_data.library is None
 
-        _add_entry(context.palette)
+    @override
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
+        if len(palette.entries) == 0:
+            _add_group(palette)
+
+        _add_entry(palette)
 
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_remove_palette_entry(Operator):
+class VIEW3D_OT_toon_remove_palette_entry(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette_entry'
     bl_label = 'Remove Palette Entry'
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        _remove_entry(context.palette)
+    def poll_operator(cls, palette: Palette) -> bool:
+        return palette.id_data.library is None
+
+    @override
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
+        _remove_entry(palette)
 
         return {'FINISHED'}

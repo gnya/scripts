@@ -7,7 +7,7 @@ from . import ui
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 1, 2),
+    'version': (0, 1, 3),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '

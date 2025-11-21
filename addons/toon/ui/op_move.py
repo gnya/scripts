@@ -6,13 +6,14 @@ if TYPE_CHECKING:
     from bpy._typing.rna_enums import OperatorReturnItems
 
 from bpy.props import EnumProperty
-from bpy.types import Context, Operator
 
 from toon.manager import PaletteManager
 from toon.props import Palette
 
+from .op_base import PaletteOperator
 
-class VIEW3D_OT_toon_move_palette(Operator):
+
+class VIEW3D_OT_toon_move_palette(PaletteOperator):
     bl_idname = 'view3d.toon_move_palette'
     bl_label = 'Move Palette'
     bl_options = {'REGISTER', 'UNDO'}
@@ -25,8 +26,7 @@ class VIEW3D_OT_toon_move_palette(Operator):
     direction: EnumProperty(items=direction_types)
 
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
         manager = PaletteManager.instance()
         i = manager.find(palette)
         offset = -1 if self.direction == 'UP' else 1
@@ -37,7 +37,7 @@ class VIEW3D_OT_toon_move_palette(Operator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_move_palette_slot(Operator):
+class VIEW3D_OT_toon_move_palette_slot(PaletteOperator):
     bl_idname = 'view3d.toon_move_up_palette'
     bl_label = 'Move Palette Slot'
     bl_options = {'REGISTER', 'UNDO'}
@@ -49,9 +49,13 @@ class VIEW3D_OT_toon_move_palette_slot(Operator):
 
     direction: EnumProperty(items=direction_types)
 
+    @classmethod
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
+    def poll_operator(cls, palette: Palette) -> bool:
+        return palette.id_data.library is None
+
+    @override
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
         pointer = palette.active_pointer()
         offset = -1 if self.direction == 'UP' else 1
 

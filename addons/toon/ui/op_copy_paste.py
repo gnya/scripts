@@ -5,40 +5,44 @@ from toon.utils import override
 if TYPE_CHECKING:
     from bpy._typing.rna_enums import OperatorReturnItems
 
+import bpy
 import json
 
-from bpy.types import Context, Operator
 from json.decoder import JSONDecodeError
 
 from toon.json import decode_palette, encode_palette
 from toon.props import Palette
 
+from .op_base import PaletteOperator
 
-class VIEW3D_OT_toon_copy_palette(Operator):
+
+class VIEW3D_OT_toon_copy_palette(PaletteOperator):
     bl_idname = 'view3d.toon_copy_palette'
     bl_label = 'Copy Palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
         data = encode_palette(palette)
-        context.window_manager.clipboard = json.dumps(data)
+        bpy.context.window_manager.clipboard = json.dumps(data)
 
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_paste_palette(Operator):
+class VIEW3D_OT_toon_paste_palette(PaletteOperator):
     bl_idname = 'view3d.toon_paste_palette'
     bl_label = 'Paste Palette'
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
     @override
-    def execute(self, context: Context) -> set[OperatorReturnItems]:
-        palette: Palette = context.palette
+    def poll_operator(cls, palette: Palette) -> bool:
+        return palette.id_data.library is None
 
+    @override
+    def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
         try:
-            data = json.loads(context.window_manager.clipboard)
+            data = json.loads(bpy.context.window_manager.clipboard)
         except JSONDecodeError:
             return {'CANCELLED'}
         else:
