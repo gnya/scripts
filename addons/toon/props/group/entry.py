@@ -3,8 +3,9 @@ from toon.utils import override
 from bpy.props import BoolProperty, StringProperty
 from bpy.types import Context, PropertyGroup
 
+from toon.utils import make_unique_name
+
 from .base import EntryBase, GroupBase
-from .naming import make_unique_name
 
 
 class Entry(EntryBase, PropertyGroup):
@@ -36,7 +37,7 @@ class Entry(EntryBase, PropertyGroup):
     name: StringProperty(update=_update_name)
 
     @override
-    def parent(self) -> GroupBase | tuple[list[str], list[EntryBase]] | None:
+    def parent(self) -> GroupBase[EntryBase] | tuple[list[str], list[EntryBase]] | None:
         path = self.path_from_id().rsplit('.', 1)[0]
 
         return self.id_data.path_resolve(path)

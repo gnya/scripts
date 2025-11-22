@@ -31,27 +31,31 @@ class ToonNodeCategory(NodeCategory):
 
 
 class ToonNode(ShaderNodeCustomGroup):
-    def node_tree_name(self) -> str:
-        return f'.{self.bl_name}'
+    def node_tree_key(self) -> tuple[str, str]:
+        return f'.{self.bl_name}', ''
 
-    def init_toon_node(self, context: Context, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree):
         pass
+
+    def get_node_tree(self) -> NodeTree | None:
+        name, lib = self.node_tree_key()
+
+        if not name:
+            return None
+        elif not lib and name in bpy.data.node_groups:
+            return bpy.data.node_groups[name]
+        elif (name, lib) in bpy.data.node_groups:
+            return bpy.data.node_groups[name, lib]
+        else:
+            node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
+            self.init_node_tree(node_tree)
+
+            return node_tree
 
     @override
     def init(self, context: Context):
-        name = self.node_tree_name()
-
-        if not name:
-            return
-
-        node_tree = bpy.data.node_groups.get(name)
-
-        if node_tree is None:
-            node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
-            self.init_toon_node(context, node_tree)
-
-        # Assignment to `self.node_tree` must always be done last.
-        self.node_tree = node_tree
+        self.node_tree = None
+        self.node_tree = self.get_node_tree()
 
     @override
     def free(self):
@@ -80,10 +84,10 @@ class ToonNodeLight(ToonNode):
     )
 
     @override
-    def node_tree_name(self) -> str:
-        name = super().node_tree_name()
+    def node_tree_key(self) -> tuple[str, str]:
+        name, lib = super().node_tree_key()
 
-        return f'{name}_{self.object.name}' if self.object else name
+        return f'{name}_{self.object.name}' if self.object else name, lib
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):

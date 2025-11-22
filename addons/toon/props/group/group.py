@@ -1,20 +1,24 @@
+from typing import Any, get_args, get_origin, TypeVar
 from toon.utils import override
 
-from bpy.props import BoolProperty
+from bpy.props import BoolProperty, CollectionProperty
 from bpy.types import PropertyGroup
+
+from toon.utils import make_unique_name
 
 from .base import EntryBase, GroupBase
 from .entry import Entry
-from .naming import make_unique_name
+
+E = TypeVar('E', bound=EntryBase)
 
 
-class Group(GroupBase, Entry, PropertyGroup):
+class Group(GroupBase[E], Entry, PropertyGroup):
     show_expanded: BoolProperty(
         default=True,
         options={'LIBRARY_EDITABLE'}
     )
 
-    def _key_to_index(self, key: int | str | EntryBase) -> int:
+    def _key_to_index(self, key: int | str | E) -> int:
         if isinstance(key, int):
             if key < 0:
                 return len(self.entries) + key
@@ -30,7 +34,7 @@ class Group(GroupBase, Entry, PropertyGroup):
             return -1
 
     @override
-    def first(self, key: int | str) -> EntryBase | None:
+    def first(self, key: int | str) -> E | None:
         index = self._key_to_index(key)
 
         if index < 0 or index >= len(self.entries):
@@ -39,22 +43,22 @@ class Group(GroupBase, Entry, PropertyGroup):
         return self.entries[index]
 
     @override
-    def find(self, key: str | EntryBase) -> int:
+    def find(self, key: str | E) -> int:
         return self._key_to_index(key)
 
     @override
-    def add(self, name: str) -> EntryBase:
+    def add(self, name: str) -> E:
         name = make_unique_name(name, self.entries.keys())
 
         # Add entry.
-        entry: EntryBase = self.entries.add()
+        entry: E = self.entries.add()
         entry.on_add()
         entry.name = name
 
         return entry
 
     @override
-    def remove(self, key: int | str | EntryBase):
+    def remove(self, key: int | str | E):
         index = self._key_to_index(key)
 
         if index < 0 or index >= len(self.entries):
@@ -67,12 +71,15 @@ class Group(GroupBase, Entry, PropertyGroup):
         return True
 
     @override
-    def clear(self) -> None:
-        for i in range(len(self.entries)):
-            self.remove(i)
+    def clear(self) -> bool:
+        for i in reversed(range(len(self.entries))):
+            if not self.remove(i):
+                return False
+
+        return True
 
     @override
-    def move(self, src_key: int | str | EntryBase, dst_key: int | str | EntryBase):
+    def move(self, src_key: int | str | E, dst_key: int | str | E):
         src_index = self._key_to_index(src_key)
         dst_index = self._key_to_index(dst_key)
 
@@ -129,3 +136,17 @@ class Group(GroupBase, Entry, PropertyGroup):
             for src_entry in src_entry_itr:
                 src_entry.on_move(dst_entry)
                 dst_entry = src_entry
+
+    @classmethod
+    def _entry_type(cls) -> Any | None:
+        for alias in cls.__orig_bases__:
+            origin = get_origin(alias)
+
+            if origin is not None and issubclass(origin, Group):
+                return get_args(alias)[0]
+
+        return None
+
+    @classmethod
+    def register(cls):
+        cls.entries = CollectionProperty(type=cls._entry_type())

@@ -1,6 +1,6 @@
 from toon.utils import override
 
-from bpy.types import Context, NodeTree
+from bpy.types import NodeTree
 
 from .base import ToonNode, create_script_node
 
@@ -10,7 +10,7 @@ class ToonNodeOutput(ToonNode):
     bl_label = 'Toon Output'
 
     @override
-    def init_toon_node(self, context: Context, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketColor', 'Color')
         i.default_value = (1.0, 1.0, 1.0, 1.0)
 

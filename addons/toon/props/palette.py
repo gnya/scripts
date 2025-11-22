@@ -1,17 +1,17 @@
 from bpy.props import BoolProperty, CollectionProperty, IntProperty
 from bpy.types import PropertyGroup
 
-from .group import EntryBase, Group, GroupBase
+from .group import Group
 from .palette_entry import PaletteEntry
 
 
-class PaletteGroup(Group, PropertyGroup):
-    entries: CollectionProperty(type=PaletteEntry)
+class PaletteGroup(Group[PaletteEntry], PropertyGroup):
+    pass
 
 
 class PalettePointer():
     def __init__(
-            self, group: GroupBase, entry: EntryBase | None,
+            self, group: PaletteGroup, entry: PaletteEntry | None,
             group_id: int = -1, entry_id: int = -1
     ):
         self.group = group
@@ -26,7 +26,7 @@ class PaletteSlot(PropertyGroup):
     group_id: IntProperty()
 
 
-class Palette(Group, PropertyGroup):
+class Palette(Group[PaletteGroup], PropertyGroup):
     def _get_active_slot_id(self) -> int:
         if (
             self.active_slot_id_value < 0 or
@@ -43,8 +43,6 @@ class Palette(Group, PropertyGroup):
 
     def _set_active_slot_id(self, value: int):
         self.active_slot_id_value = value
-
-    entries: CollectionProperty(type=PaletteGroup)
 
     is_available: BoolProperty(default=False)
 

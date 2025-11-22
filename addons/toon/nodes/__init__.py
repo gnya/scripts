@@ -1,5 +1,6 @@
+from .palette import PaletteNode
+
 from .matcap import ToonNodeMatCap
-from .palette import ToonNodePalette
 from .visualize import ToonNodeVisualize
 
 from .hsv_jitter import ToonNodeHSVJitter
@@ -15,8 +16,8 @@ from .output import ToonNodeOutput
 
 
 node_classes = (
+    PaletteNode,
     ToonNodeMatCap,
-    ToonNodePalette,
     ToonNodeVisualize,
     ToonNodeHSVJitter,
     ToonNodeUVPixelSnap,

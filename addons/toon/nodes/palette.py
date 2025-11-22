@@ -1,28 +1,44 @@
 from toon.utils import override
 
 from bpy.props import StringProperty
-from bpy.types import Context, UILayout
+from bpy.types import Context, ShaderNodeCustomGroup, UILayout
 
 from toon.manager import PaletteManager
 from toon.props import Palette
 
-from .base import ToonNode
 
-
-class ToonNodePalette(ToonNode):
-    bl_name = 'ToonNodePalette'
+class PaletteNode(ShaderNodeCustomGroup):
+    bl_name = 'PaletteNode'
     bl_label = 'Palette'
 
-    def _update_palette_name(self, context: Context):
-        self.init(context)
-        self.update()
+    def _get_palette_name(self) -> str:
+        manager = PaletteManager.instance()
+        node_tree = self.node_tree
+
+        if node_tree is None:
+            return ''
+
+        palette = manager.from_data(node_tree)
+
+        if palette is None:
+            return ''
+
+        return palette.name
+
+    def _set_palette_name(self, value: str):
+        manager = PaletteManager.instance()
+        palette = manager.first(value)
+
+        if palette is not None:
+            self.node_tree = palette.id_data
+            self.update()
 
     def _update_palette_group_name(self, context: Context):
         self.update()
 
     palette_name: StringProperty(
         name='Palette Name',
-        update=_update_palette_name
+        get=_get_palette_name, set=_set_palette_name
     )
 
     palette_group_name: StringProperty(
@@ -31,21 +47,17 @@ class ToonNodePalette(ToonNode):
     )
 
     def palette(self) -> Palette | None:
-        if not self.palette_name:
+        manager = PaletteManager.instance()
+        node_tree = self.node_tree
+
+        if node_tree is None:
             return None
 
-        manager = PaletteManager.instance()
-
-        return manager.first(self.palette_name)
+        return manager.from_data(node_tree)
 
     @override
-    def node_tree_name(self) -> str:
-        palette = self.palette()
-
-        if palette is None:
-            return ''
-
-        return palette.id_data.name
+    def init(self, context: Context):
+        pass  # Doing anything.
 
     @override
     def free(self):
@@ -64,7 +76,7 @@ class ToonNodePalette(ToonNode):
         if palette is None:
             return
 
-        group = palette.entries.get(self.palette_group_name)
+        group = palette.first(self.palette_group_name)
 
         if group is None:
             return
@@ -75,10 +87,11 @@ class ToonNodePalette(ToonNode):
     @override
     def draw_buttons(self, context: Context, layout: UILayout):
         manager = PaletteManager.instance()
+        manager.update_ids()
 
         layout.prop_search(
             self, 'palette_name',
-            manager, 'entries',
+            manager, 'ids_cache',
             text='', icon='COLOR'
         )
 

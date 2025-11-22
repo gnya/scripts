@@ -26,11 +26,13 @@ class ToonNodeVisualize(ToonNode):
     )
 
     @override
-    def node_tree_name(self):
-        return f'{super().node_tree_name()}_{self.visualize_type}'
+    def node_tree_key(self) -> tuple[str, str]:
+        name, lib = super().node_tree_key()
+
+        return f'{name}_{self.visualize_type}', lib
 
     @override
-    def init_toon_node(self, context: Context, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree):
         node_tree.outputs.new('NodeSocketColor', 'Color')
 
         script = create_script_node(node_tree, 'visualize')
