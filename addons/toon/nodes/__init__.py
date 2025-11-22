@@ -5,6 +5,7 @@ from .visualize import ToonNodeVisualize
 
 from .hsv_jitter import ToonNodeHSVJitter
 from .uv_pixel_snap import ToonNodeUVPixelSnap
+from .lambert import ToonNodeLambert
 from .material import ToonNodeMaterial
 
 from .area_light import ToonNodeAreaLight
@@ -21,6 +22,7 @@ node_classes = (
     ToonNodeVisualize,
     ToonNodeHSVJitter,
     ToonNodeUVPixelSnap,
+    ToonNodeLambert,
     ToonNodeMaterial,
     ToonNodeAreaLight,
     ToonNodePointLight,

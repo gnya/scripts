@@ -13,7 +13,7 @@ def register():
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import register_class
 
-    from .manager import ManagablePalette
+    from .palette import ManagablePalette
 
     register_class(PaletteID)
 
@@ -34,7 +34,7 @@ def unregister():
     from bpy.types import NodeTree, WindowManager
     from bpy.utils import unregister_class
 
-    from .manager import ManagablePalette
+    from .palette import ManagablePalette
 
     unregister_class(PaletteID)
 

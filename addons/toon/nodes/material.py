@@ -32,8 +32,8 @@ class ToonNodeMaterial(ToonNode):
         i.min_value = 0.0
         i.max_value = float('inf')
 
-        node_tree.outputs.new('NodeSocketFloatFactor', 'Diffuse')
-        node_tree.outputs.new('NodeSocketFloatFactor', 'Specular')
+        node_tree.outputs.new('NodeSocketFloat', 'Diffuse')
+        node_tree.outputs.new('NodeSocketFloat', 'Specular')
 
         input = node_tree.nodes.new('NodeGroupInput')
         script = create_script_node(node_tree, 'material')

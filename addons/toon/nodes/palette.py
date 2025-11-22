@@ -5,6 +5,7 @@ from bpy.types import Context, ShaderNodeCustomGroup, UILayout
 
 from toon.manager import PaletteManager
 from toon.props import Palette
+from toon.utils import NodeLinkRebinder
 
 
 class PaletteNode(ShaderNodeCustomGroup):
@@ -29,12 +30,16 @@ class PaletteNode(ShaderNodeCustomGroup):
         manager = PaletteManager.instance()
         palette = manager.first(value)
 
-        if palette is not None:
+        if palette is None:
+            return
+
+        with NodeLinkRebinder(self):
             self.node_tree = palette.id_data
             self.update()
 
     def _update_palette_group_name(self, context: Context):
-        self.update()
+        with NodeLinkRebinder(self):
+            self.update()
 
     palette_name: StringProperty(
         name='Palette Name',

@@ -3,6 +3,8 @@ from toon.utils import override
 from bpy.props import EnumProperty
 from bpy.types import Context, NodeTree, UILayout
 
+from toon.utils import NodeLinkRebinder
+
 from .base import ToonNode, create_script_node
 
 
@@ -17,8 +19,9 @@ class ToonNodeVisualize(ToonNode):
     ]
 
     def _update_visualize_type(self, context: Context):
-        self.free()
-        self.init(context)
+        with NodeLinkRebinder(self):
+            self.free()
+            self.init(context)
 
     visualize_type: EnumProperty(
         items=visualize_types, name='Visualize Type', default='0',

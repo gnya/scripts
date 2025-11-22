@@ -7,7 +7,7 @@ from bpy.props import CollectionProperty
 from bpy.types import NodeTree, PropertyGroup
 
 from toon.props import Palette
-from toon.props.group import EntryBase, GroupBase
+from toon.props.group import GroupBase
 from toon.utils import make_unique_name
 
 from .id import PaletteID
@@ -159,16 +159,3 @@ class PaletteManager(GroupBase[Palette], PropertyGroup):
                 palette.order = src_index
 
         return True
-
-
-class ManagablePalette(Palette):
-    @override
-    def parent(self) -> tuple[list[str], list[EntryBase]]:
-        manager = PaletteManager.instance()
-        names, entries = [], []
-
-        for palette in manager.palettes():
-            names.append(palette.name)
-            entries.append(palette)
-
-        return names, entries
