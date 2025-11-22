@@ -24,7 +24,7 @@ class VIEW3D_UL_toon_palette_entry(UIList):
     bl_idname = 'VIEW3D_UL_toon_palette_entry'
 
     filter_name: StringProperty(
-        default='', options={'TEXTEDIT_UPDATE'}
+        name='Filter by Name', default='', options={'TEXTEDIT_UPDATE'}
     )
 
     @override

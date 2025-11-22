@@ -19,6 +19,7 @@ from .op_base import PaletteOperator
 class VIEW3D_OT_toon_copy_palette(PaletteOperator):
     bl_idname = 'view3d.toon_copy_palette'
     bl_label = 'Copy Palette'
+    bl_description = 'Copy the selected palette to clipboard as json'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
@@ -32,6 +33,7 @@ class VIEW3D_OT_toon_copy_palette(PaletteOperator):
 class VIEW3D_OT_toon_paste_palette(PaletteOperator):
     bl_idname = 'view3d.toon_paste_palette'
     bl_label = 'Paste Palette'
+    bl_description = 'Paste json text on clipboard to the selected palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod

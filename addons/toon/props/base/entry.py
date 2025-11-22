@@ -34,7 +34,7 @@ class Entry(EntryBase, PropertyGroup):
 
     disable_update_name: BoolProperty(default=False)
 
-    name: StringProperty(update=_update_name)
+    name: StringProperty(name='Name', update=_update_name)
 
     @override
     def parent(self) -> GroupBase[EntryBase] | tuple[list[str], list[EntryBase]] | None:

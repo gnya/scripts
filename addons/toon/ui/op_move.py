@@ -16,6 +16,7 @@ from .op_base import PaletteOperator
 class VIEW3D_OT_toon_move_palette(PaletteOperator):
     bl_idname = 'view3d.toon_move_palette'
     bl_label = 'Move Palette'
+    bl_description = 'Move the selected palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     direction_types = [
@@ -40,6 +41,7 @@ class VIEW3D_OT_toon_move_palette(PaletteOperator):
 class VIEW3D_OT_toon_move_palette_slot(PaletteOperator):
     bl_idname = 'view3d.toon_move_up_palette'
     bl_label = 'Move Palette Slot'
+    bl_description = 'Move the selected group or entry'
     bl_options = {'REGISTER', 'UNDO'}
 
     direction_types = [

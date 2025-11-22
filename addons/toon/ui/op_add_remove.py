@@ -95,6 +95,7 @@ def _remove_entry(palette: Palette):
 class VIEW3D_OT_toon_add_palette(Operator):
     bl_idname = 'view3d.toon_add_palette'
     bl_label = 'Add Palette'
+    bl_description = 'Add a empty palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
@@ -108,6 +109,7 @@ class VIEW3D_OT_toon_add_palette(Operator):
 class VIEW3D_OT_toon_remove_palette(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette'
     bl_label = 'Remove Palette'
+    bl_description = 'Remove the selected palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -126,6 +128,7 @@ class VIEW3D_OT_toon_remove_palette(PaletteOperator):
 class VIEW3D_OT_toon_add_palette_group(PaletteOperator):
     bl_idname = 'view3d.toon_add_palette_group'
     bl_label = 'Add Palette Group'
+    bl_description = 'Add a empty group to the selected palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -143,6 +146,7 @@ class VIEW3D_OT_toon_add_palette_group(PaletteOperator):
 class VIEW3D_OT_toon_remove_palette_group(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette_group'
     bl_label = 'Remove Palette Group'
+    bl_description = 'Remove the selected group from the active palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -160,6 +164,7 @@ class VIEW3D_OT_toon_remove_palette_group(PaletteOperator):
 class VIEW3D_OT_toon_add_palette_entry(PaletteOperator):
     bl_idname = 'view3d.toon_add_palette_entry'
     bl_label = 'Add Palette Entry'
+    bl_description = 'Add a entry to the selected palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -180,6 +185,7 @@ class VIEW3D_OT_toon_add_palette_entry(PaletteOperator):
 class VIEW3D_OT_toon_remove_palette_entry(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette_entry'
     bl_label = 'Remove Palette Entry'
+    bl_description = 'Remove the selected entry from the active palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod

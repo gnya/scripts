@@ -7,7 +7,8 @@ from bpy.types import (
 )
 from bpy.props import PointerProperty, StringProperty
 
-from toon.shaders import script_path
+from toon.shaders import script_filepath
+from toon.utils import NodeLinkRebinder
 
 
 class ToonNode(ShaderNodeCustomGroup):
@@ -36,7 +37,7 @@ class ToonNodeOSL(ToonNode):
             node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
             script = node_tree.nodes.new('ShaderNodeScript')
             script.mode = 'EXTERNAL'
-            script.filepath = script_path(self.osl_name)
+            script.filepath = script_filepath(self.osl_name)
             self.init_node_tree(node_tree, script)
 
             return node_tree
@@ -55,21 +56,21 @@ class ToonNodeOSL(ToonNode):
 
 
 class ToonNodeOSLLight(ToonNodeOSL):
-    last_object_name: StringProperty(default='')
-
     def _poll_object(self, object: Object):
         return object.type in {'LIGHT', 'EMPTY'}
 
     def _update_object(self, context: Context):
-        self.free()
-        self.init(context)
+        with NodeLinkRebinder(self):
+            self.free()
+            self.init(context)
 
         self.last_object_name = self.object.name if self.object else ''
 
+    last_object_name: StringProperty(default='')
+
     object: PointerProperty(
         name='Object', type=Object,
-        poll=_poll_object,
-        update=_update_object
+        poll=_poll_object, update=_update_object
     )
 
     @override

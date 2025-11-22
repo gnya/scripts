@@ -36,20 +36,17 @@ class ToonSettings(PropertyGroup):
     ]
 
     cast_shadows: EnumProperty(
-        name='Cast Shadows',
-        default='0', items=shadow_casting_types,
+        name='Cast Shadows', default='0', items=shadow_casting_types,
         set=_set_cast_shadows, get=_get_cast_shadows
     )
 
     shadow_id: IntProperty(
-        name='Shadow ID',
-        default=0, min=0, max=63,
+        name='Shadow ID', default=0, min=0, max=63,
         set=_set_shadow_id, get=_get_shadow_id
     )
 
     transparent_id: IntProperty(
-        name='Transparent ID',
-        default=0, min=0, max=63,
+        name='Transparent ID', default=0, min=0, max=63,
         set=_set_transparent_id, get=_get_transparent_id
     )
 

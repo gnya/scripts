@@ -42,23 +42,29 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         self._init_branch()
 
     type: EnumProperty(
-        items=entry_types, default='COLOR',
+        description='Type of entry', items=entry_types, default='COLOR',
         update=_update_type
     )
 
     color: FloatVectorProperty(
-        subtype='COLOR', size=4, soft_min=0.0, soft_max=1.0,
+        name='Color', subtype='COLOR', size=4, soft_min=0.0, soft_max=1.0,
         update=_update_color
     )
 
     mix_factor: FloatProperty(
-        default=0, soft_min=0.0, soft_max=1.0,
+        name='Factor', default=0, soft_min=0.0, soft_max=1.0,
         update=_update_mix_factor
     )
 
-    mix_source_a: StringProperty(update=_update_mix_source)
+    mix_source_a: StringProperty(
+        name='Source A',
+        update=_update_mix_source
+    )
 
-    mix_source_b: StringProperty(update=_update_mix_source)
+    mix_source_b: StringProperty(
+        name='Source B',
+        update=_update_mix_source
+    )
 
     def _root(self) -> NodeSocket:
         return self.socket().links[0].from_node.inputs[0]

@@ -1,13 +1,14 @@
 from . import manager
 from . import nodes
 from . import props
+from . import shaders
 from . import ui
 
 
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 1, 6),
+    'version': (0, 1, 7),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '
@@ -20,6 +21,7 @@ def register():
     props.register()
     manager.register()
     ui.register()
+    shaders.register()
     nodes.register()
 
 
@@ -27,6 +29,7 @@ def unregister():
     props.unregister()
     manager.unregister()
     ui.unregister()
+    shaders.unregister()
     nodes.unregister()
 
 

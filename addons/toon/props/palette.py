@@ -47,22 +47,19 @@ class Palette(Group[PaletteGroup], PropertyGroup):
     is_available: BoolProperty(default=False)
 
     order: IntProperty(
-        default=-1,
-        options={'LIBRARY_EDITABLE'}
+        default=-1, options={'LIBRARY_EDITABLE'}
     )
 
     slots: CollectionProperty(
-        type=PaletteSlot,
-        options={'LIBRARY_EDITABLE'}
+        type=PaletteSlot, options={'LIBRARY_EDITABLE'}
     )
 
     active_slot_id_value: IntProperty(
-        default=-1,
-        options={'LIBRARY_EDITABLE'}
+        default=-1, options={'LIBRARY_EDITABLE'}
     )
 
     active_slot_id: IntProperty(
-        options={'LIBRARY_EDITABLE'},
+        name='Active Slot ID', options={'LIBRARY_EDITABLE'},
         get=_get_active_slot_id, set=_set_active_slot_id
     )
 

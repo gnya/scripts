@@ -14,7 +14,7 @@ E = TypeVar('E', bound=EntryBase)
 
 class Group(GroupBase[E], Entry, PropertyGroup):
     show_expanded: BoolProperty(
-        default=True,
+        name='Show Expanded', default=True,
         options={'LIBRARY_EDITABLE'}
     )
 
@@ -149,4 +149,6 @@ class Group(GroupBase[E], Entry, PropertyGroup):
 
     @classmethod
     def register(cls):
-        cls.entries = CollectionProperty(type=cls._entry_type())
+        cls.entries = CollectionProperty(
+            name='Entries', type=cls._entry_type()
+        )
