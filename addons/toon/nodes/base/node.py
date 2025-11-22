@@ -6,35 +6,21 @@ from bpy.types import (
     Context, Node, NodeTree, Object, ShaderNodeCustomGroup, UILayout
 )
 from bpy.props import PointerProperty, StringProperty
-from nodeitems_utils import NodeCategory
 
-from .shaders import script_path
-
-
-def create_script_node(node_tree: NodeTree, script_name: str) -> Node:
-    script = node_tree.nodes.new('ShaderNodeScript')
-    script.mode = 'EXTERNAL'
-    script.filepath = script_path(script_name)
-
-    return script
-
-
-class ToonNodeCategory(NodeCategory):
-    @classmethod
-    def poll(cls, context: Context) -> bool:
-        return (
-            context.space_data.type == 'NODE_EDITOR' and
-            context.space_data.tree_type == 'ShaderNodeTree' and
-            context.scene.render.engine == 'CYCLES' and
-            context.scene.cycles.shading_system
-        )
+from toon.shaders import script_path
 
 
 class ToonNode(ShaderNodeCustomGroup):
+    pass
+
+
+class ToonNodeOSL(ToonNode):
+    osl_name = ''
+
     def node_tree_key(self) -> tuple[str, str]:
         return f'.{self.bl_name}', ''
 
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         pass
 
     def get_node_tree(self) -> NodeTree | None:
@@ -48,7 +34,10 @@ class ToonNode(ShaderNodeCustomGroup):
             return bpy.data.node_groups[name, lib]
         else:
             node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
-            self.init_node_tree(node_tree)
+            script = node_tree.nodes.new('ShaderNodeScript')
+            script.mode = 'EXTERNAL'
+            script.filepath = script_path(self.osl_name)
+            self.init_node_tree(node_tree, script)
 
             return node_tree
 
@@ -65,7 +54,7 @@ class ToonNode(ShaderNodeCustomGroup):
             bpy.data.node_groups.remove(node_tree)
 
 
-class ToonNodeLight(ToonNode):
+class ToonNodeOSLLight(ToonNodeOSL):
     last_object_name: StringProperty(default='')
 
     def _poll_object(self, object: Object):

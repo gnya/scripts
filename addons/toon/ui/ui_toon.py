@@ -1,3 +1,5 @@
+from toon.utils import override
+
 from bpy import types
 from bpy.types import Context, Panel
 
@@ -19,6 +21,7 @@ class OBJECT_PT_toon(Panel):
     bl_region_type = 'WINDOW'
     bl_context = 'object'
 
+    @override
     def draw(self, context: Context):
         layout = self.layout
 
@@ -48,6 +51,7 @@ class MATERIAL_PT_toon(Panel):
     bl_region_type = 'WINDOW'
     bl_context = 'material'
 
+    @override
     def draw(self, context: Context):
         layout = self.layout
 

@@ -1,16 +1,17 @@
 from toon.utils import override
 
-from bpy.types import NodeTree
+from bpy.types import Node, NodeTree
 
-from .base import ToonNodeLight, create_script_node
+from .base import ToonNodeOSLLight
 
 
-class ToonNodePointLight(ToonNodeLight):
+class ToonNodePointLight(ToonNodeOSLLight):
     bl_name = 'ToonNodePointLight'
     bl_label = 'Point Light'
+    osl_name = 'point_light'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
         i.min_value = 0.0
@@ -29,7 +30,6 @@ class ToonNodePointLight(ToonNodeLight):
         location.attribute_type = 'VIEW_LAYER'
         location.attribute_name = f'{a}.location' if a else ''
         input = node_tree.nodes.new('NodeGroupInput')
-        script = create_script_node(node_tree, 'point_light')
         node_tree.links.new(location.outputs[1], script.inputs[0])
         node_tree.links.new(input.outputs[0], script.inputs[1])
         node_tree.links.new(input.outputs[1], script.inputs[2])

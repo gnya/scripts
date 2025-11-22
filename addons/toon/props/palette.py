@@ -1,7 +1,7 @@
 from bpy.props import BoolProperty, CollectionProperty, IntProperty
 from bpy.types import PropertyGroup
 
-from .group import Group
+from .base import Group
 from .palette_entry import PaletteEntry
 
 

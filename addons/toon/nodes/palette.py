@@ -1,14 +1,16 @@
 from toon.utils import override
 
 from bpy.props import StringProperty
-from bpy.types import Context, ShaderNodeCustomGroup, UILayout
+from bpy.types import Context, UILayout
 
 from toon.manager import PaletteManager
 from toon.props import Palette
 from toon.utils import NodeLinkRebinder
 
+from .base import ToonNode
 
-class PaletteNode(ShaderNodeCustomGroup):
+
+class PaletteNode(ToonNode):
     bl_name = 'PaletteNode'
     bl_label = 'Palette'
 

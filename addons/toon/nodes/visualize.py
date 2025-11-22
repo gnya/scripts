@@ -1,16 +1,17 @@
 from toon.utils import override
 
 from bpy.props import EnumProperty
-from bpy.types import Context, NodeTree, UILayout
+from bpy.types import Context, Node, NodeTree, UILayout
 
 from toon.utils import NodeLinkRebinder
 
-from .base import ToonNode, create_script_node
+from .base import ToonNodeOSL
 
 
-class ToonNodeVisualize(ToonNode):
+class ToonNodeVisualize(ToonNodeOSL):
     bl_name = 'ToonNodeVisualize'
     bl_label = 'Visualize'
+    osl_name = 'visualize'
 
     visualize_types = [
         ('0', 'Shadow ID', ''),
@@ -35,10 +36,9 @@ class ToonNodeVisualize(ToonNode):
         return f'{name}_{self.visualize_type}', lib
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         node_tree.outputs.new('NodeSocketColor', 'Color')
 
-        script = create_script_node(node_tree, 'visualize')
         script.inputs[0].default_value = int(self.visualize_type)
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(script.outputs[0], output.inputs[0])

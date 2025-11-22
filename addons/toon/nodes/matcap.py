@@ -1,18 +1,18 @@
 from toon.utils import override
 
-from bpy.types import NodeTree
+from bpy.types import Node, NodeTree
 
-from .base import ToonNode, create_script_node
+from .base import ToonNodeOSL
 
 
-class ToonNodeMatCap(ToonNode):
+class ToonNodeMatCap(ToonNodeOSL):
     bl_name = 'ToonNodeMatCap'
     bl_label = 'MatCap'
+    osl_name = 'matcap'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         node_tree.outputs.new('NodeSocketVector', 'UV')
 
-        script = create_script_node(node_tree, 'matcap')
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(script.outputs[0], output.inputs[0])

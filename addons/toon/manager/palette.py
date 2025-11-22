@@ -1,7 +1,7 @@
 from toon.utils import override
 
 from toon.props import Palette
-from toon.props.group import EntryBase
+from toon.props.base import EntryBase
 
 from .manager import PaletteManager
 

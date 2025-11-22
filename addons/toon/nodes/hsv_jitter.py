@@ -1,16 +1,17 @@
 from toon.utils import override
 
-from bpy.types import NodeTree
+from bpy.types import Node, NodeTree
 
-from .base import ToonNode, create_script_node
+from .base import ToonNodeOSL
 
 
-class ToonNodeHSVJitter(ToonNode):
+class ToonNodeHSVJitter(ToonNodeOSL):
     bl_name = 'ToonNodeHSVJitter'
     bl_label = 'HSV Jitter'
+    osl_name = 'hsv_jitter'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         i = node_tree.inputs.new('NodeSocketFloat', 'Seed')
         i.default_value = 0.0
         i.min_value = float('-inf')
@@ -62,7 +63,6 @@ class ToonNodeHSVJitter(ToonNode):
         node_tree.outputs.new('NodeSocketColor', 'Color')
 
         input = node_tree.nodes.new('NodeGroupInput')
-        script = create_script_node(node_tree, 'hsv_jitter')
         node_tree.links.new(input.outputs[0], script.inputs[0])
         node_tree.links.new(input.outputs[1], script.inputs[1])
         node_tree.links.new(input.outputs[2], script.inputs[2])

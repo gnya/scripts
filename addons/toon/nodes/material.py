@@ -1,16 +1,17 @@
 from toon.utils import override
 
-from bpy.types import NodeTree
+from bpy.types import Node, NodeTree
 
-from .base import ToonNode, create_script_node
+from .base import ToonNodeOSL
 
 
-class ToonNodeMaterial(ToonNode):
+class ToonNodeMaterial(ToonNodeOSL):
     bl_name = 'ToonNodeMaterial'
     bl_label = 'Material'
+    osl_name = 'material'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         i = node_tree.inputs.new('NodeSocketVector', 'Light')
         i.default_value = (0.0, 0.0, 1.0)
         i.min_value = float('-inf')
@@ -36,7 +37,6 @@ class ToonNodeMaterial(ToonNode):
         node_tree.outputs.new('NodeSocketFloat', 'Specular')
 
         input = node_tree.nodes.new('NodeGroupInput')
-        script = create_script_node(node_tree, 'material')
         node_tree.links.new(input.outputs[0], script.inputs[0])
         node_tree.links.new(input.outputs[1], script.inputs[1])
         node_tree.links.new(input.outputs[2], script.inputs[2])

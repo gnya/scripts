@@ -16,7 +16,7 @@ from .sun_light import ToonNodeSunLight
 from .output import ToonNodeOutput
 
 
-node_classes = (
+classes = (
     PaletteNode,
     ToonNodeMatCap,
     ToonNodeVisualize,
@@ -34,27 +34,13 @@ node_classes = (
 
 def register():
     from bpy.utils import register_class
-    from nodeitems_utils import NodeItem, register_node_categories
 
-    from .base import ToonNodeCategory
-
-    for c in node_classes:
+    for c in classes:
         register_class(c)
-
-    toon_nodes = []
-
-    for c in node_classes:
-        toon_nodes.append(NodeItem(c.__name__))
-
-    cat = ToonNodeCategory('TOON', 'Toon', items=toon_nodes)
-    register_node_categories('TOON', [cat])
 
 
 def unregister():
     from bpy.utils import unregister_class
-    from nodeitems_utils import unregister_node_categories
 
-    for c in node_classes:
+    for c in classes:
         unregister_class(c)
-
-    unregister_node_categories('TOON')

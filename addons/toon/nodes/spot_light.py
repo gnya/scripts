@@ -1,17 +1,18 @@
 from toon.utils import override
 
-from bpy.types import NodeTree
+from bpy.types import Node, NodeTree
 import math
 
-from .base import ToonNodeLight, create_script_node
+from .base import ToonNodeOSLLight
 
 
-class ToonNodeSpotLight(ToonNodeLight):
+class ToonNodeSpotLight(ToonNodeOSLLight):
     bl_name = 'ToonNodeSpotLight'
     bl_label = 'Spot Light'
+    osl_name = 'tex_light'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
         i.min_value = 0.0
@@ -35,7 +36,6 @@ class ToonNodeSpotLight(ToonNodeLight):
         rotation.attribute_type = 'VIEW_LAYER'
         rotation.attribute_name = f'{a}.rotation_euler' if a else ''
         input = node_tree.nodes.new('NodeGroupInput')
-        script = create_script_node(node_tree, 'tex_light')
         node_tree.links.new(location.outputs[1], script.inputs[0])
         node_tree.links.new(rotation.outputs[1], script.inputs[1])
         node_tree.links.new(input.outputs[0], script.inputs[2])

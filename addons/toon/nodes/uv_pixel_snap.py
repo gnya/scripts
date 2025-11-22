@@ -1,16 +1,17 @@
 from toon.utils import override
 
-from bpy.types import NodeTree
+from bpy.types import Node, NodeTree
 
-from .base import ToonNode, create_script_node
+from .base import ToonNodeOSL
 
 
-class ToonNodeUVPixelSnap(ToonNode):
+class ToonNodeUVPixelSnap(ToonNodeOSL):
     bl_name = 'ToonNodeUVPixelSnap'
     bl_label = 'UV Pixel Snap'
+    osl_name = 'uv_pixel_snap'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         i = node_tree.inputs.new('NodeSocketVector', 'UV')
         i.default_value = (0.0, 0.0, 0.0)
         i.min_value = float('-inf')
@@ -30,7 +31,6 @@ class ToonNodeUVPixelSnap(ToonNode):
         node_tree.outputs.new('NodeSocketVector', 'UV')
 
         input = node_tree.nodes.new('NodeGroupInput')
-        script = create_script_node(node_tree, 'uv_pixel_snap')
         node_tree.links.new(input.outputs[0], script.inputs[0])
         node_tree.links.new(input.outputs[1], script.inputs[1])
         node_tree.links.new(input.outputs[2], script.inputs[2])

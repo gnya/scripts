@@ -7,7 +7,7 @@ from bpy.props import CollectionProperty
 from bpy.types import NodeTree, PropertyGroup
 
 from toon.props import Palette
-from toon.props.group import GroupBase
+from toon.props.base import GroupBase
 from toon.utils import make_unique_name
 
 from .id import PaletteID

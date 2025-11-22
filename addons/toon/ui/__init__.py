@@ -9,6 +9,7 @@ from .op_copy_paste import VIEW3D_OT_toon_copy_palette
 from .op_copy_paste import VIEW3D_OT_toon_paste_palette
 from .op_move import VIEW3D_OT_toon_move_palette
 from .op_move import VIEW3D_OT_toon_move_palette_slot
+from .ui_nodes import NODE_MT_category_toon
 from .ui_palette import VIEW3D_UL_toon_palette_entry
 from .ui_palette import VIEW3D_MT_toon_palette_menu
 from .ui_palette import VIEW3D_MT_toon_palette_group_menu
@@ -29,6 +30,7 @@ classes = (
     VIEW3D_OT_toon_paste_palette,
     VIEW3D_OT_toon_move_palette,
     VIEW3D_OT_toon_move_palette_slot,
+    NODE_MT_category_toon,
     VIEW3D_UL_toon_palette_entry,
     VIEW3D_MT_toon_palette_menu,
     VIEW3D_MT_toon_palette_group_menu,

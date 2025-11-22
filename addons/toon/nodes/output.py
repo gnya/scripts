@@ -1,16 +1,17 @@
 from toon.utils import override
 
-from bpy.types import NodeTree
+from bpy.types import Node, NodeTree
 
-from .base import ToonNode, create_script_node
+from .base import ToonNodeOSL
 
 
-class ToonNodeOutput(ToonNode):
+class ToonNodeOutput(ToonNodeOSL):
     bl_name = 'ToonNodeOutput'
     bl_label = 'Toon Output'
+    osl_name = 'to_closure'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         i = node_tree.inputs.new('NodeSocketColor', 'Color')
         i.default_value = (1.0, 1.0, 1.0, 1.0)
 
@@ -37,7 +38,6 @@ class ToonNodeOutput(ToonNode):
         node_tree.outputs.new('NodeSocketShader', 'Shader')
 
         input = node_tree.nodes.new('NodeGroupInput')
-        script = create_script_node(node_tree, 'to_closure')
         node_tree.links.new(input.outputs[0], script.inputs[0])
         node_tree.links.new(input.outputs[1], script.inputs[1])
         node_tree.links.new(input.outputs[2], script.inputs[2])

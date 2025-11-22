@@ -1,16 +1,17 @@
 from toon.utils import override
 
 from bpy.props import EnumProperty
-from bpy.types import Context, NodeTree, UILayout
+from bpy.types import Context, Node, NodeTree, UILayout
 
 from toon.utils import NodeLinkRebinder
 
-from .base import ToonNode, create_script_node
+from .base import ToonNodeOSL
 
 
-class ToonNodeLambert(ToonNode):
+class ToonNodeLambert(ToonNodeOSL):
     bl_name = 'ToonNodeLambert'
     bl_label = 'Lambert'
+    osl_name = 'lambert'
 
     lighting_types = [
         ('0', 'Lambert', ''),
@@ -34,7 +35,7 @@ class ToonNodeLambert(ToonNode):
         return f'{name}_{self.lighting_type}', lib
 
     @override
-    def init_node_tree(self, node_tree: NodeTree):
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         i = node_tree.inputs.new('NodeSocketVector', 'Light')
         i.default_value = (0.0, 0.0, 1.0)
         i.min_value = float('-inf')
@@ -44,7 +45,6 @@ class ToonNodeLambert(ToonNode):
         node_tree.outputs.new('NodeSocketFloat', 'Diffuse')
 
         input = node_tree.nodes.new('NodeGroupInput')
-        script = create_script_node(node_tree, 'lambert')
         script.inputs[0].default_value = int(self.lighting_type)
         node_tree.links.new(input.outputs[0], script.inputs[1])
 

@@ -5,7 +5,7 @@ from toon.utils import override
 from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
 from bpy.props import IntProperty
 
-from .group import Entry, EntryBase
+from .base import Entry, EntryBase
 
 
 class SocketEntry(Entry):
