@@ -1,21 +1,9 @@
-from bpy.types import Node, NodeSocket, NodeTree
+from bpy.types import Node, NodeTree
+
+from toon.utils import from_node
 
 from .image import encode_image
 from .palette import PaletteData, PaletteParseError
-
-
-def _from_node(root: NodeSocket) -> Node | None:
-    links = root.links
-
-    if len(links) == 0:
-        return None
-
-    node = links[0].from_node
-
-    if node.type == 'REROUTE':
-        node = _from_node(node.inputs[0])
-
-    return node
 
 
 def encode_node_tree(node_tree: NodeTree) -> PaletteData:
@@ -52,7 +40,7 @@ def encode_node_tree(node_tree: NodeTree) -> PaletteData:
             }
         else:
             root = output_node.inputs[socket_id]
-            node = _from_node(root)
+            node = from_node(root)
 
             if node is None:
                 entry_data = {
@@ -65,9 +53,11 @@ def encode_node_tree(node_tree: NodeTree) -> PaletteData:
                     'color': node.outputs[0].default_value
                 }
             elif node.type == 'TEX_IMAGE':
+                uv = from_node(node.inputs[0], find={'UVMAP'})
                 entry_data = {
                     'type': 'TEXTURE',
-                    'texture_image': encode_image(node.image)
+                    'texture_image': encode_image(node.image),
+                    'texture_uv_map': '' if uv is None else uv.uv_map
                 }
             elif node.type == 'MIX':
                 entry_data = {
@@ -101,8 +91,8 @@ def encode_node_tree(node_tree: NodeTree) -> PaletteData:
                 if node is None:
                     continue
 
-                node_a = _from_node(node.inputs[6])
-                node_b = _from_node(node.inputs[7])
+                node_a = from_node(node.inputs[6])
+                node_b = from_node(node.inputs[7])
 
                 entry_data['mix_source_a'] = node_to_entry.get(node_a, '')
                 entry_data['mix_source_b'] = node_to_entry.get(node_b, '')

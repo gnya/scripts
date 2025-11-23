@@ -12,7 +12,9 @@ def _draw_pass_index_warning(self: Panel, context: Context):
         layout = self.layout
         warning_box = layout.box()
 
-        warning_box.label(text='Do not modify the pass index number directly.', icon='ERROR')
+        warning_box.label(
+            text='Do not modify the pass index number directly.', icon='ERROR'
+        )
 
 
 class OBJECT_PT_toon(Panel):

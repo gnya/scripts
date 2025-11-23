@@ -6,11 +6,9 @@ import bpy
 from bpy.props import CollectionProperty
 from bpy.types import NodeTree, PropertyGroup
 
-from toon.props import Palette
+from toon.props import IDKey, Palette
 from toon.props.base import GroupBase
 from toon.utils import make_unique_name
-
-from .id import PaletteID
 
 
 class PaletteManager(GroupBase[Palette], PropertyGroup):
@@ -18,7 +16,7 @@ class PaletteManager(GroupBase[Palette], PropertyGroup):
     PROP_NAME = 'toon_palette_manager'
     PROP_PALETTE_NAME = 'toon_palette'
 
-    ids_cache: CollectionProperty(type=PaletteID)
+    ids_cache: CollectionProperty(type=IDKey)
 
     @staticmethod
     def instance() -> PaletteManager:

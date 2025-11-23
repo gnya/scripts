@@ -1,9 +1,7 @@
-from .id import PaletteID
 from .manager import PaletteManager
 
 
 __all__ = [
-    PaletteID,
     PaletteManager
 ]
 
@@ -14,8 +12,6 @@ def register():
     from bpy.utils import register_class
 
     from .palette import ManagablePalette
-
-    register_class(PaletteID)
 
     register_class(ManagablePalette)
     setattr(
@@ -35,8 +31,6 @@ def unregister():
     from bpy.utils import unregister_class
 
     from .palette import ManagablePalette
-
-    unregister_class(PaletteID)
 
     unregister_class(ManagablePalette)
     delattr(NodeTree, PaletteManager.PROP_PALETTE_NAME)

@@ -3,6 +3,26 @@ from typing import Any
 from bpy.types import Node, NodeSocket
 
 
+def from_node(
+        root: NodeSocket,
+        find: set[str] = set(), skip: set[str] = {'REROUTE'}
+) -> Node | None:
+    links = root.links
+
+    if len(links) == 0:
+        return None
+
+    node = links[0].from_node
+
+    if node.type in skip or (find and node.type not in find):
+        if len(node.inputs) == 0:
+            return None
+
+        node = from_node(node.inputs[0], find, skip)
+
+    return node
+
+
 class NodeLinkRebinder():
     def __init__(self, node: Node):
         self.node = node

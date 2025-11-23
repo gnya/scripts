@@ -1,39 +1,19 @@
-from .op_add_remove import VIEW3D_OT_toon_add_palette
-from .op_add_remove import VIEW3D_OT_toon_remove_palette
-from .op_add_remove import VIEW3D_OT_toon_add_palette_group
-from .op_add_remove import VIEW3D_OT_toon_remove_palette_group
-from .op_add_remove import VIEW3D_OT_toon_add_palette_entry
-from .op_add_remove import VIEW3D_OT_toon_remove_palette_entry
-from .op_convert import VIEW3D_OT_toon_convert_palette
-from .op_copy_paste import VIEW3D_OT_toon_copy_palette
-from .op_copy_paste import VIEW3D_OT_toon_paste_palette
-from .op_move import VIEW3D_OT_toon_move_palette
-from .op_move import VIEW3D_OT_toon_move_palette_slot
-from .ui_nodes import NODE_MT_category_toon
-from .ui_palette import VIEW3D_UL_toon_palette_entry
-from .ui_palette import VIEW3D_MT_toon_palette_menu
-from .ui_palette import VIEW3D_MT_toon_palette_group_menu
-from .ui_palette import VIEW3D_PT_toon_palette
-from .ui_toon import MATERIAL_PT_toon
-from .ui_toon import OBJECT_PT_toon
+from .mt_nodes import NODE_MT_category_toon
+from .mt_palette import VIEW3D_MT_toon_palette_add_menu
+from .mt_palette import VIEW3D_MT_toon_palette_menu
+from .mt_palette import VIEW3D_MT_toon_palette_group_menu
+from .pt_palette import VIEW3D_PT_toon_palette
+from .pt_toon import MATERIAL_PT_toon
+from .pt_toon import OBJECT_PT_toon
+from .ul_palette import VIEW3D_UL_toon_palette_entry
 
 
 classes = (
-    VIEW3D_OT_toon_add_palette,
-    VIEW3D_OT_toon_remove_palette,
-    VIEW3D_OT_toon_add_palette_group,
-    VIEW3D_OT_toon_remove_palette_group,
-    VIEW3D_OT_toon_add_palette_entry,
-    VIEW3D_OT_toon_remove_palette_entry,
-    VIEW3D_OT_toon_convert_palette,
-    VIEW3D_OT_toon_copy_palette,
-    VIEW3D_OT_toon_paste_palette,
-    VIEW3D_OT_toon_move_palette,
-    VIEW3D_OT_toon_move_palette_slot,
     NODE_MT_category_toon,
-    VIEW3D_UL_toon_palette_entry,
+    VIEW3D_MT_toon_palette_add_menu,
     VIEW3D_MT_toon_palette_menu,
     VIEW3D_MT_toon_palette_group_menu,
+    VIEW3D_UL_toon_palette_entry,
     VIEW3D_PT_toon_palette,
     MATERIAL_PT_toon,
     OBJECT_PT_toon

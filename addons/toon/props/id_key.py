@@ -2,7 +2,7 @@ from bpy.props import StringProperty
 from bpy.types import PropertyGroup
 
 
-class PaletteID(PropertyGroup):
+class IDKey(PropertyGroup):
     id_name: StringProperty()
 
     id_lib: StringProperty(default='')
