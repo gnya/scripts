@@ -3,16 +3,16 @@ from toon.utils import override
 from bpy.types import Context, Panel, UILayout
 
 from toon.manager import PaletteManager
-from toon.ops import VIEW3D_OT_toon_add_palette_entry
-from toon.ops import VIEW3D_OT_toon_remove_palette
-from toon.ops import VIEW3D_OT_toon_remove_palette_entry
-from toon.ops import VIEW3D_OT_toon_move_palette_slot
+from toon.ops import VIEW3D_OT_toon_palette_add_entry
+from toon.ops import VIEW3D_OT_toon_palette_remove
+from toon.ops import VIEW3D_OT_toon_palette_remove_entry
+from toon.ops import VIEW3D_OT_toon_palette_move_slot
 from toon.props import Palette
 
-from .ul_palette import VIEW3D_UL_toon_palette_entry
-from .mt_palette import VIEW3D_MT_toon_palette_add_menu
-from .mt_palette import VIEW3D_MT_toon_palette_menu
-from .mt_palette import VIEW3D_MT_toon_palette_group_menu
+from .palette_list import VIEW3D_UL_toon_palette_entry
+from .palette_menu import VIEW3D_MT_toon_palette_add
+from .palette_menu import VIEW3D_MT_toon_palette
+from .palette_menu import VIEW3D_MT_toon_palette_group
 
 
 class VIEW3D_PT_toon_palette(Panel):
@@ -35,28 +35,28 @@ class VIEW3D_PT_toon_palette(Panel):
         col = row.column()
         sub_col = col.column(align=True)
         sub_col.operator(
-            VIEW3D_OT_toon_add_palette_entry.bl_idname,
+            VIEW3D_OT_toon_palette_add_entry.bl_idname,
             text='', icon='ADD'
         )
         sub_col.operator(
-            VIEW3D_OT_toon_remove_palette_entry.bl_idname,
+            VIEW3D_OT_toon_palette_remove_entry.bl_idname,
             text='', icon='REMOVE'
         )
         sub_col.separator()
         sub_col.menu(
-            VIEW3D_MT_toon_palette_group_menu.bl_idname,
+            VIEW3D_MT_toon_palette_group.bl_idname,
             text='', icon='DOWNARROW_HLT'
         )
 
         if len(palette.slots) > 1:
             sub_col.separator()
             o = sub_col.operator(
-                VIEW3D_OT_toon_move_palette_slot.bl_idname,
+                VIEW3D_OT_toon_palette_move_slot.bl_idname,
                 text='', icon='TRIA_UP'
             )
             o.direction = 'UP'
             o = sub_col.operator(
-                VIEW3D_OT_toon_move_palette_slot.bl_idname,
+                VIEW3D_OT_toon_palette_move_slot.bl_idname,
                 text='', icon='TRIA_DOWN'
             )
             o.direction = 'DOWN'
@@ -72,13 +72,13 @@ class VIEW3D_PT_toon_palette(Panel):
         sub_row = row.row(align=True)
         sub_row.prop(palette, 'name', text='')
         sub_row.menu(
-            VIEW3D_MT_toon_palette_menu.bl_idname,
+            VIEW3D_MT_toon_palette.bl_idname,
             text='', icon='DOWNARROW_HLT'
         )
 
         sub_row = row.row(align=True)
         sub_row.operator(
-            VIEW3D_OT_toon_remove_palette.bl_idname,
+            VIEW3D_OT_toon_palette_remove.bl_idname,
             text='', emboss=False, icon='X'
         )
 
@@ -132,7 +132,7 @@ class VIEW3D_PT_toon_palette(Panel):
         layout = self.layout
 
         layout.menu(
-            VIEW3D_MT_toon_palette_add_menu.bl_idname,
+            VIEW3D_MT_toon_palette_add.bl_idname,
             text='Add Palette'
         )
 

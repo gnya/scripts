@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from toon.manager import PaletteManager
 from toon.props import Palette
 
-from .op_base import PaletteOperator
+from .base import PaletteOperator
 
 
 def _remove_group(palette: Palette):
@@ -47,7 +47,7 @@ def _remove_entry(palette: Palette):
     palette.active_slot_id += offset_slot_id
 
 
-class VIEW3D_OT_toon_remove_palette(PaletteOperator):
+class VIEW3D_OT_toon_palette_remove(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette'
     bl_label = 'Remove Palette'
     bl_description = 'Remove the selected palette'
@@ -66,7 +66,7 @@ class VIEW3D_OT_toon_remove_palette(PaletteOperator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_remove_palette_group(PaletteOperator):
+class VIEW3D_OT_toon_palette_remove_group(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette_group'
     bl_label = 'Remove Palette Group'
     bl_description = 'Remove the selected group from the active palette'
@@ -84,7 +84,7 @@ class VIEW3D_OT_toon_remove_palette_group(PaletteOperator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_remove_palette_entry(PaletteOperator):
+class VIEW3D_OT_toon_palette_remove_entry(PaletteOperator):
     bl_idname = 'view3d.toon_remove_palette_entry'
     bl_label = 'Remove Palette Entry'
     bl_description = 'Remove the selected entry from the active palette'

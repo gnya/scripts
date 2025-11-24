@@ -1,18 +1,18 @@
-from .mt_nodes import NODE_MT_category_toon
-from .mt_palette import VIEW3D_MT_toon_palette_add_menu
-from .mt_palette import VIEW3D_MT_toon_palette_menu
-from .mt_palette import VIEW3D_MT_toon_palette_group_menu
-from .pt_palette import VIEW3D_PT_toon_palette
-from .pt_toon import MATERIAL_PT_toon
-from .pt_toon import OBJECT_PT_toon
-from .ul_palette import VIEW3D_UL_toon_palette_entry
+from .node_menu import NODE_MT_toon_node_category
+from .palette_menu import VIEW3D_MT_toon_palette_add
+from .palette_menu import VIEW3D_MT_toon_palette
+from .palette_menu import VIEW3D_MT_toon_palette_group
+from .palette_list import VIEW3D_UL_toon_palette_entry
+from .palette_panel import VIEW3D_PT_toon_palette
+from .panel import MATERIAL_PT_toon
+from .panel import OBJECT_PT_toon
 
 
 classes = (
-    NODE_MT_category_toon,
-    VIEW3D_MT_toon_palette_add_menu,
-    VIEW3D_MT_toon_palette_menu,
-    VIEW3D_MT_toon_palette_group_menu,
+    NODE_MT_toon_node_category,
+    VIEW3D_MT_toon_palette_add,
+    VIEW3D_MT_toon_palette,
+    VIEW3D_MT_toon_palette_group,
     VIEW3D_UL_toon_palette_entry,
     VIEW3D_PT_toon_palette,
     MATERIAL_PT_toon,

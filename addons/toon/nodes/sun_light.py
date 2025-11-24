@@ -6,7 +6,7 @@ from .base import ToonNodeOSLLight
 
 
 class ToonNodeSunLight(ToonNodeOSLLight):
-    bl_name = 'ToonNodeSunLight'
+    bl_idname = 'ToonNodeSunLight'
     bl_label = 'Sun Light'
     osl_name = 'sun_light'
 

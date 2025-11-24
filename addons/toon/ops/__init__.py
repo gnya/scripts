@@ -1,30 +1,30 @@
-from .op_add import VIEW3D_OT_toon_add_palette
-from .op_add import VIEW3D_OT_toon_add_palette_group
-from .op_add import VIEW3D_OT_toon_add_palette_entry
-from .op_add_by import VIEW3D_OT_toon_add_palette_by_node_tree
-from .op_add_by import VIEW3D_OT_toon_add_palette_by_clipboard
-from .op_remove import VIEW3D_OT_toon_remove_palette
-from .op_remove import VIEW3D_OT_toon_remove_palette_group
-from .op_remove import VIEW3D_OT_toon_remove_palette_entry
-from .op_copy_paste import VIEW3D_OT_toon_copy_palette
-from .op_copy_paste import VIEW3D_OT_toon_paste_palette
-from .op_move import VIEW3D_OT_toon_move_palette
-from .op_move import VIEW3D_OT_toon_move_palette_slot
+from .add import VIEW3D_OT_toon_palette_add
+from .add import VIEW3D_OT_toon_palette_add_group
+from .add import VIEW3D_OT_toon_palette_add_entry
+from .add_by import VIEW3D_OT_toon_palette_add_by_node_tree
+from .add_by import VIEW3D_OT_toon_palette_add_by_clipboard
+from .remove import VIEW3D_OT_toon_palette_remove
+from .remove import VIEW3D_OT_toon_palette_remove_group
+from .remove import VIEW3D_OT_toon_palette_remove_entry
+from .copy_paste import VIEW3D_OT_toon_palette_copy
+from .copy_paste import VIEW3D_OT_toon_palette_paste
+from .move import VIEW3D_OT_toon_palette_move
+from .move import VIEW3D_OT_toon_palette_move_slot
 
 
 classes = (
-    VIEW3D_OT_toon_add_palette,
-    VIEW3D_OT_toon_add_palette_group,
-    VIEW3D_OT_toon_add_palette_entry,
-    VIEW3D_OT_toon_add_palette_by_node_tree,
-    VIEW3D_OT_toon_add_palette_by_clipboard,
-    VIEW3D_OT_toon_remove_palette,
-    VIEW3D_OT_toon_remove_palette_group,
-    VIEW3D_OT_toon_remove_palette_entry,
-    VIEW3D_OT_toon_copy_palette,
-    VIEW3D_OT_toon_paste_palette,
-    VIEW3D_OT_toon_move_palette,
-    VIEW3D_OT_toon_move_palette_slot,
+    VIEW3D_OT_toon_palette_add,
+    VIEW3D_OT_toon_palette_add_group,
+    VIEW3D_OT_toon_palette_add_entry,
+    VIEW3D_OT_toon_palette_add_by_node_tree,
+    VIEW3D_OT_toon_palette_add_by_clipboard,
+    VIEW3D_OT_toon_palette_remove,
+    VIEW3D_OT_toon_palette_remove_group,
+    VIEW3D_OT_toon_palette_remove_entry,
+    VIEW3D_OT_toon_palette_copy,
+    VIEW3D_OT_toon_palette_paste,
+    VIEW3D_OT_toon_palette_move,
+    VIEW3D_OT_toon_palette_move_slot,
 )
 
 

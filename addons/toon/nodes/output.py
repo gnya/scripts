@@ -6,7 +6,7 @@ from .base import ToonNodeOSL
 
 
 class ToonNodeOutput(ToonNodeOSL):
-    bl_name = 'ToonNodeOutput'
+    bl_idname = 'ToonNodeOutput'
     bl_label = 'Toon Output'
     osl_name = 'to_closure'
 

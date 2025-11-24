@@ -28,7 +28,7 @@ def register():
             elif osl_compile(f'{scripts_path}\\{filename}', src_path):
                 shutil.copy(src_path, dst_path)
             else:
-                print(f'{filename}: Failed to compile this osl file.')
+                print(f'Failed to compile this osl file. : {filename}')
 
 
 def unregister():

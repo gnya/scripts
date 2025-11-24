@@ -6,7 +6,7 @@ from .base import ToonNodeOSL
 
 
 class ToonNodeHSVJitter(ToonNodeOSL):
-    bl_name = 'ToonNodeHSVJitter'
+    bl_idname = 'ToonNodeHSVJitter'
     bl_label = 'HSV Jitter'
     osl_name = 'hsv_jitter'
 

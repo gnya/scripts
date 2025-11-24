@@ -179,26 +179,6 @@
 
   プロパティの値によって色分けされた結果
 
-### `uv_pixel_snap.osl`
-
-#### Inputs
-* UV
-
-  元のUV
-
-* Width
-
-  幅方向の解像度
-
-* Height
-
-  高さ方向の解像度
-
-#### Outputs
-* UV
-
-  離散化されたUV
-
 ### `hsv_jitter.osl`
 
 #### Inputs

@@ -3,7 +3,7 @@ from bpy.types import Node, NodeTree
 from toon.utils import from_node
 
 from .image import encode_image
-from .palette import PaletteData, PaletteParseError
+from .palette import PaletteData, PaletteEncodeError
 
 
 def encode_node_tree(node_tree: NodeTree) -> PaletteData:
@@ -66,13 +66,13 @@ def encode_node_tree(node_tree: NodeTree) -> PaletteData:
                 }
 
         if entry_name in palette_data[group_name]:
-            raise PaletteParseError(
-                f'{socket.name}: The socket name is duplicated.'
+            raise PaletteEncodeError(
+                f'The socket name is duplicated. : {socket.name}'
             )
 
         if node is not None and node in node_to_entry:
-            raise PaletteParseError(
-                f'{node.name}: A node cannot be shared across multiple entries.'
+            raise PaletteEncodeError(
+                f'A node cannot be shared across multiple entries. : {node.name}'
             )
 
         palette_data[group_name][entry_name] = entry_data

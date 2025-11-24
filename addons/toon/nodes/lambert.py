@@ -9,7 +9,7 @@ from .base import ToonNodeOSL
 
 
 class ToonNodeLambert(ToonNodeOSL):
-    bl_name = 'ToonNodeLambert'
+    bl_idname = 'ToonNodeLambert'
     bl_label = 'Lambert'
     osl_name = 'lambert'
 

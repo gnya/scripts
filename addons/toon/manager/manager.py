@@ -103,7 +103,7 @@ class PaletteManager(GroupBase[Palette], PropertyGroup):
         palette = self.from_data(node_tree, available_only=False)
 
         if palette is None:
-            raise RuntimeError(f'{node_tree.name}: Failed to add a palette.')
+            raise RuntimeError(f'Failed to add a palette. : {node_tree.name}')
 
         name = make_unique_name(name, self.ids_cache.keys())
         palette.is_available = True

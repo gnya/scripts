@@ -4,18 +4,18 @@ import bpy
 
 from bpy.types import Context, Menu
 
-from toon.ops import VIEW3D_OT_toon_add_palette
-from toon.ops import VIEW3D_OT_toon_add_palette_group
-from toon.ops import VIEW3D_OT_toon_add_palette_by_node_tree
-from toon.ops import VIEW3D_OT_toon_add_palette_by_clipboard
-from toon.ops import VIEW3D_OT_toon_remove_palette_group
-from toon.ops import VIEW3D_OT_toon_copy_palette
-from toon.ops import VIEW3D_OT_toon_paste_palette
-from toon.ops import VIEW3D_OT_toon_move_palette
+from toon.ops import VIEW3D_OT_toon_palette_add
+from toon.ops import VIEW3D_OT_toon_palette_add_group
+from toon.ops import VIEW3D_OT_toon_palette_add_by_node_tree
+from toon.ops import VIEW3D_OT_toon_palette_add_by_clipboard
+from toon.ops import VIEW3D_OT_toon_palette_remove_group
+from toon.ops import VIEW3D_OT_toon_palette_copy
+from toon.ops import VIEW3D_OT_toon_palette_paste
+from toon.ops import VIEW3D_OT_toon_palette_move
 
 
-class VIEW3D_MT_toon_palette_add_menu(Menu):
-    bl_idname = 'VIEW3D_MT_toon_palette_add_menu'
+class VIEW3D_MT_toon_palette_add(Menu):
+    bl_idname = 'VIEW3D_MT_toon_palette_menu_add'
     bl_label = 'Add Palette'
 
     @override
@@ -23,16 +23,16 @@ class VIEW3D_MT_toon_palette_add_menu(Menu):
         layout = self.layout
 
         layout.operator(
-            VIEW3D_OT_toon_add_palette.bl_idname,
+            VIEW3D_OT_toon_palette_add.bl_idname,
             text='Add Empty Palette', icon='ADD'
         )
         layout.operator(
-            VIEW3D_OT_toon_add_palette_by_clipboard.bl_idname,
+            VIEW3D_OT_toon_palette_add_by_clipboard.bl_idname,
             text='From Clipboard', icon='PASTEDOWN'
         )
         layout.separator()
 
-        operator_type = VIEW3D_OT_toon_add_palette_by_node_tree
+        operator_type = VIEW3D_OT_toon_palette_add_by_node_tree
 
         for node_tree in bpy.data.node_groups:
             if not operator_type.poll_node_tree(node_tree):
@@ -48,7 +48,7 @@ class VIEW3D_MT_toon_palette_add_menu(Menu):
                 o.id_lib = node_tree.library.filepath
 
 
-class VIEW3D_MT_toon_palette_menu(Menu):
+class VIEW3D_MT_toon_palette(Menu):
     bl_idname = 'VIEW3D_MT_toon_palette_menu'
     bl_label = 'Palette Specials'
 
@@ -57,27 +57,27 @@ class VIEW3D_MT_toon_palette_menu(Menu):
         layout = self.layout
 
         layout.operator(
-            VIEW3D_OT_toon_copy_palette.bl_idname,
+            VIEW3D_OT_toon_palette_copy.bl_idname,
             text='Copy Palette', icon='COPYDOWN'
         )
         layout.operator(
-            VIEW3D_OT_toon_paste_palette.bl_idname,
+            VIEW3D_OT_toon_palette_paste.bl_idname,
             text='Paste Palette', icon='PASTEDOWN'
         )
         layout.separator()
         o = layout.operator(
-            VIEW3D_OT_toon_move_palette.bl_idname,
+            VIEW3D_OT_toon_palette_move.bl_idname,
             text='Move Palette', icon='TRIA_UP'
         )
         o.direction = 'UP'
         o = layout.operator(
-            VIEW3D_OT_toon_move_palette.bl_idname,
+            VIEW3D_OT_toon_palette_move.bl_idname,
             text='Move Palette', icon='TRIA_DOWN'
         )
         o.direction = 'DOWN'
 
 
-class VIEW3D_MT_toon_palette_group_menu(Menu):
+class VIEW3D_MT_toon_palette_group(Menu):
     bl_idname = 'VIEW3D_MT_toon_palette_group_menu'
     bl_label = 'Group Specials'
 
@@ -86,10 +86,10 @@ class VIEW3D_MT_toon_palette_group_menu(Menu):
         layout = self.layout
 
         layout.operator(
-            VIEW3D_OT_toon_add_palette_group.bl_idname,
+            VIEW3D_OT_toon_palette_add_group.bl_idname,
             text='Add Group', icon='ADD'
         )
         layout.operator(
-            VIEW3D_OT_toon_remove_palette_group.bl_idname,
+            VIEW3D_OT_toon_palette_remove_group.bl_idname,
             text='Remove Group', icon='REMOVE'
         )

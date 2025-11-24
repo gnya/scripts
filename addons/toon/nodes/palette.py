@@ -11,7 +11,7 @@ from .base import ToonNode
 
 
 class PaletteNode(ToonNode):
-    bl_name = 'PaletteNode'
+    bl_idname = 'PaletteNode'
     bl_label = 'Palette'
 
     def _get_palette_name(self) -> str:

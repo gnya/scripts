@@ -10,8 +10,9 @@ GroupData = dict[str, EntryData]
 PaletteData = dict[str, GroupData]
 
 
-class PaletteParseError(Exception):
-    pass
+class PaletteEncodeError(Exception):
+    def __init__(self, msg: str):
+        self.msg = msg
 
 
 def encode_entry(entry: PaletteEntry) -> EntryData:

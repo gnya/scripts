@@ -16,7 +16,7 @@ from toon.nodes import ToonNodeSunLight
 from toon.nodes import ToonNodeOutput
 
 
-class NODE_MT_category_toon(Menu):
+class NODE_MT_toon_node_category(Menu):
     bl_idname = 'NODE_MT_category_toon'
     bl_label = 'Toon'
     bl_space_type = 'NODE_EDITOR'

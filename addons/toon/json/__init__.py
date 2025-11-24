@@ -3,6 +3,7 @@ from .node_tree import encode_node_tree
 from .palette import decode_entry, decode_group, decode_palette
 from .palette import encode_entry, encode_group, encode_palette
 
+from .palette import PaletteEncodeError
 
 __all__ = [
     decode_image,
@@ -13,5 +14,6 @@ __all__ = [
     decode_palette,
     encode_entry,
     encode_group,
-    encode_palette
+    encode_palette,
+    PaletteEncodeError
 ]

@@ -6,7 +6,7 @@ from .base import ToonNodeOSL
 
 
 class ToonNodeMaterial(ToonNodeOSL):
-    bl_name = 'ToonNodeMaterial'
+    bl_idname = 'ToonNodeMaterial'
     bl_label = 'Material'
     osl_name = 'material'
 

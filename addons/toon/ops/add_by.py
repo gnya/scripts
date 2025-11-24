@@ -12,11 +12,11 @@ from bpy.props import StringProperty
 from bpy.types import Context, NodeSocketInterfaceColor, NodeTree, Operator
 from json.decoder import JSONDecodeError
 
-from toon.json import decode_palette, encode_node_tree
+from toon.json import decode_palette, encode_node_tree, PaletteEncodeError
 from toon.manager import PaletteManager
 
 
-class VIEW3D_OT_toon_add_palette_by_node_tree(Operator):
+class VIEW3D_OT_toon_palette_add_by_node_tree(Operator):
     bl_idname = 'view3d.toon_add_palette_by_node_tree'
     bl_label = 'Convert NodeTree to Palette'
     bl_description = 'Convert the node tree to a palette'
@@ -34,14 +34,22 @@ class VIEW3D_OT_toon_add_palette_by_node_tree(Operator):
             id_key = self.id_name, self.id_lib
 
         if id_key not in bpy.data.node_groups:
+            self.report({'ERROR'}, f'Required node tree is missing. : {id_key}')
+
             return {'CANCELLED'}
 
-        node_tree = bpy.data.node_groups[id_key]
-        manager = PaletteManager.instance()
-        palette = manager.add(node_tree.name)
-        data = encode_node_tree(node_tree)
-        decode_palette(data, palette)
-        palette.update_slots()
+        try:
+            node_tree = bpy.data.node_groups[id_key]
+            data = encode_node_tree(node_tree)
+        except PaletteEncodeError as e:
+            self.report({'ERROR'}, f'Failed to convert node tree. : {e.msg}')
+
+            return {'CANCELLED'}
+        else:
+            manager = PaletteManager.instance()
+            palette = manager.add(node_tree.name)
+            decode_palette(data, palette)
+            palette.update_slots()
 
         return {'FINISHED'}
 
@@ -59,7 +67,7 @@ class VIEW3D_OT_toon_add_palette_by_node_tree(Operator):
         return True
 
 
-class VIEW3D_OT_toon_add_palette_by_clipboard(Operator):
+class VIEW3D_OT_toon_palette_add_by_clipboard(Operator):
     bl_idname = 'view3d.toon_add_palette_by_clipboard'
     bl_label = 'Convert Clipboard Text to Palette'
     bl_description = 'Convert json text on clipboard to a palette'
@@ -69,7 +77,9 @@ class VIEW3D_OT_toon_add_palette_by_clipboard(Operator):
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         try:
             data = json.loads(bpy.context.window_manager.clipboard)
-        except JSONDecodeError:
+        except JSONDecodeError as e:
+            self.report({'ERROR'}, f'Failed to decode json text. : {e.msg}')
+
             return {'CANCELLED'}
         else:
             manager = PaletteManager.instance()

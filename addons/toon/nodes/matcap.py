@@ -6,7 +6,7 @@ from .base import ToonNodeOSL
 
 
 class ToonNodeMatCap(ToonNodeOSL):
-    bl_name = 'ToonNodeMatCap'
+    bl_idname = 'ToonNodeMatCap'
     bl_label = 'MatCap'
     osl_name = 'matcap'
 

@@ -10,7 +10,7 @@ from bpy.types import Context, Operator
 from toon.manager import PaletteManager
 from toon.props import Palette
 
-from .op_base import PaletteOperator
+from .base import PaletteOperator
 
 
 def _add_group(palette: Palette):
@@ -56,7 +56,7 @@ def _add_entry(palette: Palette):
     pointer.group.show_expanded = True
 
 
-class VIEW3D_OT_toon_add_palette(Operator):
+class VIEW3D_OT_toon_palette_add(Operator):
     bl_idname = 'view3d.toon_add_palette'
     bl_label = 'Add Palette'
     bl_description = 'Add a empty palette'
@@ -70,7 +70,7 @@ class VIEW3D_OT_toon_add_palette(Operator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_add_palette_group(PaletteOperator):
+class VIEW3D_OT_toon_palette_add_group(PaletteOperator):
     bl_idname = 'view3d.toon_add_palette_group'
     bl_label = 'Add Palette Group'
     bl_description = 'Add a empty group to the selected palette'
@@ -88,7 +88,7 @@ class VIEW3D_OT_toon_add_palette_group(PaletteOperator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_add_palette_entry(PaletteOperator):
+class VIEW3D_OT_toon_palette_add_entry(PaletteOperator):
     bl_idname = 'view3d.toon_add_palette_entry'
     bl_label = 'Add Palette Entry'
     bl_description = 'Add a entry to the selected palette'

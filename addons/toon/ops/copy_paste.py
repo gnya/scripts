@@ -13,10 +13,10 @@ from json.decoder import JSONDecodeError
 from toon.json import decode_palette, encode_palette
 from toon.props import Palette
 
-from .op_base import PaletteOperator
+from .base import PaletteOperator
 
 
-class VIEW3D_OT_toon_copy_palette(PaletteOperator):
+class VIEW3D_OT_toon_palette_copy(PaletteOperator):
     bl_idname = 'view3d.toon_copy_palette'
     bl_label = 'Copy Palette'
     bl_description = 'Copy the selected palette to clipboard as json'
@@ -30,7 +30,7 @@ class VIEW3D_OT_toon_copy_palette(PaletteOperator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_toon_paste_palette(PaletteOperator):
+class VIEW3D_OT_toon_palette_paste(PaletteOperator):
     bl_idname = 'view3d.toon_paste_palette'
     bl_label = 'Paste Palette'
     bl_description = 'Paste json text on clipboard to the selected palette'
@@ -45,7 +45,9 @@ class VIEW3D_OT_toon_paste_palette(PaletteOperator):
     def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
         try:
             data = json.loads(bpy.context.window_manager.clipboard)
-        except JSONDecodeError:
+        except JSONDecodeError as e:
+            self.report({'ERROR'}, f'Failed to decode json text. : {e.msg}')
+
             return {'CANCELLED'}
         else:
             decode_palette(data, palette)

@@ -15,14 +15,12 @@ class ToonNode(ShaderNodeCustomGroup):
     pass
 
 
-class ToonNodeOSL(ToonNode):
-    osl_name = ''
-
+class ToonNodeGroup(ToonNode):
     def node_tree_key(self) -> tuple[str, str]:
-        return f'.{self.bl_name}', ''
+        return f'.{self.bl_idname}', ''
 
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
-        pass
+    def new_node_tree(self, name: str) -> NodeTree:
+        raise NotImplementedError()
 
     def get_node_tree(self) -> NodeTree | None:
         name, lib = self.node_tree_key()
@@ -34,13 +32,7 @@ class ToonNodeOSL(ToonNode):
         elif (name, lib) in bpy.data.node_groups:
             return bpy.data.node_groups[name, lib]
         else:
-            node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
-            script = node_tree.nodes.new('ShaderNodeScript')
-            script.mode = 'EXTERNAL'
-            script.filepath = script_filepath(self.osl_name)
-            self.init_node_tree(node_tree, script)
-
-            return node_tree
+            return self.new_node_tree(name)
 
     @override
     def init(self, context: Context):
@@ -53,6 +45,23 @@ class ToonNodeOSL(ToonNode):
 
         if node_tree is not None and node_tree.users == 1:
             bpy.data.node_groups.remove(node_tree)
+
+
+class ToonNodeOSL(ToonNodeGroup):
+    osl_name = ''
+
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
+        pass
+
+    @override
+    def new_node_tree(self, name: str) -> NodeTree:
+        node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
+        script = node_tree.nodes.new('ShaderNodeScript')
+        script.mode = 'EXTERNAL'
+        script.filepath = script_filepath(self.osl_name)
+        self.init_node_tree(node_tree, script)
+
+        return node_tree
 
 
 class ToonNodeOSLLight(ToonNodeOSL):

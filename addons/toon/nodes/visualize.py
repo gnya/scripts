@@ -9,7 +9,7 @@ from .base import ToonNodeOSL
 
 
 class ToonNodeVisualize(ToonNodeOSL):
-    bl_name = 'ToonNodeVisualize'
+    bl_idname = 'ToonNodeVisualize'
     bl_label = 'Visualize'
     osl_name = 'visualize'
 
