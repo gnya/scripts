@@ -1,7 +1,7 @@
 from .node import ToonNode
 from .node import ToonNodeGroup
-from .node import ToonNodeOSL
-from .node import ToonNodeOSLLight
+from .osl import ToonNodeOSL
+from .osl import ToonNodeOSLLight
 
 
 __all__ = [

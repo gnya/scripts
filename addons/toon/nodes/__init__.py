@@ -1,4 +1,4 @@
-from .palette import PaletteNode
+from .palette import ToonNodePalette
 
 from .matcap import ToonNodeMatCap
 from .visualize import ToonNodeVisualize
@@ -17,7 +17,7 @@ from .output import ToonNodeOutput
 
 
 classes = (
-    PaletteNode,
+    ToonNodePalette,
     ToonNodeMatCap,
     ToonNodeVisualize,
     ToonNodeHSVJitter,

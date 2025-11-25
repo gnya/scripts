@@ -1,7 +1,7 @@
 bl_info = {
     'name': 'Toon',
     'author': 'gnya',
-    'version': (0, 1, 9),
+    'version': (0, 1, 10),
     'blender': (3, 6, 0),
     'description':
         'Add shader script wrappers and other features '

@@ -10,8 +10,8 @@ from toon.utils import NodeLinkRebinder
 from .base import ToonNode
 
 
-class PaletteNode(ToonNode):
-    bl_idname = 'PaletteNode'
+class ToonNodePalette(ToonNode):
+    bl_idname = 'ToonNodePalette'
     bl_label = 'Palette'
 
     def _get_palette_name(self) -> str:

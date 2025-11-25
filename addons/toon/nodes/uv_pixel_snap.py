@@ -34,42 +34,45 @@ class ToonNodeUVPixelSnap(ToonNodeGroup):
         node_tree.outputs.new('NodeSocketVector', 'UV')
 
         input = node_tree.nodes.new('NodeGroupInput')
-        xyz = node_tree.nodes.new('ShaderNodeSeparateXYZ')
-        node_tree.links.new(input.outputs[0], xyz.inputs[0])
+        to_xyz = node_tree.nodes.new('ShaderNodeSeparateXYZ')
+        node_tree.links.new(input.outputs[0], to_xyz.inputs[0])
 
+        # float U = floor(UVIn[0] * Width) / Width;
         mul_w = node_tree.nodes.new('ShaderNodeMath')
         mul_w.operation = 'MULTIPLY'
-        node_tree.links.new(xyz.outputs[0], mul_w.inputs[0])
+        node_tree.links.new(to_xyz.outputs[0], mul_w.inputs[0])
         node_tree.links.new(input.outputs[1], mul_w.inputs[1])
-
-        mul_h = node_tree.nodes.new('ShaderNodeMath')
-        mul_h.operation = 'MULTIPLY'
-        node_tree.links.new(xyz.outputs[1], mul_h.inputs[0])
-        node_tree.links.new(input.outputs[2], mul_h.inputs[1])
 
         floor_w = node_tree.nodes.new('ShaderNodeMath')
         floor_w.operation = 'FLOOR'
         node_tree.links.new(mul_w.outputs[0], floor_w.inputs[0])
-
-        floor_h = node_tree.nodes.new('ShaderNodeMath')
-        floor_h.operation = 'FLOOR'
-        node_tree.links.new(mul_h.outputs[0], floor_h.inputs[0])
 
         div_w = node_tree.nodes.new('ShaderNodeMath')
         div_w.operation = 'DIVIDE'
         node_tree.links.new(floor_w.outputs[0], div_w.inputs[0])
         node_tree.links.new(input.outputs[1], div_w.inputs[1])
 
+        # float V = floor(UVIn[1] * Height) / Height;
+        mul_h = node_tree.nodes.new('ShaderNodeMath')
+        mul_h.operation = 'MULTIPLY'
+        node_tree.links.new(to_xyz.outputs[1], mul_h.inputs[0])
+        node_tree.links.new(input.outputs[2], mul_h.inputs[1])
+
+        floor_h = node_tree.nodes.new('ShaderNodeMath')
+        floor_h.operation = 'FLOOR'
+        node_tree.links.new(mul_h.outputs[0], floor_h.inputs[0])
+
         div_h = node_tree.nodes.new('ShaderNodeMath')
         div_h.operation = 'DIVIDE'
         node_tree.links.new(floor_h.outputs[0], div_h.inputs[0])
         node_tree.links.new(input.outputs[2], div_h.inputs[1])
 
-        xyz = node_tree.nodes.new('ShaderNodeCombineXYZ')
-        node_tree.links.new(div_w.outputs[0], xyz.inputs[0])
-        node_tree.links.new(div_h.outputs[0], xyz.inputs[1])
+        # UVOut = vector(U, V, 0.0);
+        from_xyz = node_tree.nodes.new('ShaderNodeCombineXYZ')
+        node_tree.links.new(div_w.outputs[0], from_xyz.inputs[0])
+        node_tree.links.new(div_h.outputs[0], from_xyz.inputs[1])
 
         output = node_tree.nodes.new('NodeGroupOutput')
-        node_tree.links.new(xyz.outputs[0], output.inputs[0])
+        node_tree.links.new(from_xyz.outputs[0], output.inputs[0])
 
         return node_tree

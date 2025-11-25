@@ -25,10 +25,22 @@
 
   光源の強さが1/2に減衰する距離
 
+* Width
+
+  ライトオブジェクトの光源の幅
+
+* Height
+
+  ライトオブジェクトの光源の高さ
+
 #### Outputs
 * Light
 
   レンダリングポイントにおけるライトベクトル
+
+* UV
+
+  レンダリングポイントにおけるライトテクスチャのUV座標
 
 ### `sun_light.osl`
 
@@ -45,6 +57,10 @@
 * Light
 
   レンダリングポイントにおけるライトベクトル
+
+* UV
+
+  レンダリングポイントにおけるライトテクスチャのUV座標（常にゼロベクトルを返します）
 
 ### `point_light.osl`
 
@@ -66,7 +82,11 @@
 
   レンダリングポイントにおけるライトベクトル
 
-### `tex_light.osl`
+* UV
+
+  レンダリングポイントにおけるライトテクスチャのUV座標
+
+### `spot_light.osl`
 
 #### Inputs
 * Location
@@ -154,13 +174,6 @@
 
   シェーダー
 
-### `matcap.osl`
-
-#### Outputs
-* UV
-
-  レンダリングポイントにおけるMatcapのUV座標
-
 ### `visualize.osl`
 
 #### Inputs
@@ -178,62 +191,6 @@
 * Color
 
   プロパティの値によって色分けされた結果
-
-### `hsv_jitter.osl`
-
-#### Inputs
-* Seed
-
-  乱数のシード値
-
-* Hue Jitter
-
-  色相の振れ幅
-
-* Saturation Jitter
-
-  彩度の振れ幅
-
-* Value Jitter
-
-  明度の振れ幅
-
-* Fac Jitter
-
-  係数の振れ幅
-
-* Hue
-
-  色相
-
-* Saturation
-
-  彩度
-
-* Value
-
-  明度
-
-* Fac
-
-  係数
-
-#### Outputs
-* Hue
-
-  色相
-
-* Saturation
-
-  彩度
-
-* Value
-
-  明度
-
-* Fac
-
-  係数
 
 ### `lambert.osl`
 

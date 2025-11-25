@@ -5,27 +5,24 @@
 
 #include "node_math.h"
 
-shader area_light(
+shader spot_light(
     vector Location = vector(0.0, 0.0, 0.0),
     point Rotation = point(0.0, 0.0, 0.0),
     float Energy = 1.0,
-    float Distance = 1.0,
-    float Width = 1.0,
-    float Height = 1.0,
+    float Size = M_PI_4,
 
     output vector Light = vector(0.0, 0.0, 0.0),
     output vector UV = vector(0.0, 0.0, 0.0)
 ) {
     matrix mat = transpose(euler_to_mat(Rotation));
-    vector z_axis = vector(mat[0][2], mat[1][2], mat[2][2]);
-    vector incomming = transform(mat, Location - P);
+    vector direction = normalize(Location - P);
+    vector incomming = transform(mat, direction);
 
-    UV = -incomming / vector(Width, Height, 1.0);
+    UV = -incomming / (abs(incomming[2]) * tan(Size / 2.0) * 2.0);
 
     if (abs(UV[0]) <= 0.5 && abs(UV[1]) <= 0.5 && UV[2] <= 0.0) {
-        float falloff = -UV[2] / Distance;
-        float strength = Energy / M_PI / exp2(falloff);
+         float strength = Energy / M_PI;
 
-        Light = z_axis * strength;
+         Light = direction * strength;
     }
 }

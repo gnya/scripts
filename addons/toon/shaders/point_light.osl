@@ -3,15 +3,25 @@
  * author: gnya
  */
 
+ #include "node_math.h"
+
 shader point_light(
     vector Location = vector(0.0, 0.0, 0.0),
+    point Rotation = point(0.0, 0.0, 0.0),
     float Energy = 1.0,
     float Distance = 1.0,
 
-    output vector Light = vector(0.0, 0.0, 0.0)
+    output vector Light = vector(0.0, 0.0, 0.0),
+    output vector UV = vector(0.0, 0.0, 0.0)
 ) {
-    float falloff = length(Location - P) / Distance;
+    matrix mat = transpose(euler_to_mat(Rotation));
+    vector direction = normalize(Location - P);
+    vector incomming = transform(mat, direction);
+
+    UV = -incomming;
+
+    float falloff = distance(Location, P) / Distance;
     float strength = Energy / M_PI / exp2(falloff);
 
-    Light = normalize(Location - P) * strength;
+    Light = direction * strength;
 }

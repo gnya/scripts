@@ -11,7 +11,7 @@ class ToonNodeAreaLight(ToonNodeOSLLight):
     osl_name = 'area_light'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
+    def init_sockets(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
         i.min_value = 0.0
@@ -22,8 +22,21 @@ class ToonNodeAreaLight(ToonNodeOSLLight):
         i.min_value = 0.0
         i.max_value = float('inf')
 
-        node_tree.outputs.new('NodeSocketVector', 'Light')
+        i = node_tree.inputs.new('NodeSocketFloat', 'Width')
+        i.default_value = 1.0
+        i.min_value = 0.0
+        i.max_value = float('inf')
 
+        i = node_tree.inputs.new('NodeSocketFloat', 'Height')
+        i.default_value = 1.0
+        i.min_value = 0.0
+        i.max_value = float('inf')
+
+        node_tree.outputs.new('NodeSocketVector', 'Light')
+        node_tree.outputs.new('NodeSocketVector', 'UV')
+
+    @override
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         a = f'objects["{self.object.name}"]' if self.object else ''
         location = node_tree.nodes.new('ShaderNodeAttribute')
         location.name = 'Attribute Location'
@@ -38,6 +51,9 @@ class ToonNodeAreaLight(ToonNodeOSLLight):
         node_tree.links.new(rotation.outputs[1], script.inputs[1])
         node_tree.links.new(input.outputs[0], script.inputs[2])
         node_tree.links.new(input.outputs[1], script.inputs[3])
+        node_tree.links.new(input.outputs[2], script.inputs[4])
+        node_tree.links.new(input.outputs[3], script.inputs[5])
 
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(script.outputs[0], output.inputs[0])
+        node_tree.links.new(script.outputs[1], output.inputs[1])

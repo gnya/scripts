@@ -36,9 +36,11 @@ class ToonNodeVisualize(ToonNodeOSL):
         return f'{name}_{self.visualize_type}', lib
 
     @override
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
+    def init_sockets(self, node_tree: NodeTree):
         node_tree.outputs.new('NodeSocketColor', 'Color')
 
+    @override
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         script.inputs[0].default_value = int(self.visualize_type)
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(script.outputs[0], output.inputs[0])

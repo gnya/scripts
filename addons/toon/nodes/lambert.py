@@ -35,7 +35,7 @@ class ToonNodeLambert(ToonNodeOSL):
         return f'{name}_{self.lighting_type}', lib
 
     @override
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
+    def init_sockets(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketVector', 'Light')
         i.default_value = (0.0, 0.0, 1.0)
         i.min_value = float('-inf')
@@ -44,6 +44,8 @@ class ToonNodeLambert(ToonNodeOSL):
 
         node_tree.outputs.new('NodeSocketFloat', 'Diffuse')
 
+    @override
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         input = node_tree.nodes.new('NodeGroupInput')
         script.inputs[0].default_value = int(self.lighting_type)
         node_tree.links.new(input.outputs[0], script.inputs[1])

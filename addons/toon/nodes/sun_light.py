@@ -11,14 +11,17 @@ class ToonNodeSunLight(ToonNodeOSLLight):
     osl_name = 'sun_light'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
+    def init_sockets(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
         i.min_value = 0.0
         i.max_value = float('inf')
 
         node_tree.outputs.new('NodeSocketVector', 'Light')
+        node_tree.outputs.new('NodeSocketVector', 'UV')
 
+    @override
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         a = f'objects["{self.object.name}"]' if self.object else ''
         rotation = node_tree.nodes.new('ShaderNodeAttribute')
         rotation.name = 'Attribute Rotation'
@@ -30,3 +33,4 @@ class ToonNodeSunLight(ToonNodeOSLLight):
 
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(script.outputs[0], output.inputs[0])
+        node_tree.links.new(script.outputs[1], output.inputs[1])

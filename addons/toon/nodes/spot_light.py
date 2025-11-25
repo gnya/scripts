@@ -9,16 +9,16 @@ from .base import ToonNodeOSLLight
 class ToonNodeSpotLight(ToonNodeOSLLight):
     bl_idname = 'ToonNodeSpotLight'
     bl_label = 'Spot Light'
-    osl_name = 'tex_light'
+    osl_name = 'spot_light'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
+    def init_sockets(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketFloat', 'Energy')
         i.default_value = 1.0
         i.min_value = 0.0
         i.max_value = float('inf')
 
-        i = node_tree.inputs.new('NodeSocketFloatFactor', 'Size')
+        i = node_tree.inputs.new('NodeSocketFloatAngle', 'Size')
         i.default_value = math.pi / 4.0
         i.min_value = 0.0
         i.max_value = math.pi
@@ -26,6 +26,8 @@ class ToonNodeSpotLight(ToonNodeOSLLight):
         node_tree.outputs.new('NodeSocketVector', 'Light')
         node_tree.outputs.new('NodeSocketVector', 'UV')
 
+    @override
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         a = f'objects["{self.object.name}"]' if self.object else ''
         location = node_tree.nodes.new('ShaderNodeAttribute')
         location.name = 'Attribute Location'

@@ -11,7 +11,7 @@ class ToonNodeOutput(ToonNodeOSL):
     osl_name = 'to_closure'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
+    def init_sockets(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketColor', 'Color')
         i.default_value = (1.0, 1.0, 1.0, 1.0)
 
@@ -37,6 +37,8 @@ class ToonNodeOutput(ToonNodeOSL):
 
         node_tree.outputs.new('NodeSocketShader', 'Shader')
 
+    @override
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         input = node_tree.nodes.new('NodeGroupInput')
         node_tree.links.new(input.outputs[0], script.inputs[0])
         node_tree.links.new(input.outputs[1], script.inputs[1])

@@ -2,7 +2,7 @@ from toon.utils import override
 
 from bpy.types import Context, Menu, Node, UILayout
 
-from toon.nodes import PaletteNode
+from toon.nodes import ToonNodePalette
 from toon.nodes import ToonNodeMatCap
 from toon.nodes import ToonNodeVisualize
 from toon.nodes import ToonNodeHSVJitter
@@ -26,12 +26,10 @@ class NODE_MT_toon_node_category(Menu):
     def poll(cls, context: Context) -> bool:
         return (
             context.space_data.type == 'NODE_EDITOR' and
-            context.space_data.tree_type == 'ShaderNodeTree' and
-            context.scene.render.engine == 'CYCLES' and
-            context.scene.cycles.shading_system
+            context.space_data.tree_type == 'ShaderNodeTree'
         )
 
-    def _draw_item(self, layout: UILayout, type: type):
+    def _draw_node(self, layout: UILayout, type: type):
         bl_rna = Node.bl_rna_get_subclass(type.__name__)
 
         if bl_rna is not None:
@@ -43,27 +41,34 @@ class NODE_MT_toon_node_category(Menu):
         o.type = type.__name__
         o.use_transform = True
 
+    def _draw_osl_node(self, context: Context, layout: UILayout, type: type):
+        if (
+            context.scene.render.engine == 'CYCLES' and
+            context.scene.cycles.shading_system
+        ):
+            self._draw_node(layout, type)
+
     @override
     def draw(self, context: Context):
         layout = self.layout
 
         col = layout.column(align=True)
-        self._draw_item(col, PaletteNode)
+        self._draw_node(col, ToonNodePalette)
         col.separator()
-        self._draw_item(col, ToonNodeMatCap)
-        self._draw_item(col, ToonNodeVisualize)
-        self._draw_item(col, ToonNodeHSVJitter)
-        self._draw_item(col, ToonNodeUVPixelSnap)
+        self._draw_node(col, ToonNodeMatCap)
+        self._draw_node(col, ToonNodeHSVJitter)
+        self._draw_node(col, ToonNodeUVPixelSnap)
         col.separator()
-        self._draw_item(col, ToonNodeLambert)
-        self._draw_item(col, ToonNodeMaterial)
+        self._draw_osl_node(context, col, ToonNodeAreaLight)
+        self._draw_osl_node(context, col, ToonNodePointLight)
+        self._draw_osl_node(context, col, ToonNodeSpotLight)
+        self._draw_osl_node(context, col, ToonNodeSunLight)
         col.separator()
-        self._draw_item(col, ToonNodeAreaLight)
-        self._draw_item(col, ToonNodePointLight)
-        self._draw_item(col, ToonNodeSpotLight)
-        self._draw_item(col, ToonNodeSunLight)
+        self._draw_osl_node(context, col, ToonNodeVisualize)
+        self._draw_osl_node(context, col, ToonNodeLambert)
+        self._draw_osl_node(context, col, ToonNodeMaterial)
         col.separator()
-        self._draw_item(col, ToonNodeOutput)
+        self._draw_osl_node(context, col, ToonNodeOutput)
 
     @classmethod
     def register(cls):

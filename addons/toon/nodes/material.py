@@ -11,7 +11,7 @@ class ToonNodeMaterial(ToonNodeOSL):
     osl_name = 'material'
 
     @override
-    def init_node_tree(self, node_tree: NodeTree, script: Node):
+    def init_sockets(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketVector', 'Light')
         i.default_value = (0.0, 0.0, 1.0)
         i.min_value = float('-inf')
@@ -36,6 +36,8 @@ class ToonNodeMaterial(ToonNodeOSL):
         node_tree.outputs.new('NodeSocketFloat', 'Diffuse')
         node_tree.outputs.new('NodeSocketFloat', 'Specular')
 
+    @override
+    def init_node_tree(self, node_tree: NodeTree, script: Node):
         input = node_tree.nodes.new('NodeGroupInput')
         node_tree.links.new(input.outputs[0], script.inputs[0])
         node_tree.links.new(input.outputs[1], script.inputs[1])
