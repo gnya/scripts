@@ -63,12 +63,8 @@ class ToonNodePalette(ToonNode):
         return manager.from_data(node_tree)
 
     @override
-    def init(self, context: Context):
-        pass  # Doing anything.
-
-    @override
     def free(self):
-        pass  # Doing anything.
+        self.node_tree = None
 
     @override
     def update(self):

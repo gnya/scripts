@@ -1,16 +1,12 @@
 from toon.utils import override
 
-import bpy
-
-from bpy.app.handlers import load_post, persistent
 from bpy.types import ShaderNodeTexImage
 
 from toon.props import Palette
 from toon.props.base import EntryBase
+from toon.utils import subscribe_rna
 
 from .manager import PaletteManager
-
-_msgbus_owner = object()
 
 
 class ManagablePalette(Palette):
@@ -35,7 +31,7 @@ class ManagablePalette(Palette):
     """
 
     @staticmethod
-    def _update_texture_uv_snap_size():
+    def _update_all_uv_snap_size():
         manager = PaletteManager.instance()
 
         for palette in manager.palettes():
@@ -48,28 +44,16 @@ class ManagablePalette(Palette):
 
                     if image is None:
                         continue
+                    elif entry.texture_uv_snap_size == image.size:
+                        continue
 
                     entry.texture_uv_snap_size = image.size
-
-    @staticmethod
-    @persistent
-    def _subscribe_texture_update(dummy: str):
-        bpy.msgbus.clear_by_owner(_msgbus_owner)
-        bpy.msgbus.subscribe_rna(
-            key=(ShaderNodeTexImage, 'image'),
-            owner=_msgbus_owner,
-            args=(),
-            notify=ManagablePalette._update_texture_uv_snap_size
-        )
 
     @classmethod
     def register(cls):
         super(ManagablePalette, cls).register()
 
-        if ManagablePalette._subscribe_texture_update not in load_post:
-            load_post.append(ManagablePalette._subscribe_texture_update)
-
-    @staticmethod
-    def unregister():
-        if ManagablePalette._subscribe_texture_update in load_post:
-            load_post.remove(ManagablePalette._subscribe_texture_update)
+        subscribe_rna(
+            (ShaderNodeTexImage, 'image'),
+            ManagablePalette._update_all_uv_snap_size
+        )

@@ -16,9 +16,11 @@ from . import ops
 from . import props
 from . import shaders
 from . import ui
+from . import utils
 
 
 def register():
+    utils.register()
     props.register()
     manager.register()
     ops.register()
@@ -28,6 +30,7 @@ def register():
 
 
 def unregister():
+    utils.unregister()
     props.unregister()
     manager.unregister()
     ops.unregister()

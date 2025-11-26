@@ -26,7 +26,8 @@ class NODE_MT_toon_node_category(Menu):
     def poll(cls, context: Context) -> bool:
         return (
             context.space_data.type == 'NODE_EDITOR' and
-            context.space_data.tree_type == 'ShaderNodeTree'
+            context.space_data.tree_type == 'ShaderNodeTree' and
+            context.material is not None
         )
 
     def _draw_node(self, layout: UILayout, type: type):
@@ -41,13 +42,6 @@ class NODE_MT_toon_node_category(Menu):
         o.type = type.__name__
         o.use_transform = True
 
-    def _draw_osl_node(self, context: Context, layout: UILayout, type: type):
-        if (
-            context.scene.render.engine == 'CYCLES' and
-            context.scene.cycles.shading_system
-        ):
-            self._draw_node(layout, type)
-
     @override
     def draw(self, context: Context):
         layout = self.layout
@@ -59,16 +53,23 @@ class NODE_MT_toon_node_category(Menu):
         self._draw_node(col, ToonNodeHSVJitter)
         self._draw_node(col, ToonNodeUVPixelSnap)
         col.separator()
-        self._draw_osl_node(context, col, ToonNodeAreaLight)
-        self._draw_osl_node(context, col, ToonNodePointLight)
-        self._draw_osl_node(context, col, ToonNodeSpotLight)
-        self._draw_osl_node(context, col, ToonNodeSunLight)
-        col.separator()
-        self._draw_osl_node(context, col, ToonNodeVisualize)
-        self._draw_osl_node(context, col, ToonNodeLambert)
-        self._draw_osl_node(context, col, ToonNodeMaterial)
-        col.separator()
-        self._draw_osl_node(context, col, ToonNodeOutput)
+
+        if (
+            context.scene.render.engine == 'CYCLES' and
+            context.scene.cycles.shading_system
+        ):
+            self._draw_node(col, ToonNodeAreaLight)
+            self._draw_node(col, ToonNodePointLight)
+            self._draw_node(col, ToonNodeSpotLight)
+            self._draw_node(col, ToonNodeSunLight)
+            col.separator()
+            self._draw_node(col, ToonNodeVisualize)
+            self._draw_node(col, ToonNodeLambert)
+            self._draw_node(col, ToonNodeMaterial)
+            col.separator()
+            self._draw_node(col, ToonNodeOutput)
+        else:
+            col.label(text='Enable Cycles OSL', icon='INFO')
 
     @classmethod
     def register(cls):

@@ -22,11 +22,7 @@ class ToonNodeSunLight(ToonNodeOSLLight):
 
     @override
     def init_node_tree(self, node_tree: NodeTree, script: Node):
-        a = f'objects["{self.object.name}"]' if self.object else ''
-        rotation = node_tree.nodes.new('ShaderNodeAttribute')
-        rotation.name = 'Attribute Rotation'
-        rotation.attribute_type = 'VIEW_LAYER'
-        rotation.attribute_name = f'{a}.rotation_euler' if a else ''
+        rotation = self.new_attr_node(node_tree, 'rotation_euler')
         input = node_tree.nodes.new('NodeGroupInput')
         node_tree.links.new(rotation.outputs[1], script.inputs[0])
         node_tree.links.new(input.outputs[0], script.inputs[1])
