@@ -1,10 +1,10 @@
 from toon.utils import override
 
-from bpy.types import ShaderNodeTexImage
+from bpy.types import NodeTree
 
 from toon.props import Palette
 from toon.props.base import EntryBase
-from toon.utils import subscribe_rna
+from toon.utils import node_tree_update_post
 
 from .manager import PaletteManager
 
@@ -31,29 +31,28 @@ class ManagablePalette(Palette):
     """
 
     @staticmethod
-    def _update_all_uv_snap_size():
+    def _update_all_uv_snap_size(node_tree: NodeTree):
         manager = PaletteManager.instance()
+        palette = manager.from_data(node_tree)
 
-        for palette in manager.palettes():
-            for group in palette.entries:
-                for entry in group.entries:
-                    if entry.type != 'TEXTURE':
-                        continue
+        if palette is None:
+            return
 
-                    image = entry.texture_image
+        for group in palette.entries:
+            for entry in group.entries:
+                if entry.type != 'TEXTURE':
+                    continue
 
-                    if image is None:
-                        continue
-                    elif entry.texture_uv_snap_size == image.size:
-                        continue
+                image = entry.texture_image
 
-                    entry.texture_uv_snap_size = image.size
+                if image is None:
+                    continue
+
+                entry.texture_uv_snap_size = image.size
 
     @classmethod
     def register(cls):
         super(ManagablePalette, cls).register()
 
-        subscribe_rna(
-            (ShaderNodeTexImage, 'image'),
-            ManagablePalette._update_all_uv_snap_size
-        )
+        if cls._update_all_uv_snap_size not in node_tree_update_post:
+            node_tree_update_post.append(cls._update_all_uv_snap_size)

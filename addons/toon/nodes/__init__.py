@@ -8,10 +8,10 @@ from .uv_pixel_snap import ToonNodeUVPixelSnap
 from .lambert import ToonNodeLambert
 from .material import ToonNodeMaterial
 
-from .area_light import ToonNodeAreaLight
-from .point_light import ToonNodePointLight
-from .spot_light import ToonNodeSpotLight
-from .sun_light import ToonNodeSunLight
+from .area_light import ToonNodeLightArea
+from .point_light import ToonNodeLightPoint
+from .spot_light import ToonNodeLightSpot
+from .sun_light import ToonNodeLightSun
 
 from .output import ToonNodeOutput
 
@@ -24,10 +24,10 @@ classes = (
     ToonNodeUVPixelSnap,
     ToonNodeLambert,
     ToonNodeMaterial,
-    ToonNodeAreaLight,
-    ToonNodePointLight,
-    ToonNodeSpotLight,
-    ToonNodeSunLight,
+    ToonNodeLightArea,
+    ToonNodeLightPoint,
+    ToonNodeLightSpot,
+    ToonNodeLightSun,
     ToonNodeOutput
 )
 

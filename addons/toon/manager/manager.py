@@ -41,9 +41,11 @@ class PaletteManager(GroupBase[Palette], PropertyGroup):
             return self.ids_cache.find(name)
 
     def from_data(self, data: NodeTree, available_only: bool = True) -> Palette | None:
-        palette = getattr(data, PaletteManager.PROP_PALETTE_NAME)
+        palette = getattr(data, PaletteManager.PROP_PALETTE_NAME, None)
 
-        if not palette.is_available and available_only:
+        if palette is None:
+            return None
+        elif not palette.is_available and available_only:
             return None
 
         return palette

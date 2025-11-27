@@ -9,10 +9,10 @@ from toon.nodes import ToonNodeHSVJitter
 from toon.nodes import ToonNodeUVPixelSnap
 from toon.nodes import ToonNodeLambert
 from toon.nodes import ToonNodeMaterial
-from toon.nodes import ToonNodeAreaLight
-from toon.nodes import ToonNodePointLight
-from toon.nodes import ToonNodeSpotLight
-from toon.nodes import ToonNodeSunLight
+from toon.nodes import ToonNodeLightArea
+from toon.nodes import ToonNodeLightPoint
+from toon.nodes import ToonNodeLightSpot
+from toon.nodes import ToonNodeLightSun
 from toon.nodes import ToonNodeOutput
 
 
@@ -58,10 +58,10 @@ class NODE_MT_toon_node_category(Menu):
             context.scene.render.engine == 'CYCLES' and
             context.scene.cycles.shading_system
         ):
-            self._draw_node(col, ToonNodeAreaLight)
-            self._draw_node(col, ToonNodePointLight)
-            self._draw_node(col, ToonNodeSpotLight)
-            self._draw_node(col, ToonNodeSunLight)
+            self._draw_node(col, ToonNodeLightArea)
+            self._draw_node(col, ToonNodeLightPoint)
+            self._draw_node(col, ToonNodeLightSpot)
+            self._draw_node(col, ToonNodeLightSun)
             col.separator()
             self._draw_node(col, ToonNodeVisualize)
             self._draw_node(col, ToonNodeLambert)

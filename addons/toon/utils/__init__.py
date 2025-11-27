@@ -1,8 +1,8 @@
 from .naming import make_unique_name
 from .node import from_node
 from .typing import override
-from .msgbus import subscribe_rna
-from .msgbus import unsubscribe_rna_all
+from .handlers import object_rename_post
+from .handlers import node_tree_update_post
 
 from .node import NodeLinkRebinder
 
@@ -11,19 +11,19 @@ __all__ = [
     make_unique_name,
     from_node,
     override,
-    subscribe_rna,
-    unsubscribe_rna_all,
+    object_rename_post,
+    node_tree_update_post,
     NodeLinkRebinder
 ]
 
 
 def register():
-    from . import msgbus
+    from . import handlers
 
-    msgbus.register()
+    handlers.register()
 
 
 def unregister():
-    from . import msgbus
+    from . import handlers
 
-    msgbus.unregister()
+    handlers.unregister()

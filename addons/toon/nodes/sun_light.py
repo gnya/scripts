@@ -5,8 +5,8 @@ from bpy.types import Node, NodeTree
 from .base import ToonNodeOSLLight
 
 
-class ToonNodeSunLight(ToonNodeOSLLight):
-    bl_idname = 'ToonNodeSunLight'
+class ToonNodeLightSun(ToonNodeOSLLight):
+    bl_idname = 'ToonNodeLightSun'
     bl_label = 'Sun Light'
     osl_name = 'sun_light'
 

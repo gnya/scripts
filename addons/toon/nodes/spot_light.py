@@ -6,8 +6,8 @@ import math
 from .base import ToonNodeOSLLight
 
 
-class ToonNodeSpotLight(ToonNodeOSLLight):
-    bl_idname = 'ToonNodeSpotLight'
+class ToonNodeLightSpot(ToonNodeOSLLight):
+    bl_idname = 'ToonNodeLightSpot'
     bl_label = 'Spot Light'
     osl_name = 'spot_light'
 
