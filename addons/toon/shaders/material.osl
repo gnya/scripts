@@ -4,48 +4,16 @@
  */
 
 #include "group_id.h"
+#include "shadow.h"
 
 #define MAX_LOOP 50
-
-/*
- * This function calculates the amount by which the ray start
- * point is moved along the geometry normal. This is based on
- * the shadow terminator setting in cycles, but is not perfect
- * due to limitation of OSL functionality.
- * ref: https://github.com/blender/.../cycles/kernel/light/sample.h
- */
-vector ray_offset(vector L, float cutoff, float eps0, float eps1) {
-    if (cutoff == 0.0) {
-        return 0.0;
-    }
-
-    float NL = dot(N, L);
-    int transmit = NL < 0.0;
-
-    NL = abs(NL);
-
-    vector n = transmit ? -Ng : Ng;
-    float nL = dot(n, L);
-
-    float offset = 0.0;
-    float eps = transmit ? eps1 : eps0;
-
-    if (NL < cutoff) {
-        offset = clamp(2.0 - (nL + NL) / cutoff, 0.0, 1.0);
-    } else {
-        offset = clamp(1.0 - nL / cutoff, 0.0, 1.0);
-    }
-
-    return n * offset * eps;
-}
 
 /*
  * This function checks whether lights from the direction of
  * a given light source reaches the point of current interest.
  */
 int shadow(vector L, float cutoff, float eps) {
-    vector offset = ray_offset(L, cutoff, 5.0e-4, 1.0e-5);
-    vector pos = P + offset;
+    vector pos = P + ray_offset(L, cutoff);
 
     int this_group = 0;
     int this_props = 0;  // Unused.
@@ -85,7 +53,7 @@ int shadow(vector L, float cutoff, float eps) {
 shader material(
     vector Light = vector(0.0, 0.0, 0.0)
     [[ string widget = "null" ]],
-    float Cutoff = 0.05,
+    float Cutoff = 0.1,
     float Reflectance = 0.5,
     float Exponent = 10.0,
 

@@ -12,6 +12,7 @@ from toon.ops import VIEW3D_OT_toon_palette_remove_group
 from toon.ops import VIEW3D_OT_toon_palette_copy
 from toon.ops import VIEW3D_OT_toon_palette_paste
 from toon.ops import VIEW3D_OT_toon_palette_move
+from toon.json import poll_node_tree
 
 
 class VIEW3D_MT_toon_palette_add(Menu):
@@ -32,14 +33,12 @@ class VIEW3D_MT_toon_palette_add(Menu):
         )
         layout.separator()
 
-        operator_type = VIEW3D_OT_toon_palette_add_by_node_tree
-
         for node_tree in bpy.data.node_groups:
-            if not operator_type.poll_node_tree(node_tree):
+            if not poll_node_tree(node_tree):
                 continue
 
             o = layout.operator(
-                operator_type.bl_idname,
+                VIEW3D_OT_toon_palette_add_by_node_tree.bl_idname,
                 text=f'From {node_tree.name}', icon='NODETREE'
             )
             o.id_name = node_tree.name

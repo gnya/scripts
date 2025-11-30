@@ -40,6 +40,8 @@ class VIEW3D_UL_toon_palette_entry(UIList):
                     row.row().prop(pointer.entry, 'color', text='')
                 elif pointer.entry.type == 'TEXTURE':
                     row.row().prop(pointer.entry.node(), 'image', text='')
+                elif pointer.entry.type == 'VALUE':
+                    row.row().prop(pointer.entry, 'value', text='', slider=True)
                 elif pointer.entry.type == 'MIX':
                     row.row().prop(pointer.entry, 'mix_factor', text='', slider=True)
 

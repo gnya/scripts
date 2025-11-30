@@ -24,7 +24,9 @@ class VIEW3D_OT_toon_palette_move(PaletteOperator):
         ('DOWN', 'Down', '')
     ]
 
-    direction: EnumProperty(items=direction_types)
+    direction: EnumProperty(
+        items=direction_types, options={'HIDDEN'}
+    )
 
     @override
     def execute_operator(self, palette: Palette) -> set[OperatorReturnItems]:
@@ -49,7 +51,9 @@ class VIEW3D_OT_toon_palette_move_slot(PaletteOperator):
         ('DOWN', 'Down', '')
     ]
 
-    direction: EnumProperty(items=direction_types)
+    direction: EnumProperty(
+        items=direction_types, options={'HIDDEN'}
+    )
 
     @classmethod
     @override

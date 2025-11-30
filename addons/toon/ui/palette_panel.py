@@ -87,7 +87,7 @@ class VIEW3D_PT_toon_palette(Panel):
 
         if pointer is not None and pointer.entry is not None:
             row = layout.row()
-            row.prop(pointer.entry, 'type', expand=True)
+            row.prop(pointer.entry, 'type', text='')
 
             col = layout.column()
             col.use_property_split = True
@@ -101,6 +101,8 @@ class VIEW3D_PT_toon_palette(Panel):
                     new='image.new', open='image.open'
                 )
                 col.prop(pointer.entry, 'texture_uv_map', text='UV Map')
+            elif pointer.entry.type == 'VALUE':
+                col.prop(pointer.entry, 'value', text='Value', slider=True)
             elif pointer.entry.type == 'MIX':
                 col.prop(pointer.entry, 'mix_factor', text='Factor', slider=True)
                 col.prop_search(

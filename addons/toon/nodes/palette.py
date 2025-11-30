@@ -33,11 +33,11 @@ class ToonNodePalette(ToonNode):
         palette = manager.first(value)
 
         if palette is None:
-            return
-
-        with NodeLinkRebinder(self):
-            self.node_tree = palette.id_data
-            self.update()
+            self.node_tree = None
+        else:
+            with NodeLinkRebinder(self):
+                self.node_tree = palette.id_data
+                self.update()
 
     def _update_palette_group_name(self, context: Context):
         with NodeLinkRebinder(self):
@@ -72,6 +72,7 @@ class ToonNodePalette(ToonNode):
             return
 
         for o in self.outputs:
+            o.hide = True
             o.enabled = False
 
         palette = self.palette()
@@ -85,7 +86,9 @@ class ToonNodePalette(ToonNode):
             return
 
         for entry in group.entries:
-            self.outputs[entry.socket_id].enabled = True
+            id = entry.socket_id
+            self.outputs[id].hide = False
+            self.outputs[id].enabled = True
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):

@@ -19,7 +19,7 @@ class ToonNodeMaterial(ToonNodeOSL):
         i.hide_value = True
 
         i = node_tree.inputs.new('NodeSocketFloatFactor', 'Cutoff')
-        i.default_value = 0.05
+        i.default_value = 0.1
         i.min_value = 0.0
         i.max_value = 1.0
 

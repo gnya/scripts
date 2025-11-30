@@ -16,8 +16,9 @@ from .socket_entry import SocketEntry
 class PaletteEntry(SocketEntry, PropertyGroup):
     entry_types = [
         ('COLOR', 'Color', '', 'COLOR', 0),
-        ('TEXTURE', 'Texture', '', 'TEXTURE', 1),
-        ('MIX', 'Mix', '', 'PROPERTIES', 2)
+        ('TEXTURE', 'Texture', '', 'IMAGE_DATA', 1),
+        ('VALUE', 'Value', '', 'PROPERTIES', 2),
+        ('MIX', 'Mix', '', 'DOT', 3)
     ]
 
     def _update_type(self, context: Context):
@@ -48,6 +49,12 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         if uv is not None:
             uv.uv_map = self.texture_uv_map
 
+    def _update_value(self, context: Context):
+        value = self.node()
+
+        if value is not None:
+            value.outputs[0].default_value = self.value
+
     def _update_mix_factor(self, context: Context):
         mix = self.node()
 
@@ -59,7 +66,8 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         self._init_branch()
 
     type: EnumProperty(
-        description='Type of entry', items=entry_types, default='COLOR',
+        name='Type', description='Type of entry',
+        items=entry_types, default='COLOR',
         update=_update_type
     )
 
@@ -76,6 +84,11 @@ class PaletteEntry(SocketEntry, PropertyGroup):
     texture_uv_map: StringProperty(
         name='UV Map',
         update=_update_texture_uv_map
+    )
+
+    value: FloatProperty(
+        name='Value', default=0, soft_min=0.0, soft_max=1.0,
+        update=_update_value
     )
 
     mix_factor: FloatProperty(
@@ -124,10 +137,14 @@ class PaletteEntry(SocketEntry, PropertyGroup):
         node_tree = self.node_tree()
 
         if self.type == 'COLOR':
+            self.change_socket_type('NodeSocketColor')
+
             rgb = node_tree.nodes.new('ShaderNodeRGB')
             rgb.outputs[0].default_value = self.color
             node_tree.links.new(rgb.outputs[0], self._root())
         elif self.type == 'TEXTURE':
+            self.change_socket_type('NodeSocketColor')
+
             tex = node_tree.nodes.new('ShaderNodeTexImage')
             tex.interpolation = 'Closest'
             node_tree.links.new(tex.outputs[0], self._root())
@@ -137,23 +154,33 @@ class PaletteEntry(SocketEntry, PropertyGroup):
 
             uv = node_tree.nodes.new('ShaderNodeUVMap')
             node_tree.links.new(uv.outputs[0], snap.inputs[0])
+        elif self.type == 'VALUE':
+            self.change_socket_type('NodeSocketFloat')
+
+            value = node_tree.nodes.new('ShaderNodeValue')
+            value.outputs[0].default_value = self.value
+            node_tree.links.new(value.outputs[0], self._root())
         elif self.type == 'MIX':
+            self.change_socket_type('NodeSocketColor')
+
             mix = node_tree.nodes.new('ShaderNodeMixRGB')
             mix.inputs[0].default_value = self.mix_factor
             node_tree.links.new(mix.outputs[0], self._root())
             parent = self.parent()
 
-            if parent is not None:
-                a = parent.first(self.mix_source_a)
-                b = parent.first(self.mix_source_b)
+            if parent is None:
+                return
 
-                if a is not None and a.type != 'MIX':
-                    output = a.socket().links[0].from_socket
-                    node_tree.links.new(output, mix.inputs[1])
+            a = parent.first(self.mix_source_a)
+            b = parent.first(self.mix_source_b)
 
-                if b is not None and b.type != 'MIX':
-                    output = b.socket().links[0].from_socket
-                    node_tree.links.new(output, mix.inputs[2])
+            if a is not None and a.type != 'MIX':
+                output = a.socket().links[0].from_socket
+                node_tree.links.new(output, mix.inputs[1])
+
+            if b is not None and b.type != 'MIX':
+                output = b.socket().links[0].from_socket
+                node_tree.links.new(output, mix.inputs[2])
 
     def _remove_branch(self, root: NodeSocket, forced: bool = False):
         if len(root.links) == 0:

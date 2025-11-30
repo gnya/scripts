@@ -1,6 +1,8 @@
-from typing import Any
+from typing import Iterator
 
-from bpy.types import Node, NodeSocket
+import bpy
+
+from bpy.types import ID, Node, NodeSocket, NodeTree
 
 
 def from_node(
@@ -23,41 +25,37 @@ def from_node(
     return node
 
 
-class NodeLinkRebinder():
-    def __init__(self, node: Node):
-        self.node = node
-        self.inputs: dict[str, list[NodeSocket]] = {}
-        self.outputs: dict[str, list[NodeSocket]] = {}
+def node_itr(node_tree: NodeTree, type: str = '') -> Iterator[Node]:
+    if not type:
+        for node in node_tree.nodes:
+            yield node
+    else:
+        for node in node_tree.nodes:
+            if node.bl_idname == type:
+                yield node
 
-    def __enter__(self):
-        for input in self.node.inputs:
-            if input.enabled:
-                sockets = [l.from_socket for l in input.links]
-                self.inputs[input.name] = sockets
 
-        for output in self.node.outputs:
-            if output.enabled:
-                sockets = [l.to_socket for l in output.links]
-                self.outputs[output.name] = sockets
+def node_tree_itr(collection: Iterator[ID]) -> Iterator[Node]:
+    for data in collection:
+        node_tree = getattr(data, 'node_tree', data)
 
-        # Remove all links.
-        for input in self.node.inputs:
-            for link in input.links:
-                self.node.id_data.links.remove(link)
+        if not isinstance(node_tree, NodeTree):
+            continue
 
-        for output in self.node.outputs:
-            for link in output.links:
-                self.node.id_data.links.remove(link)
+        yield from node_itr(node_tree)
 
-        return self
 
-    def __exit__(self, *exc: Any):
-        for input in self.node.inputs:
-            if input.enabled and input.name in self.inputs:
-                for socket in self.inputs[input.name]:
-                    self.node.id_data.links.new(socket, input)
+def all_node_itr() -> Iterator[Node]:
+    yield from node_tree_itr(bpy.data.node_groups)
+    yield from node_tree_itr(bpy.data.materials)
+    yield from node_tree_itr(bpy.data.scenes)
+    yield from node_tree_itr(bpy.data.linestyles)
+    yield from node_tree_itr(bpy.data.lights)
+    yield from node_tree_itr(bpy.data.worlds)
+    yield from node_tree_itr(bpy.data.textures)
 
-        for output in self.node.outputs:
-            if output.enabled and output.name in self.outputs:
-                for socket in self.outputs[output.name]:
-                    self.node.id_data.links.new(output, socket)
+
+def all_node_users_itr(node_tree: NodeTree) -> Iterator[Node]:
+    for node in all_node_itr():
+        if node_tree == getattr(node, 'node_tree', None):
+            yield node

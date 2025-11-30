@@ -6,6 +6,19 @@ from .image import encode_image
 from .palette import PaletteData, PaletteEncodeError
 
 
+def poll_node_tree(node_tree: NodeTree):
+    if node_tree.name.startswith('.'):
+        return False
+    elif len(node_tree.outputs) == 0:
+        return False
+
+    for o in node_tree.outputs:
+        if o.bl_socket_idname not in {'NodeSocketColor', 'NodeSocketFloat'}:
+            return False
+
+    return True
+
+
 def encode_node_tree(node_tree: NodeTree) -> PaletteData:
     palette_data: PaletteData = {'Group': {}}
     entry_to_node: dict[str, dict[str, Node | None]] = {}
@@ -29,25 +42,33 @@ def encode_node_tree(node_tree: NodeTree) -> PaletteData:
             entry_to_node[group_name] = {}
 
         entry_data = {}
-        node = None
 
         if output_node is None:
             root = node_tree.outputs[socket_id]
-
-            entry_data = {
-                'type': 'COLOR',
-                'color': list(root.default_value)
-            }
+            root_type = root.bl_socket_idname
+            node = None
         else:
             root = output_node.inputs[socket_id]
+            root_type = root.bl_idname
             node = from_node(root)
 
-            if node is None:
+        if node is None:
+            if root_type == 'NodeSocketColor':
                 entry_data = {
                     'type': 'COLOR',
                     'color': list(root.default_value)
                 }
-            elif node.type == 'RGB':
+            elif root_type == 'NodeSocketFloat':
+                entry_data = {
+                    'type': 'VALUE',
+                    'value': root.default_value
+                }
+            else:
+                raise PaletteEncodeError(
+                    f'Incompatible socket type. : {root_type}'
+                )
+        else:
+            if node.type == 'RGB':
                 entry_data = {
                     'type': 'COLOR',
                     'color': node.outputs[0].default_value
@@ -59,11 +80,20 @@ def encode_node_tree(node_tree: NodeTree) -> PaletteData:
                     'texture_image': encode_image(node.image),
                     'texture_uv_map': '' if uv is None else uv.uv_map
                 }
+            elif node.type == 'VALUE':
+                entry_data = {
+                    'type': 'VALUE',
+                    'value': node.outputs[0].default_value
+                }
             elif node.type == 'MIX':
                 entry_data = {
                     'type': 'MIX',
                     'mix_factor': node.inputs[0].default_value
                 }
+            else:
+                raise PaletteEncodeError(
+                    f'Incompatible node type. : {node.type}'
+                )
 
         if entry_name in palette_data[group_name]:
             raise PaletteEncodeError(

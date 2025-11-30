@@ -5,6 +5,7 @@ import bpy
 from bpy.app.handlers import depsgraph_update_post, load_post, persistent
 from bpy.types import Depsgraph, NodeTree, Object, Scene
 
+
 object_rename_post: list[Callable[[Object, str], None]] = []
 node_tree_update_post: list[Callable[[NodeTree], None]] = []
 

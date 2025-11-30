@@ -43,7 +43,10 @@ def _add_entry(palette: Palette):
 
     if pointer.entry is not None:
         name = pointer.entry.name
-        color = pointer.entry.color
+
+        if pointer.entry.type == 'COLOR':
+            color = pointer.entry.color
+
         entry_id = pointer.entry_id + 1
         offset_slot_id = 1
 

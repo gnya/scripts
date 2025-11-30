@@ -5,6 +5,8 @@ from toon.utils import override
 from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
 from bpy.props import IntProperty
 
+from toon.utils import change_socket_type
+
 from .base import Entry, EntryBase
 
 
@@ -39,6 +41,11 @@ class SocketEntry(Entry):
             output = node_tree.nodes.new('NodeGroupOutput')
 
         return output.inputs[self.socket_id]
+
+    def change_socket_type(self, type: str):
+        change_socket_type(
+            self.node_tree(), self.socket_id, type, 'OUT'
+        )
 
     @override
     def compare(self, other: EntryBase) -> int:

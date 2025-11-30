@@ -9,7 +9,7 @@ import bpy
 import json
 
 from bpy.props import StringProperty
-from bpy.types import Context, NodeSocketInterfaceColor, NodeTree, Operator
+from bpy.types import Context, Operator
 from json.decoder import JSONDecodeError
 
 from toon.json import decode_palette, encode_node_tree, PaletteEncodeError
@@ -22,9 +22,13 @@ class VIEW3D_OT_toon_palette_add_by_node_tree(Operator):
     bl_description = 'Convert the node tree to a palette'
     bl_options = {'REGISTER', 'UNDO'}
 
-    id_name: StringProperty(name='Node Tree Name')
+    id_name: StringProperty(
+        name='Node Tree Name', options={'HIDDEN'}
+    )
 
-    id_lib: StringProperty(name='Node Tree Library Filepath', default='')
+    id_lib: StringProperty(
+        name='Node Tree Library Filepath', default='', options={'HIDDEN'}
+    )
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -52,19 +56,6 @@ class VIEW3D_OT_toon_palette_add_by_node_tree(Operator):
             palette.update_slots()
 
         return {'FINISHED'}
-
-    @staticmethod
-    def poll_node_tree(node_tree: NodeTree):
-        if node_tree.name.startswith('.'):
-            return False
-        elif len(node_tree.outputs) == 0:
-            return False
-
-        for o in node_tree.outputs:
-            if not isinstance(o, NodeSocketInterfaceColor):
-                return False
-
-        return True
 
 
 class VIEW3D_OT_toon_palette_add_by_clipboard(Operator):

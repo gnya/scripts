@@ -23,6 +23,8 @@ def encode_entry(entry: PaletteEntry) -> EntryData:
     elif entry.type == 'TEXTURE':
         data['texture_image'] = encode_image(entry.texture_image)
         data['texture_uv_map'] = entry.texture_uv_map
+    elif entry.type == 'VALUE':
+        data['value'] = entry.value
     elif entry.type == 'MIX':
         data['mix_factor'] = entry.mix_factor
         data['mix_source_a'] = entry.mix_source_a
@@ -39,6 +41,8 @@ def decode_entry(data: EntryData, entry: PaletteEntry):
     elif entry.type == 'TEXTURE':
         entry.texture_image = decode_image(data.get('texture_image', {}))
         entry.texture_uv_map = data.get('texture_uv_map', '')
+    elif entry.type == 'VALUE':
+        entry.value = data.get('value', 0.0)
     elif entry.type == 'MIX':
         entry.mix_factor = data.get('mix_factor', 0.0)
         entry.mix_source_a = data.get('mix_source_a', '')
