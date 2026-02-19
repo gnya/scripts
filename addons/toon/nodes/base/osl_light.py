@@ -135,6 +135,8 @@ class ToonNodeOSLLight(ToonNodeOSL):
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):
+        super().draw_buttons(context, layout)
+
         layout.prop(self, 'object', text='Object')
 
     @classmethod
