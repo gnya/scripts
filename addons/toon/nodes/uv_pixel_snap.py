@@ -37,7 +37,7 @@ class ToonNodeUVPixelSnap(ToonNodeGroup):
         to_xyz = node_tree.nodes.new('ShaderNodeSeparateXYZ')
         node_tree.links.new(input.outputs[0], to_xyz.inputs[0])
 
-        # float U = floor(UVIn[0] * Width) / Width;
+        # float U = (floor(UVIn[0] * Width) + 0.5) / Width;
         mul_w = node_tree.nodes.new('ShaderNodeMath')
         mul_w.operation = 'MULTIPLY'
         node_tree.links.new(to_xyz.outputs[0], mul_w.inputs[0])
@@ -47,12 +47,17 @@ class ToonNodeUVPixelSnap(ToonNodeGroup):
         floor_w.operation = 'FLOOR'
         node_tree.links.new(mul_w.outputs[0], floor_w.inputs[0])
 
+        add_w = node_tree.nodes.new('ShaderNodeMath')
+        add_w.operation = 'ADD'
+        add_w.inputs[1].default_value = 0.5
+        node_tree.links.new(floor_w.outputs[0], add_w.inputs[0])
+
         div_w = node_tree.nodes.new('ShaderNodeMath')
         div_w.operation = 'DIVIDE'
-        node_tree.links.new(floor_w.outputs[0], div_w.inputs[0])
+        node_tree.links.new(add_w.outputs[0], div_w.inputs[0])
         node_tree.links.new(input.outputs[1], div_w.inputs[1])
 
-        # float V = floor(UVIn[1] * Height) / Height;
+        # float V = (floor(UVIn[1] * Height) + 0.5) / Height;
         mul_h = node_tree.nodes.new('ShaderNodeMath')
         mul_h.operation = 'MULTIPLY'
         node_tree.links.new(to_xyz.outputs[1], mul_h.inputs[0])
@@ -62,9 +67,14 @@ class ToonNodeUVPixelSnap(ToonNodeGroup):
         floor_h.operation = 'FLOOR'
         node_tree.links.new(mul_h.outputs[0], floor_h.inputs[0])
 
+        add_h = node_tree.nodes.new('ShaderNodeMath')
+        add_h.operation = 'ADD'
+        add_h.inputs[1].default_value = 0.5
+        node_tree.links.new(floor_h.outputs[0], add_h.inputs[0])
+
         div_h = node_tree.nodes.new('ShaderNodeMath')
         div_h.operation = 'DIVIDE'
-        node_tree.links.new(floor_h.outputs[0], div_h.inputs[0])
+        node_tree.links.new(add_h.outputs[0], div_h.inputs[0])
         node_tree.links.new(input.outputs[2], div_h.inputs[1])
 
         # UVOut = vector(U, V, 0.0);
