@@ -12,6 +12,10 @@ def register():
     from bpy.utils import resource_path
     from _cycles import osl_compile  # type: ignore
 
+    from toon.utils import register_pid
+
+    register_pid(SHADER_PREFIX)
+
     scripts_path = os.path.dirname(os.path.abspath(__file__))
     shaders_path = f"{resource_path('USER')}\\shaders"
 
@@ -37,11 +41,16 @@ def unregister():
 
     from bpy.utils import resource_path
 
-    shaders_path = f"{resource_path('USER')}\\shaders"
+    from toon.utils import unregister_pid, list_pids
 
-    for filename in os.listdir(shaders_path):
-        if filename.startswith(SHADER_PREFIX) and filename.endswith('.oso'):
-            os.remove(f'{shaders_path}\\{filename}')
+    unregister_pid(SHADER_PREFIX)
 
-    if len(os.listdir(shaders_path)) == 0:
-        shutil.rmtree(shaders_path)
+    if not list_pids(SHADER_PREFIX):
+        shaders_path = f"{resource_path('USER')}\\shaders"
+
+        for filename in os.listdir(shaders_path):
+            if filename.startswith(SHADER_PREFIX) and filename.endswith('.oso'):
+                os.remove(f'{shaders_path}\\{filename}')
+
+        if len(os.listdir(shaders_path)) == 0:
+            shutil.rmtree(shaders_path)
