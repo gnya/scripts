@@ -13,7 +13,7 @@
  * a given light source reaches the point of current interest.
  */
 int shadow(vector L, float cutoff, float eps) {
-    vector pos = P + ray_offset(L, cutoff);
+    vector pos = P + L * eps + ray_offset(L, cutoff);
 
     int this_group = 0;
     int this_props = 0;  // Unused.
