@@ -8,25 +8,36 @@
 
 #define MAX_LOOP 50
 
+
+/*
+ * This function wraps `trace(pos, dir, ...)` for tracing.
+ */
+int trace_ray(point pos, vector dir, int finite, float len) {
+    if (finite) {
+        return trace(pos, dir, "maxdist", max(0.0, len));
+    } else {
+        return trace(pos, dir);
+    }
+}
+
+
 /*
  * This function checks whether lights from the direction of
  * a given light source reaches the point of current interest.
  */
-int shadow(vector L, float cutoff, float eps) {
+int shadow(vector L, float ray_length, float cutoff, float eps) {
     int this_group = 0;
     int this_props = 0;  // Unused.
+    int this_backfacing = dot(Ng, L) < 0.0;
 
     get_this_shadow_group(this_group, this_props);
 
-    int max_loop = MAX_LOOP;
     int count = 0;
 
-    int hit_group = 0;
-    int hit_props = 0;
-
-    int this_backfacing = dot(Ng, L) < 0.0;
-
-    vector pos = P + ray_offset(L, cutoff);
+    point pos = P + ray_offset(L, cutoff);
+    int finite = ray_length >= 0.0;
+    float len = ray_length;
+    point last_pos = pos;
 
     if (this_backfacing) {
         pos -= L * eps;
@@ -34,7 +45,10 @@ int shadow(vector L, float cutoff, float eps) {
         pos += L * eps;
     }
 
-    for (; count < max_loop && trace(pos, L); count++) {
+    int hit_group = 0;
+    int hit_props = 0;
+
+    for (; count < MAX_LOOP && trace_ray(pos, L, finite, len); count++) {
         get_hit_shadow_group(hit_group, hit_props);
 
         if (this_group == 0 || this_group != hit_group) {
@@ -46,10 +60,12 @@ int shadow(vector L, float cutoff, float eps) {
         }
 
         getmessage("trace", "P", pos);
+        len -= distance(pos, last_pos);
+        last_pos = pos;
         pos += L * eps;
     }
 
-    if (count == max_loop) {
+    if (count == MAX_LOOP) {
         warning("the max loop has been reached.");
     }
 
@@ -58,6 +74,8 @@ int shadow(vector L, float cutoff, float eps) {
 
 shader material(
     vector Light = vector(0.0, 0.0, 0.0)
+    [[ string widget = "null" ]],
+    float RayLength = 0.0
     [[ string widget = "null" ]],
     vector Normal = N
     [[ string widget = "null" ]],
@@ -86,7 +104,7 @@ shader material(
     if (Diffuse != 0.0) {
         vector L = normalize(Light);
 
-        if (shadow(L, Cutoff, 1.0e-6)) {
+        if (shadow(L, RayLength, Cutoff, 1.0e-6)) {
             Diffuse = 0.0;
             Specular = 0.0;
         }

@@ -33,6 +33,7 @@ class ToonNodeLightArea(ToonNodeOSLLight):
         i.max_value = float('inf')
 
         node_tree.outputs.new('NodeSocketVector', 'Light')
+        node_tree.outputs.new('NodeSocketFloat', 'Ray Length')
         node_tree.outputs.new('NodeSocketVector', 'UV')
 
     @override
@@ -50,3 +51,4 @@ class ToonNodeLightArea(ToonNodeOSLLight):
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(script.outputs[0], output.inputs[0])
         node_tree.links.new(script.outputs[1], output.inputs[1])
+        node_tree.links.new(script.outputs[2], output.inputs[2])

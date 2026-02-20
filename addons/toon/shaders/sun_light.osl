@@ -10,6 +10,7 @@ shader sun_light(
     float Energy = 1.0,
 
     output vector Light = vector(0.0, 0.0, 0.0),
+    output float RayLength = -1.0,
     output vector UV = vector(0.0, 0.0, 0.0)
 ) {
     matrix mat = transpose(euler_to_mat(Rotation));

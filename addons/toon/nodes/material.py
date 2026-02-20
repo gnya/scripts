@@ -13,13 +13,19 @@ class ToonNodeMaterial(ToonNodeOSL):
     @override
     def init_sockets(self, node_tree: NodeTree):
         i = node_tree.inputs.new('NodeSocketVector', 'Light')
-        i.default_value = (0.0, 0.0, 1.0)
+        i.default_value = (0.0, 0.0, 0.0)
+        i.min_value = float('-inf')
+        i.max_value = float('inf')
+        i.hide_value = True
+
+        i = node_tree.inputs.new('NodeSocketFloat', 'Ray Length')
+        i.default_value = 0.0
         i.min_value = float('-inf')
         i.max_value = float('inf')
         i.hide_value = True
 
         i = node_tree.inputs.new('NodeSocketVector', 'Normal')
-        i.default_value = (0.0, 0.0, 1.0)
+        i.default_value = (0.0, 0.0, 0.0)
         i.min_value = -1.0
         i.max_value = 1.0
         i.hide_value = True
@@ -50,10 +56,11 @@ class ToonNodeMaterial(ToonNodeOSL):
         node_tree.links.new(input.outputs[2], script.inputs[2])
         node_tree.links.new(input.outputs[3], script.inputs[3])
         node_tree.links.new(input.outputs[4], script.inputs[4])
+        node_tree.links.new(input.outputs[5], script.inputs[5])
 
         preview_mat = node_tree.nodes.new('ShaderNodeBsdfDiffuse')
         preview_mat.inputs[0].default_value = (1.0, 1.0, 1.0, 1.0)
-        node_tree.links.new(input.outputs[1], preview_mat.inputs[2])
+        node_tree.links.new(input.outputs[2], preview_mat.inputs[2])
 
         shader_to_rgb = node_tree.nodes.new('ShaderNodeShaderToRGB')
         node_tree.links.new(preview_mat.outputs[0], shader_to_rgb.inputs[0])

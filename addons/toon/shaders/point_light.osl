@@ -12,6 +12,7 @@ shader point_light(
     float Distance = 1.0,
 
     output vector Light = vector(0.0, 0.0, 0.0),
+    output float RayLength = 0.0,
     output vector UV = vector(0.0, 0.0, 0.0)
 ) {
     matrix mat = transpose(euler_to_mat(Rotation));
@@ -24,4 +25,5 @@ shader point_light(
     float strength = Energy / M_PI / exp2(falloff);
 
     Light = direction * strength;
+    RayLength = distance(Location, P);
 }
