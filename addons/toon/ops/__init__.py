@@ -12,6 +12,7 @@ from .move import VIEW3D_OT_toon_palette_move
 from .move import VIEW3D_OT_toon_palette_move_slot
 from .node import NODE_OT_toon_node_compile_all
 from .node import NODE_OT_toon_node_reload_all
+from .node import NODE_OT_toon_node_setup_osl_render
 
 
 classes = (
@@ -28,7 +29,8 @@ classes = (
     VIEW3D_OT_toon_palette_move,
     VIEW3D_OT_toon_palette_move_slot,
     NODE_OT_toon_node_compile_all,
-    NODE_OT_toon_node_reload_all
+    NODE_OT_toon_node_reload_all,
+    NODE_OT_toon_node_setup_osl_render
 )
 
 

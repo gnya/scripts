@@ -5,6 +5,7 @@ from bpy.types import Context, Panel
 
 from toon.ops import NODE_OT_toon_node_compile_all
 from toon.ops import NODE_OT_toon_node_reload_all
+from toon.ops import NODE_OT_toon_node_setup_osl_render
 
 
 def _draw_pass_index_warning(self: Panel, context: Context):
@@ -109,6 +110,10 @@ class VIEW3D_PT_toon_node(Panel):
     def draw(self, context: Context):
         layout = self.layout
 
+        layout.operator(
+            NODE_OT_toon_node_setup_osl_render.bl_idname,
+            text='Setup OSL Render', icon='PREFERENCES'
+        )
         layout.operator(
             NODE_OT_toon_node_reload_all.bl_idname,
             text='Reload All Nodes', icon='FILE_REFRESH'
