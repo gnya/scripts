@@ -46,9 +46,16 @@ class ToonNodeOutput(ToonNodeOSL):
         node_tree.links.new(input.outputs[3], script.inputs[3])
         node_tree.links.new(input.outputs[4], script.inputs[4])
 
+        transparent = node_tree.nodes.new('ShaderNodeBsdfTransparent')
+        transparent.inputs[0].default_value = (1.0, 1.0, 1.0, 1.0)
+        preview_mat = node_tree.nodes.new('ShaderNodeMixShader')
+        node_tree.links.new(input.outputs[4], preview_mat.inputs[0])
+        node_tree.links.new(transparent.outputs[0], preview_mat.inputs[1])
+        node_tree.links.new(input.outputs[0], preview_mat.inputs[2])
+
         mix = node_tree.nodes.new('ShaderNodeMixShader')
         node_tree.links.new(script.outputs[0], mix.inputs[0])
-        node_tree.links.new(input.outputs[0], mix.inputs[1])
+        node_tree.links.new(preview_mat.outputs[0], mix.inputs[1])
         node_tree.links.new(script.outputs[1], mix.inputs[2])
 
         output = node_tree.nodes.new('NodeGroupOutput')
