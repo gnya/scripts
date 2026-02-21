@@ -104,7 +104,7 @@ shader material(
     if (Diffuse != 0.0) {
         vector L = normalize(Light);
 
-        if (shadow(L, RayLength, Cutoff, 1.0e-6)) {
+        if (shadow(L, RayLength, Cutoff, 1.0e-5)) {
             Diffuse = 0.0;
             Specular = 0.0;
         }

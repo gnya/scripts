@@ -2,8 +2,7 @@ from toon.utils import override
 
 import bpy
 
-from bpy.types import Context, Node, NodeTree, UILayout
-from bpy.props import BoolProperty
+from bpy.types import Node, NodeTree
 
 from toon.shaders import script_filepath
 
@@ -12,8 +11,6 @@ from .node import ToonNodeGroup
 
 class ToonNodeOSL(ToonNodeGroup):
     osl_name = ''
-
-    node_ready: BoolProperty(default=False)
 
     def _try_load_osl(self, node: Node | None) -> bool:
         if node is None:
@@ -31,19 +28,18 @@ class ToonNodeOSL(ToonNodeGroup):
         pass
 
     @override
-    def new_node_tree(self, name: str) -> NodeTree:
+    def new_node_tree(self, name: str) -> tuple[NodeTree, bool]:
         node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
         script = node_tree.nodes.new('ShaderNodeScript')
 
         self.init_sockets(node_tree)
 
-        if self._try_load_osl(script):
-            self.init_node_tree(node_tree, script)
-            self.node_ready = True
-        else:
-            self.node_ready = False
+        if not self._try_load_osl(script):
+            return node_tree, False
 
-        return node_tree
+        self.init_node_tree(node_tree, script)
+
+        return node_tree, True
 
     @override
     def update(self):
@@ -56,8 +52,3 @@ class ToonNodeOSL(ToonNodeGroup):
 
         if not self._try_load_osl(script):
             self.node_ready = False
-
-    @override
-    def draw_buttons(self, context: Context, layout: UILayout):
-        if not self.node_ready:
-            layout.label(text='Need reload.', icon='ERROR')

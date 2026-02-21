@@ -120,18 +120,18 @@ class ToonNodeOSLLight(ToonNodeOSL):
         return node
 
     @override
-    def get_node_tree(self) -> NodeTree | None:
+    def get_node_tree(self) -> tuple[NodeTree | None, bool]:
         name, _ = self.node_tree_key()
 
         if not name:
-            return None
+            return None, False
 
         node_tree = self._get_node_tree(name)
 
         if node_tree is None:
             return self.new_node_tree(name)
         else:
-            return node_tree
+            return node_tree, True
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):

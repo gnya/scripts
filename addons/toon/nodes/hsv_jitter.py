@@ -12,7 +12,7 @@ class ToonNodeHSVJitter(ToonNodeGroup):
     bl_label = 'HSV Jitter'
 
     @override
-    def new_node_tree(self, name: str) -> NodeTree:
+    def new_node_tree(self, name: str) -> tuple[NodeTree, bool]:
         node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
 
         i = node_tree.inputs.new('NodeSocketFloat', 'Seed')
@@ -127,4 +127,4 @@ class ToonNodeHSVJitter(ToonNodeGroup):
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(hsv.outputs[0], output.inputs[0])
 
-        return node_tree
+        return node_tree, True

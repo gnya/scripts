@@ -12,7 +12,7 @@ class ToonNodeMatCap(ToonNodeGroup):
     bl_label = 'MatCap'
 
     @override
-    def new_node_tree(self, name: str) -> NodeTree:
+    def new_node_tree(self, name: str) -> tuple[NodeTree, bool]:
         node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
 
         node_tree.outputs.new('NodeSocketVector', 'UV')
@@ -73,4 +73,4 @@ class ToonNodeMatCap(ToonNodeGroup):
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(mul_add.outputs[0], output.inputs[0])
 
-        return node_tree
+        return node_tree, True

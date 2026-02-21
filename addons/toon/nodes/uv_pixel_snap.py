@@ -12,7 +12,7 @@ class ToonNodeUVPixelSnap(ToonNodeGroup):
     bl_label = 'UV Pixel Snap'
 
     @override
-    def new_node_tree(self, name: str) -> NodeTree:
+    def new_node_tree(self, name: str) -> tuple[NodeTree, bool]:
         node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
 
         i = node_tree.inputs.new('NodeSocketVector', 'UV')
@@ -85,4 +85,4 @@ class ToonNodeUVPixelSnap(ToonNodeGroup):
         output = node_tree.nodes.new('NodeGroupOutput')
         node_tree.links.new(from_xyz.outputs[0], output.inputs[0])
 
-        return node_tree
+        return node_tree, True
