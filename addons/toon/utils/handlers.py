@@ -93,7 +93,7 @@ def _init_object_rename(scene: Scene):
         _object_last_names[obj.as_pointer()] = obj.name
 
 
-def register():
+def register_handlers():
     if _depsgraph_update_post not in depsgraph_update_post:
         depsgraph_update_post.append(_depsgraph_update_post)
 
@@ -101,7 +101,7 @@ def register():
         load_post.append(_init_object_rename)
 
 
-def unregister():
+def unregister_handlers():
     if _depsgraph_update_post in depsgraph_update_post:
         depsgraph_update_post.remove(_depsgraph_update_post)
 

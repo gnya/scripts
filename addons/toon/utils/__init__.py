@@ -35,12 +35,12 @@ __all__ = [
 
 
 def register():
-    from . import handlers
+    from .handlers import register_handlers
 
-    handlers.register()
+    register_handlers()
 
 
 def unregister():
-    from . import handlers
+    from .handlers import unregister_handlers
 
-    handlers.unregister()
+    unregister_handlers()

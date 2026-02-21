@@ -95,13 +95,13 @@ shader material(
 ) {
     Diffuse = clamp(dot(Light, Normal), 0.0, 1.0);
 
-    if (Reflectance != 0.0) {
+    if (Reflectance > 0.0) {
         vector R = reflect(normalize(Light), Normal);
         
         Specular = pow(max(0.0, dot(-I, R)), Exponent) * Reflectance;
     }
 
-    if (Diffuse != 0.0) {
+    if (Diffuse > 0.0) {
         vector L = normalize(Light);
 
         if (shadow(L, RayLength, Cutoff, 1.0e-5)) {
