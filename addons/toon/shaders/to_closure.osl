@@ -15,6 +15,7 @@
  */
 float glossy(float reflectance, float distance, int max_depth) {
     int g_depth = 0;
+
     getattribute("path:glossy_depth", g_depth);
 
     if (g_depth > max_depth) {
@@ -35,7 +36,9 @@ float glossy(float reflectance, float distance, int max_depth) {
     if (trace(pos, dir)) {
         float p_dist = 0.0; // distance from rendering point
         float s_dist = 0.0; // distance from rendering surface
+
         getmessage("trace", "hitdist", p_dist);
+
         s_dist = dot(I, N) * p_dist;
 
         value = (distance - s_dist) / distance;
@@ -50,6 +53,7 @@ float glossy(float reflectance, float distance, int max_depth) {
  */
 int transparent_culling() {
     int t_depth = 0;
+
     getattribute("path:transparent_depth", t_depth);
 
     if (t_depth == 0) {
@@ -57,6 +61,7 @@ int transparent_culling() {
     }
 
     int this_group = 0;
+
     get_this_transparent_group(this_group);
 
     if (this_group == 0) {
@@ -97,17 +102,19 @@ shader to_closure(
 
     output closure color Shader = emission()
 ) {
-    Shader = Color * emission();
+    if (Transparency == 0.0 || transparent_culling()) {
+        Shader = transparent();
+    } else {
+        Shader = Color * emission();
 
-    if (Reflectance > 0.0) {
-        float r = glossy(Reflectance, Distance, Depth);
+        if (Reflectance > 0.0) {
+            float r = glossy(Reflectance, Distance, Depth);
 
-        Shader = mix(Shader, reflection(N), r);
-    }
+            Shader = mix(Shader, reflection(N), r);
+        }
 
-    if (Transparency < 1.0) {
-        float t = transparent_culling() ? 0.0 : Transparency;
-
-        Shader = mix(transparent(), Shader, t);
+        if (Transparency < 1.0) {
+            Shader = mix(transparent(), Shader, Transparency);
+        }
     }
 }
