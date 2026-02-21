@@ -3,6 +3,9 @@ from toon.utils import override
 from bpy import types
 from bpy.types import Context, Panel
 
+from toon.ops import NODE_OT_toon_node_compile_all
+from toon.ops import NODE_OT_toon_node_reload_all
+
 
 def _draw_pass_index_warning(self: Panel, context: Context):
     if (
@@ -17,7 +20,8 @@ def _draw_pass_index_warning(self: Panel, context: Context):
         )
 
 
-class OBJECT_PT_toon(Panel):
+class OBJECT_PT_toon_node(Panel):
+    bl_idname = 'OBJECT_PT_toon'
     bl_label = 'Toon'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -47,7 +51,8 @@ class OBJECT_PT_toon(Panel):
         types.OBJECT_PT_relations.remove(_draw_pass_index_warning)
 
 
-class MATERIAL_PT_toon(Panel):
+class MATERIAL_PT_toon_node(Panel):
+    bl_idname = 'MATERIAL_PT_toon'
     bl_label = 'Toon'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -91,3 +96,24 @@ class MATERIAL_PT_toon(Panel):
 
         if hasattr(types, 'CYCLES_MATERIAL_PT_settings'):
             types.CYCLES_MATERIAL_PT_settings.remove(_draw_pass_index_warning)
+
+
+class VIEW3D_PT_toon_node(Panel):
+    bl_idname = 'VIEW3D_PT_toon_node'
+    bl_label = 'Shader'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Toon'
+
+    @override
+    def draw(self, context: Context):
+        layout = self.layout
+
+        layout.operator(
+            NODE_OT_toon_node_reload_all.bl_idname,
+            text='Reload All Nodes', icon='FILE_REFRESH'
+        )
+        layout.operator(
+            NODE_OT_toon_node_compile_all.bl_idname,
+            text='Compile All Shaders', icon='FILE_CACHE'
+        )

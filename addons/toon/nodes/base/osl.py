@@ -4,7 +4,7 @@ import bpy
 
 from bpy.types import Node, NodeTree
 
-from toon.shaders import script_filepath
+from toon.shaders import shader_filepath
 
 from .node import ToonNodeGroup
 
@@ -17,7 +17,7 @@ class ToonNodeOSL(ToonNodeGroup):
             return False
 
         node.mode = 'EXTERNAL'
-        node.filepath = script_filepath(self.osl_name)
+        node.filepath = shader_filepath(self.osl_name)
 
         return len(node.inputs) > 0 or len(node.outputs) > 0
 
