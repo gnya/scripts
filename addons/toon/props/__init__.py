@@ -1,13 +1,13 @@
-from .toon_settings import ToonSettings
+from .node import ToonNodeSettings
 
 
 __all__ = [
-    ToonSettings
+    ToonNodeSettings
 ]
 
 
 classes = (
-    ToonSettings,
+    ToonNodeSettings,
 )
 
 

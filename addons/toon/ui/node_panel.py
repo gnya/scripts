@@ -6,6 +6,7 @@ from bpy.types import Context, Panel
 from toon.ops import NODE_OT_toon_node_compile_all
 from toon.ops import NODE_OT_toon_node_reload_all
 from toon.ops import NODE_OT_toon_node_setup_osl_render
+from toon.props import ToonNodeSettings
 
 
 def _draw_pass_index_warning(self: Panel, context: Context):
@@ -35,7 +36,7 @@ class OBJECT_PT_toon_node(Panel):
         if context.object is None:
             return
 
-        settings = context.object.toon_settings
+        settings = ToonNodeSettings.instance(context.object)
 
         col = layout.column()
         col.use_property_split = True
@@ -66,8 +67,8 @@ class MATERIAL_PT_toon_node(Panel):
         if context.object is None or context.material is None:
             return
 
-        object_settings = context.object.toon_settings
-        settings = context.material.toon_settings
+        object_settings = ToonNodeSettings.instance(context.object)
+        settings = ToonNodeSettings.instance(context.material)
 
         col = layout.column()
         col.use_property_split = True

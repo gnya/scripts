@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from bpy.props import EnumProperty, IntProperty, PointerProperty
 from bpy.types import Material, Object, PropertyGroup
 
 
-class ToonSettings(PropertyGroup):
-    PROP_NAME = 'toon_settings'
+class ToonNodeSettings(PropertyGroup):
+    PROP_NAME = 'toon_node_settings'
 
     def _set_cast_shadows(self, value: int):
         self.id_data.pass_index = (
@@ -51,17 +53,21 @@ class ToonSettings(PropertyGroup):
     )
 
     @staticmethod
+    def instance(id: Material | Object) -> ToonNodeSettings:
+        return getattr(id, ToonNodeSettings.PROP_NAME)
+
+    @staticmethod
     def register():
         setattr(
-            Material, ToonSettings.PROP_NAME,
-            PointerProperty(type=ToonSettings)
+            Material, ToonNodeSettings.PROP_NAME,
+            PointerProperty(type=ToonNodeSettings)
         )
         setattr(
-            Object, ToonSettings.PROP_NAME,
-            PointerProperty(type=ToonSettings)
+            Object, ToonNodeSettings.PROP_NAME,
+            PointerProperty(type=ToonNodeSettings)
         )
 
     @staticmethod
     def unregister():
-        delattr(Material, ToonSettings.PROP_NAME)
-        delattr(Object, ToonSettings.PROP_NAME)
+        delattr(Material, ToonNodeSettings.PROP_NAME)
+        delattr(Object, ToonNodeSettings.PROP_NAME)
