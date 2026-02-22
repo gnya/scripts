@@ -35,11 +35,13 @@ class NODE_OT_toon_node_compile_all(Operator):
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         if not compile_all_shaders():
-            self.report({'ERROR'}, 'Failed to compile osl file.')
+            self.report({'ERROR'}, 'Failed to compile OSL scripts.')
 
             return {'CANCELLED'}
 
         register_shaders()
+
+        self.report({'INFO'}, 'Successfully compiled OSL scripts.')
 
         return {'FINISHED'}
 

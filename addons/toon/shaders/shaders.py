@@ -21,7 +21,7 @@ def compile_all_shaders() -> bool:
             src_path = f'{SCRIPTS_PATH}\\{basename}.oso'
 
             if not osl_compile(f'{SCRIPTS_PATH}\\{filename}', src_path):
-                print(f'Failed to compile this osl file. : {filename}')
+                print(f'Failed to compile this OSL script. : {filename}')
 
                 return False
 
@@ -42,7 +42,7 @@ def register_shaders():
             elif osl_compile(f'{SCRIPTS_PATH}\\{filename}', src_path):
                 shutil.copy(src_path, dst_path)
             else:
-                print(f'Failed to compile this osl file. : {filename}')
+                print(f'Failed to compile this OSL script. : {filename}')
 
 
 def unregister_shaders():
