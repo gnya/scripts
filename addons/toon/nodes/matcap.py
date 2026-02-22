@@ -4,10 +4,10 @@ import bpy
 
 from bpy.types import NodeTree
 
-from .base import ToonNodeGroup
+from .base import ToonNode
 
 
-class ToonNodeMatCap(ToonNodeGroup):
+class ToonNodeMatCap(ToonNode):
     bl_idname = 'ToonNodeMatCap'
     bl_label = 'MatCap'
 

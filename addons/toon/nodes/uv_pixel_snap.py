@@ -4,10 +4,10 @@ import bpy
 
 from bpy.types import NodeTree
 
-from .base import ToonNodeGroup
+from .base import ToonNode
 
 
-class ToonNodeUVPixelSnap(ToonNodeGroup):
+class ToonNodeUVPixelSnap(ToonNode):
     bl_idname = 'ToonNodeUVPixelSnap'
     bl_label = 'UV Pixel Snap'
 

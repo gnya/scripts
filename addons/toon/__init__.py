@@ -10,7 +10,6 @@ bl_info = {
 }
 
 
-from . import manager
 from . import nodes
 from . import ops
 from . import props
@@ -22,7 +21,6 @@ from . import utils
 def register():
     utils.register()
     props.register()
-    manager.register()
     ops.register()
     ui.register()
     shaders.register()
@@ -32,7 +30,6 @@ def register():
 def unregister():
     utils.unregister()
     props.unregister()
-    manager.unregister()
     ops.unregister()
     ui.unregister()
     shaders.unregister()

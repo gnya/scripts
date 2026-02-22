@@ -6,10 +6,10 @@ from bpy.types import Node, NodeTree
 
 from toon.shaders import shader_filepath
 
-from .node import ToonNodeGroup
+from .node import ToonNode
 
 
-class ToonNodeOSL(ToonNodeGroup):
+class ToonNodeOSL(ToonNode):
     osl_name = ''
 
     def _try_load_osl(self, node: Node | None) -> bool:

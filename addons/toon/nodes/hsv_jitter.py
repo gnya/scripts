@@ -4,10 +4,10 @@ import bpy
 
 from bpy.types import NodeTree
 
-from .base import ToonNodeGroup
+from .base import ToonNode
 
 
-class ToonNodeHSVJitter(ToonNodeGroup):
+class ToonNodeHSVJitter(ToonNode):
     bl_idname = 'ToonNodeHSVJitter'
     bl_label = 'HSV Jitter'
 

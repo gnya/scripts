@@ -2,7 +2,6 @@ from toon.utils import override
 
 from bpy.types import Context, Menu, Node, UILayout
 
-from toon.nodes import ToonNodePalette
 from toon.nodes import ToonNodeMatCap
 from toon.nodes import ToonNodeVisualize
 from toon.nodes import ToonNodeHSVJitter
@@ -47,8 +46,6 @@ class NODE_MT_toon_node_category(Menu):
         layout = self.layout
 
         col = layout.column(align=True)
-        self._draw_node(col, ToonNodePalette)
-        col.separator()
         self._draw_node(col, ToonNodeMatCap)
         self._draw_node(col, ToonNodeHSVJitter)
         self._draw_node(col, ToonNodeUVPixelSnap)

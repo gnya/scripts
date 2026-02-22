@@ -1,33 +1,9 @@
-from .add import VIEW3D_OT_toon_palette_add
-from .add import VIEW3D_OT_toon_palette_add_group
-from .add import VIEW3D_OT_toon_palette_add_entry
-from .add_by import VIEW3D_OT_toon_palette_add_by_node_tree
-from .add_by import VIEW3D_OT_toon_palette_add_by_clipboard
-from .remove import VIEW3D_OT_toon_palette_remove
-from .remove import VIEW3D_OT_toon_palette_remove_group
-from .remove import VIEW3D_OT_toon_palette_remove_entry
-from .copy_paste import VIEW3D_OT_toon_palette_copy
-from .copy_paste import VIEW3D_OT_toon_palette_paste
-from .move import VIEW3D_OT_toon_palette_move
-from .move import VIEW3D_OT_toon_palette_move_slot
 from .node import NODE_OT_toon_node_compile_all
 from .node import NODE_OT_toon_node_reload_all
 from .node import NODE_OT_toon_node_setup_osl_render
 
 
 classes = (
-    VIEW3D_OT_toon_palette_add,
-    VIEW3D_OT_toon_palette_add_group,
-    VIEW3D_OT_toon_palette_add_entry,
-    VIEW3D_OT_toon_palette_add_by_node_tree,
-    VIEW3D_OT_toon_palette_add_by_clipboard,
-    VIEW3D_OT_toon_palette_remove,
-    VIEW3D_OT_toon_palette_remove_group,
-    VIEW3D_OT_toon_palette_remove_entry,
-    VIEW3D_OT_toon_palette_copy,
-    VIEW3D_OT_toon_palette_paste,
-    VIEW3D_OT_toon_palette_move,
-    VIEW3D_OT_toon_palette_move_slot,
     NODE_OT_toon_node_compile_all,
     NODE_OT_toon_node_reload_all,
     NODE_OT_toon_node_setup_osl_render

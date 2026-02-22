@@ -1,30 +1,13 @@
-from .id_key import IDKey
-from .palette_entry import PaletteEntry
-from .palette import Palette
-from .palette import PaletteGroup
-from .palette import PalettePointer
-from .palette import PaletteSlot
 from .toon_settings import ToonSettings
 
 
 __all__ = [
-    IDKey,
-    PaletteEntry,
-    Palette,
-    PaletteGroup,
-    PalettePointer,
-    PaletteSlot,
     ToonSettings
 ]
 
 
 classes = (
-    IDKey,
-    PaletteEntry,
-    PaletteGroup,
-    PaletteSlot,
-    Palette,
-    ToonSettings
+    ToonSettings,
 )
 
 

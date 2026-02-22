@@ -10,10 +10,6 @@ from toon.utils import NodeLinkRebinder
 
 
 class ToonNode(ShaderNodeCustomGroup):
-    pass
-
-
-class ToonNodeGroup(ToonNode):
     node_ready: BoolProperty(default=False)
 
     def node_tree_key(self) -> tuple[str, str]:
