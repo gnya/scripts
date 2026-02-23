@@ -2,13 +2,15 @@ from .node_menu import NODE_MT_toon_node_category
 from .node_panel import VIEW3D_PT_toon_node
 from .node_panel import MATERIAL_PT_toon_node
 from .node_panel import OBJECT_PT_toon_node
+from .palette_panel import VIEW3D_PT_toon_palette
 
 
 classes = (
     NODE_MT_toon_node_category,
     VIEW3D_PT_toon_node,
     MATERIAL_PT_toon_node,
-    OBJECT_PT_toon_node
+    OBJECT_PT_toon_node,
+    VIEW3D_PT_toon_palette
 )
 
 

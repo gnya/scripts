@@ -1,13 +1,25 @@
 from .node import ToonNodeSettings
+from .palette import ToonPaletteColor
+from .palette import ToonPaletteGroup
+from .palette import ToonPalette
+from .palette import ToonPaletteFacade
 
 
 __all__ = [
-    ToonNodeSettings
+    ToonNodeSettings,
+    ToonPaletteColor,
+    ToonPaletteGroup,
+    ToonPalette,
+    ToonPaletteFacade
 ]
 
 
 classes = (
     ToonNodeSettings,
+    ToonPaletteColor,
+    ToonPaletteGroup,
+    ToonPalette,
+    ToonPaletteFacade
 )
 
 

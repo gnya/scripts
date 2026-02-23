@@ -1,12 +1,14 @@
 from .node import NODE_OT_toon_node_compile_all
 from .node import NODE_OT_toon_node_reload_all
 from .node import NODE_OT_toon_node_setup_osl_render
+from .palette_add import VIEW3D_OT_toon_palette_add
 
 
 classes = (
     NODE_OT_toon_node_compile_all,
     NODE_OT_toon_node_reload_all,
-    NODE_OT_toon_node_setup_osl_render
+    NODE_OT_toon_node_setup_osl_render,
+    VIEW3D_OT_toon_palette_add
 )
 
 
