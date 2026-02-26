@@ -49,7 +49,7 @@ class ToonNodeOSLLight(ToonNodeOSL):
                 continue
 
             for node in node_tree.nodes:
-                if node.type != 'ATTRIBUTE':
+                if node.bl_idname != 'ShaderNodeAttribute':
                     continue
 
                 attr = node.attribute_name
@@ -76,7 +76,7 @@ class ToonNodeOSLLight(ToonNodeOSL):
             return
 
         for node in node_tree.nodes:
-            if node.type != 'ATTRIBUTE':
+            if node.bl_idname != 'ShaderNodeAttribute':
                 continue
 
             prefix = self._attr_prefix()
