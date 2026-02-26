@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import get_args, Iterator, Literal
 
 import bpy
 
@@ -6,13 +6,24 @@ from bpy.types import NodeTree
 from re import sub
 
 
-NODE_TREE_NAME = '.ToonPalette'
+TOON_PALETTE_PREFIX = '.ToonPalette'
+
+
+ToonPaletteColorTypes = Literal['COLOR', 'TEXTURE', 'VECTOR', 'VALUE']
+
+
+def color_type_to_int(type: ToonPaletteColorTypes) -> int:
+    return get_args(ToonPaletteColorTypes).index(type)
+
+
+def int_to_color_type(type: int) -> ToonPaletteColorTypes:
+    return get_args(ToonPaletteColorTypes)[type]
 
 
 def is_palette(node_tree: NodeTree):
     names = node_tree.name.split('|', 2)
 
-    return len(names) == 3 and names[0] == NODE_TREE_NAME
+    return len(names) == 3 and names[0] == TOON_PALETTE_PREFIX
 
 
 def get_palette_name(node_tree: NodeTree) -> str:
@@ -68,4 +79,4 @@ def build_node_tree_name(palette_name: str, group_name: str, unique: bool = Fals
     if unique:
         palette_name = _make_unique_name(palette_name, _group_names())
 
-    return '|'.join([NODE_TREE_NAME, palette_name, group_name])
+    return '|'.join([TOON_PALETTE_PREFIX, palette_name, group_name])

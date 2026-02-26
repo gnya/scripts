@@ -45,6 +45,7 @@ class ToonPalette(object):
         name = build_node_tree_name(self.name, group_name)
         node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
         node_tree.use_fake_user = True
+        ToonPaletteGroup(node_tree).init()
 
         self.node_trees.append(node_tree)
 

@@ -31,6 +31,8 @@ class ToonPaletteGroup(object):
 
     def add(self, color_name: str) -> bool:
         self.node_tree.outputs.new('NodeSocketColor', color_name)
+        index = len(self.node_tree.outputs) - 1
+        ToonPaletteColor(index, self.node_tree).init()
 
         return True
 
@@ -46,6 +48,9 @@ class ToonPaletteGroup(object):
     def colors(self) -> Iterator[ToonPaletteColor]:
         for index in range(len(self.node_tree.outputs)):
             yield ToonPaletteColor(index, self.node_tree)
+
+    def init(self):
+        self.node_tree.nodes.new('NodeGroupOutput')
 
     @staticmethod
     def from_node_tree(node_tree: NodeTree) -> ToonPaletteGroup | None:
