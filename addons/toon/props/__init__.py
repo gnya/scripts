@@ -1,25 +1,34 @@
 from .node import ToonNodeSettings
-from .palette import ToonPaletteColor
-from .palette import ToonPaletteGroup
-from .palette import ToonPalette
-from .palette import ToonPaletteFacade
+from .palette_node import ToonPaletteSearchGroup
+from .palette_node import ToonPaletteSearchPalette
+from .palette_node import ToonPaletteSearchIndex
+from .palette_panel import ToonPaletteViewSettings
+from .palette_panel import ToonPaletteUIItem
+from .palette_panel import ToonPaletteUIPaletteState
+from .palette_panel import ToonPaletteUIState
 
 
 __all__ = [
     ToonNodeSettings,
-    ToonPaletteColor,
-    ToonPaletteGroup,
-    ToonPalette,
-    ToonPaletteFacade
+    ToonPaletteSearchGroup,
+    ToonPaletteSearchPalette,
+    ToonPaletteSearchIndex,
+    ToonPaletteViewSettings,
+    ToonPaletteUIItem,
+    ToonPaletteUIPaletteState,
+    ToonPaletteUIState
 ]
 
 
 classes = (
     ToonNodeSettings,
-    ToonPaletteColor,
-    ToonPaletteGroup,
-    ToonPalette,
-    ToonPaletteFacade
+    ToonPaletteSearchGroup,
+    ToonPaletteSearchPalette,
+    ToonPaletteSearchIndex,
+    ToonPaletteViewSettings,
+    ToonPaletteUIItem,
+    ToonPaletteUIPaletteState,
+    ToonPaletteUIState
 )
 
 

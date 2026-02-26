@@ -3,7 +3,8 @@ from toon.utils import override
 from bpy.props import StringProperty
 from bpy.types import Context, ShaderNodeCustomGroup, UILayout
 
-from toon.props import ToonPaletteFacade
+from toon.palette import ToonPaletteFacade
+from toon.props import ToonPaletteSearchIndex
 from toon.utils import NodeLinkRebinder
 
 
@@ -28,10 +29,13 @@ class ToonNodePalette(ShaderNodeCustomGroup):
 
     @override
     def init(self, context: Context):
-        facade = ToonPaletteFacade.instance()
-        facade.update()
+        palette = ToonPaletteFacade.get(self.palette_name)
 
-        self.node_tree = facade.get_node_tree(self.palette_name, self.group_name)
+        if palette is not None:
+            group = palette.get(self.group_name)
+
+            if group is not None:
+                self.node_tree = group.node_tree
 
     @override
     def free(self):
@@ -39,21 +43,19 @@ class ToonNodePalette(ShaderNodeCustomGroup):
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):
-        facade = ToonPaletteFacade.instance()
-        facade.update()
+        states = ToonPaletteSearchIndex.current()
 
         layout.prop_search(
             self, 'palette_name',
-            facade, 'palettes',
+            states, 'palettes',
             text='', icon='COLOR'
         )
 
-        index = facade.palettes.find(self.palette_name)
+        state = states.palettes.get(self.palette_name)
 
-        if index >= 0:
-            palette = facade.palettes[index]
+        if state is not None:
             layout.prop_search(
                 self, 'group_name',
-                palette, 'groups',
+                state, 'groups',
                 text='', icon='GROUP'
             )
