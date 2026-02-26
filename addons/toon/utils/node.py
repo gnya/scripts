@@ -2,7 +2,7 @@ from typing import Iterator
 
 import bpy
 
-from bpy.types import ID, Node, NodeTree
+from bpy.types import ID, Node, NodeSocket, NodeTree
 
 
 def node_itr(node_tree: NodeTree, type: str = '') -> Iterator[Node]:
@@ -39,3 +39,33 @@ def all_node_users_itr(node_tree: NodeTree) -> Iterator[Node]:
     for node in all_node_itr():
         if node_tree == getattr(node, 'node_tree', None):
             yield node
+
+
+def remove_nodes(root: NodeSocket):
+    if len(root.links) != 1:
+        return
+
+    node = root.links[0].from_node
+
+    for input in node.inputs:
+        remove_nodes(input)
+
+    root.id_data.nodes.remove(node)
+
+
+def search_node(root: NodeSocket, type: str) -> Node | None:
+    if len(root.links) != 1:
+        return
+
+    node = root.links[0].from_node
+
+    if node.bl_idname == type:
+        return node
+
+    for input in node.inputs:
+        node = search_node(input, type)
+
+        if node is not None:
+            return node
+
+    return None

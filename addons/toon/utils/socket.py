@@ -1,11 +1,70 @@
-from typing import Any, Iterator
+from typing import Any, Iterator, Literal
 
 from bpy.types import bpy_prop_array
 from bpy.types import Node, NodeSocket, NodeTree
 
+from .node import node_itr, all_node_users_itr
+
 
 SocketValue = int | float | list[int | float]
 SocketBinder = dict[str, tuple[SocketValue, list[NodeSocket]]]
+
+
+def _rebind_inputs(node_tree: NodeTree, node: Node, old_id: int, new_id: int):
+    old_socket = node.inputs[old_id]
+    new_socket = node.inputs[new_id]
+
+    for link in old_socket.links:
+        node_tree.links.new(link.from_socket, new_socket)
+
+
+def _rebind_outputs(node_tree: NodeTree, node: Node, old_id: int, new_id: int):
+    old_socket = node.outputs[old_id]
+    new_socket = node.outputs[new_id]
+
+    for link in old_socket.links:
+        node_tree.links.new(new_socket, link.to_socket)
+
+
+def change_socket_type(
+    node_tree: NodeTree, socket_id: int,
+    type: str, in_out: Literal['IN', 'OUT']
+):
+    if in_out == 'IN':
+        sockets = node_tree.inputs
+    else:
+        sockets = node_tree.outputs
+
+    old_id = socket_id
+    old_interface = sockets[old_id]
+
+    if old_interface.bl_socket_idname == type:
+        return
+
+    # Add socket.
+    sockets.new(type, old_interface.name)
+    new_id = len(sockets) - 1
+
+    if in_out == 'IN':
+        inner_node_type = 'NodeGroupInput'
+        inner_rebinder = _rebind_outputs
+        outer_rebinder = _rebind_inputs
+    else:
+        inner_node_type = 'NodeGroupOutput'
+        inner_rebinder = _rebind_inputs
+        outer_rebinder = _rebind_outputs
+
+    # Rebind inner sockets.
+    for node in node_itr(node_tree, inner_node_type):
+        inner_rebinder(node_tree, node, old_id, new_id)
+
+    # Rebind outer sockets.
+    for node in all_node_users_itr(node_tree):
+        outer_rebinder(node.id_data, node, old_id, new_id)
+
+    # Move new socket and remove old socket.
+    sockets.move(new_id, old_id)
+    sockets.remove(old_interface)
 
 
 def _bind_sockets(
