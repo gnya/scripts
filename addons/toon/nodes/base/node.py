@@ -43,7 +43,6 @@ class ToonNode(ShaderNodeCustomGroup):
 
     @override
     def init(self, context: Context):
-        self.node_tree = None
         self.node_tree, self.node_ready = self.get_node_tree()
 
     @override
