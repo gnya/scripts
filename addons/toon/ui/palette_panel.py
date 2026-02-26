@@ -81,7 +81,29 @@ class VIEW3D_PT_toon_palette(Panel):
             # o.direction = 'DOWN'
 
     def _draw_palette_props(self, layout: UILayout, state: ToonPaletteUIPaletteState):
-        pass
+        item = state.active_item()
+
+        if item is None or item.type == 'GROUP':
+            return
+
+        row = layout.row()
+        row.prop(item, 'color_type', text='')
+
+        col = layout.column()
+        col.use_property_split = True
+        col.use_property_decorate = False
+
+        if item.color_type == 'COLOR':
+            col.prop(*item.color_ptr, text='Color')
+        elif item.color_type == 'TEXTURE':
+            col.template_ID(*item.texture_ptr, new='image.new', open='image.open')
+            col.prop(*item.uv_map_ptr, text='UV Map')
+        elif item.color_type == 'VECTOR':
+            col.prop(*item.color_ptr, text='Vector', slider=True)
+        elif item.color_type == 'VALUE':
+            col.prop(*item.color_ptr, text='Value', slider=True)
+
+        col.separator()
 
     def _draw_palette(self, layout: UILayout, state: ToonPaletteUIPaletteState):
         col = layout.column(align=True)

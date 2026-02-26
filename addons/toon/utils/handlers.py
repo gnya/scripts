@@ -7,7 +7,7 @@ from bpy.types import Depsgraph, NodeTree, Object, Scene
 
 
 object_rename_post: list[Callable[[Object, str], None]] = []
-node_tree_update_post: list[Callable[[NodeTree], None]] = []
+node_group_update_post: list[Callable[[NodeTree], None]] = []
 
 _object_last_names: dict[int, str] = {}
 
@@ -50,7 +50,7 @@ def _object_rename(graph: Depsgraph):
     _object_last_names = last_names
 
 
-def _poll_node_tree_update(graph: Depsgraph) -> bool:
+def _poll_node_group_update(graph: Depsgraph) -> bool:
     if graph.mode != 'VIEWPORT':
         return False
 
@@ -61,8 +61,8 @@ def _poll_node_tree_update(graph: Depsgraph) -> bool:
     return False
 
 
-def _node_tree_update(graph: Depsgraph):
-    if not _poll_node_tree_update(graph):
+def _node_group_update(graph: Depsgraph):
+    if not _poll_node_group_update(graph):
         return
 
     for update in graph.updates:
@@ -75,14 +75,14 @@ def _node_tree_update(graph: Depsgraph):
         elif origin.name == 'Shader Nodetree':
             continue
 
-        for callback in node_tree_update_post:
+        for callback in node_group_update_post:
             callback(origin)
 
 
 @persistent
 def _depsgraph_update_post(scene: Scene, graph: Depsgraph):
     _object_rename(graph)
-    _node_tree_update(graph)
+    _node_group_update(graph)
 
 
 @persistent

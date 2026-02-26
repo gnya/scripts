@@ -33,8 +33,18 @@ class VIEW3D_UL_toon_palette_entry(UIList):
                 row.prop(item, 'group_name', text='', emboss=False)
             elif item.type == 'COLOR':
                 row.separator(factor=3.0)
-                # TODO Implement later.
-                # row.row().prop(item, 'color', text='')
+                left = row.row()
+                left.ui_units_x = 8.0
+
+                if item.color_type == 'COLOR':
+                    left.prop(*item.color_ptr, text='')
+                elif item.color_type == 'TEXTURE':
+                    left.prop(*item.texture_ptr, text='')
+                elif item.color_type == 'VECTOR':
+                    left.prop(*item.color_ptr, text='', slider=True)
+                elif item.color_type == 'VALUE':
+                    left.prop(*item.color_ptr, text='', slider=True)
+
                 row.prop(item, 'color_name', text='', emboss=False)
         elif self.layout_type in {'GRID'}:
             pass

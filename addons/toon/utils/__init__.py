@@ -11,7 +11,7 @@ from .socket import change_socket_type
 from .typing import override
 
 from .handlers import object_rename_post
-from .handlers import node_tree_update_post
+from .handlers import node_group_update_post
 
 from .socket import NodeLinkRebinder
 
@@ -29,7 +29,7 @@ __all__ = [
     change_socket_type,
     override,
     object_rename_post,
-    node_tree_update_post,
+    node_group_update_post,
     NodeLinkRebinder
 ]
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Iterator
+from typing import Any, Iterator
 
 import bpy
 
@@ -18,8 +18,11 @@ from toon.palette import ToonPaletteColor
 from toon.palette import ToonPaletteGroup
 from toon.palette import ToonPalette
 from toon.palette import ToonPaletteFacade
+from toon.palette import color_type_to_int
+from toon.palette import int_to_color_type
 from toon.palette import get_palette_name
 from toon.palette import get_group_name
+from toon.utils import node_group_update_post
 
 from .palette_node import ToonPaletteSearchIndex
 
@@ -90,6 +93,52 @@ class ToonPaletteUIItem(PropertyGroup):
         get=_get_color_name, set=_set_color_name
     )
 
+    color_types = [
+        ('COLOR', 'Color', ''),
+        ('TEXTURE', 'Texture', ''),
+        ('VECTOR', 'Vector', ''),
+        ('VALUE', 'Value', '')
+    ]
+
+    def _get_color_type(self) -> int:
+        if (color := self.color_data()) is not None:
+            return color_type_to_int(color.type)
+        else:
+            return -1
+
+    def _set_color_type(self, value: int):
+        if (color := self.color_data()) is not None:
+            color.type = int_to_color_type(value)
+        else:
+            pass
+
+    color_type: EnumProperty(
+        name='Type', description='Type of color',
+        items=color_types, default='COLOR',
+        get=_get_color_type, set=_set_color_type
+    )
+
+    @property
+    def color_ptr(self) -> tuple[Any, str]:
+        if (color := self.color_data()) is not None:
+            return color.color_ptr
+        else:
+            return None, ''
+
+    @property
+    def texture_ptr(self) -> tuple[Any, str]:
+        if (color := self.color_data()) is not None:
+            return color.texture_ptr
+        else:
+            return None, ''
+
+    @property
+    def uv_map_ptr(self) -> tuple[Any, str]:
+        if (color := self.color_data()) is not None:
+            return color.uv_map_ptr
+        else:
+            return None, ''
+
     def _view_settings(self) -> ToonPaletteViewSettings:
         return ToonPaletteViewSettings.instance(self.node_tree)
 
@@ -119,6 +168,52 @@ class ToonPaletteUIItem(PropertyGroup):
             return None
 
         return ToonPaletteColor(self.socket_index, self.node_tree)
+
+    def init(self, group: ToonPaletteGroup, color: ToonPaletteColor | None, header_index: int):
+        self.node_tree = group.node_tree
+        self.header_index = header_index
+
+        if color is None:
+            self.type = 'GROUP'
+        else:
+            self.type = 'COLOR'
+            self.socket_index = color.socket_index
+
+    @staticmethod
+    def _update_texture_uv_snap(node_tree: NodeTree):
+        group = ToonPaletteGroup.from_node_tree(node_tree)
+
+        if group is None:
+            return
+
+        for color in group.colors():
+            data, prop = color.texture_ptr
+
+            if data is None:
+                continue
+
+            tex = getattr(data, prop)
+
+            if tex is None:
+                continue
+
+            (data_w, prop_w), (data_h, prop_h) = color.uv_pixel_snap_ptr
+
+            if data_w is None or data_h is None:
+                continue
+
+            setattr(data_w, prop_w, tex.size[0])
+            setattr(data_h, prop_h, tex.size[1])
+
+    @classmethod
+    def register(cls):
+        if ToonPaletteUIItem._update_texture_uv_snap not in node_group_update_post:
+            node_group_update_post.append(ToonPaletteUIItem._update_texture_uv_snap)
+
+    @staticmethod
+    def unregister():
+        if ToonPaletteUIItem._update_texture_uv_snap in node_group_update_post:
+            node_group_update_post.remove(ToonPaletteUIItem._update_texture_uv_snap)
 
 
 class ToonPaletteUIPaletteState(PropertyGroup):
@@ -181,26 +276,18 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     def init(self, palette: ToonPalette):
         self.node_tree = palette.header
-        index = 0
+        header_index = 0
 
         for group in palette.groups():
-            header_index = index
-
             item = self.list_items.add()
-            item.type = 'GROUP'
-            item.node_tree = group.node_tree
-            item.header_index = header_index
+            item.init(group, None, header_index)
+            colors = list(group.colors())
 
-            for color in group.colors():
+            for color in colors:
                 item = self.list_items.add()
-                item.type = 'COLOR'
-                item.socket_index = color.socket_index
-                item.node_tree = group.node_tree
-                item.header_index = header_index
+                item.init(group, color, header_index)
 
-                index += 1
-
-            index += 1
+            header_index += len(colors)
 
     def palette_data(self) -> ToonPalette | None:
         return ToonPalette.from_node_tree(self.node_tree)
