@@ -41,6 +41,9 @@ class ToonPaletteFacade(object):
 
     @staticmethod
     def get(palette_name: str) -> ToonPalette | None:
+        if palette_name == '':
+            return None
+
         node_trees = list(filter_node_trees(palette_name))
 
         if len(node_trees) > 0:

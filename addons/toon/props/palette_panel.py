@@ -14,12 +14,14 @@ from bpy.props import (
 )
 from bpy.types import NodeTree, PropertyGroup, Scene, WindowManager
 
-from toon.palette import get_palette_name
-from toon.palette import get_group_name
 from toon.palette import ToonPaletteColor
 from toon.palette import ToonPaletteGroup
 from toon.palette import ToonPalette
 from toon.palette import ToonPaletteFacade
+from toon.palette import get_palette_name
+from toon.palette import get_group_name
+
+from .palette_node import ToonPaletteSearchIndex
 
 
 class ToonPaletteViewSettings(PropertyGroup):
@@ -65,6 +67,8 @@ class ToonPaletteUIItem(PropertyGroup):
 
         if group is not None:
             group.name = value
+
+            ToonPaletteSearchIndex.request_update()
 
     group_name: StringProperty(
         get=_get_group_name, set=_set_group_name
@@ -131,6 +135,8 @@ class ToonPaletteUIPaletteState(PropertyGroup):
         if palette is not None:
             palette.name = value
 
+            ToonPaletteSearchIndex.request_update()
+
     palette_name: StringProperty(
         get=_get_palette_name, set=_set_palette_name
     )
@@ -158,7 +164,7 @@ class ToonPaletteUIPaletteState(PropertyGroup):
     def _set_show_expanded(self, value: bool):
         self._view_settings().show_expanded = value
 
-    # 未選択なら-1、選択しているならlist_itemsの範囲内の値を返す
+    # TODO return: -1 ~ len(list_items) - 1
     active_index: IntProperty(
         get=_get_active_index, set=_set_active_index
     )

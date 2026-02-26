@@ -3,7 +3,10 @@ from toon.utils import override
 from bpy.props import StringProperty
 from bpy.types import Context, ShaderNodeCustomGroup, UILayout
 
+from toon.palette import ToonPalette
 from toon.palette import ToonPaletteFacade
+from toon.palette import get_group_name
+from toon.palette import get_palette_name
 from toon.props import ToonPaletteSearchIndex
 from toon.utils import NodeLinkRebinder
 
@@ -12,34 +15,49 @@ class ToonNodePalette(ShaderNodeCustomGroup):
     bl_idname = 'ToonNodePalette'
     bl_label = 'Palette'
 
-    def _update_property(self, context: Context):
+    def _get_palette_name(self) -> str:
+        if self.node_tree is None:
+            return ''
+
+        return get_palette_name(self.node_tree)
+
+    def _set_palette_name(self, value: str):
         with NodeLinkRebinder(self):
-            self.free()
-            self.init(context)
+            if (palette := ToonPaletteFacade.get(value)) is None:
+                self.node_tree = None
+            else:
+                self.node_tree = palette.header
 
     palette_name: StringProperty(
         name='Palette Name',
-        update=_update_property
+        get=_get_palette_name, set=_set_palette_name
     )
+
+    def _get_group_name(self) -> str:
+        if self.node_tree is None:
+            return ''
+
+        return get_group_name(self.node_tree)
+
+    def _set_group_name(self, value: str):
+        if self.node_tree is None:
+            return
+
+        palette = ToonPalette.from_node_tree(self.node_tree)
+
+        if palette is None:
+            return
+
+        with NodeLinkRebinder(self):
+            if (group := palette.get(value)) is None:
+                self.node_tree = palette.header
+            else:
+                self.node_tree = group.node_tree
 
     group_name: StringProperty(
         name='Group Name',
-        update=_update_property
+        get=_get_group_name, set=_set_group_name
     )
-
-    @override
-    def init(self, context: Context):
-        palette = ToonPaletteFacade.get(self.palette_name)
-
-        if palette is not None:
-            group = palette.get(self.group_name)
-
-            if group is not None:
-                self.node_tree = group.node_tree
-
-    @override
-    def free(self):
-        self.node_tree = None
 
     @override
     def draw_buttons(self, context: Context, layout: UILayout):
