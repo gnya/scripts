@@ -21,7 +21,7 @@ def int_to_color_type(type: int) -> ToonPaletteColorTypes:
 
 
 def is_palette(node_tree: NodeTree):
-    names = node_tree.name.split('|', 2)
+    names = node_tree.name.split('|')
 
     return len(names) == 3 and names[0] == TOON_PALETTE_PREFIX
 
