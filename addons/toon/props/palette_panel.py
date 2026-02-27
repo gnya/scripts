@@ -287,7 +287,7 @@ class ToonPaletteUIPaletteState(PropertyGroup):
                 item = self.list_items.add()
                 item.init(group, color, header_index)
 
-            header_index += len(colors)
+            header_index += len(colors) + 1
 
     def palette_data(self) -> ToonPalette | None:
         return ToonPalette.from_node_tree(self.node_tree)
