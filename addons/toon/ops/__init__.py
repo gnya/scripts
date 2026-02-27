@@ -7,6 +7,8 @@ from .palette import VIEW3D_OT_toon_palette_add_group
 from .palette import VIEW3D_OT_toon_palette_remove_group
 from .palette import VIEW3D_OT_toon_palette_add_color
 from .palette import VIEW3D_OT_toon_palette_remove_color
+from .palette import VIEW3D_OT_toon_palette_move
+from .palette import VIEW3D_OT_toon_palette_move_item
 
 
 classes = (
@@ -18,7 +20,9 @@ classes = (
     VIEW3D_OT_toon_palette_add_group,
     VIEW3D_OT_toon_palette_remove_group,
     VIEW3D_OT_toon_palette_add_color,
-    VIEW3D_OT_toon_palette_remove_color
+    VIEW3D_OT_toon_palette_remove_color,
+    VIEW3D_OT_toon_palette_move,
+    VIEW3D_OT_toon_palette_move_item
 )
 
 

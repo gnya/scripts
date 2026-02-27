@@ -6,10 +6,12 @@ from toon.ops import VIEW3D_OT_toon_palette_add
 from toon.ops import VIEW3D_OT_toon_palette_remove
 from toon.ops import VIEW3D_OT_toon_palette_add_color
 from toon.ops import VIEW3D_OT_toon_palette_remove_color
+from toon.ops import VIEW3D_OT_toon_palette_move_item
 from toon.props import ToonPaletteUIPaletteState
 from toon.props import ToonPaletteUIState
 
 from .palette_list import VIEW3D_UL_toon_palette_entry
+from .palette_menu import VIEW3D_MT_toon_palette
 from .palette_menu import VIEW3D_MT_toon_palette_group
 
 
@@ -30,10 +32,10 @@ class VIEW3D_PT_toon_palette(Panel):
 
         sub_row = row.row(align=True)
         sub_row.prop(state, 'palette_name', text='')
-        # sub_row.menu(
-        #     VIEW3D_MT_toon_palette.bl_idname,
-        #     text='', icon='DOWNARROW_HLT'
-        # )
+        sub_row.menu(
+            VIEW3D_MT_toon_palette.bl_idname,
+            text='', icon='DOWNARROW_HLT'
+        )
 
         sub_row = row.row(align=True)
         sub_row.operator(
@@ -69,16 +71,16 @@ class VIEW3D_PT_toon_palette(Panel):
 
         if len(state.list_items) > 1:
             sub_col.separator()
-            # o = sub_col.operator(
-            #     VIEW3D_OT_toon_palette_move_slot.bl_idname,
-            #     text='', icon='TRIA_UP'
-            # )
-            # o.direction = 'UP'
-            # o = sub_col.operator(
-            #     VIEW3D_OT_toon_palette_move_slot.bl_idname,
-            #     text='', icon='TRIA_DOWN'
-            # )
-            # o.direction = 'DOWN'
+            o = sub_col.operator(
+                VIEW3D_OT_toon_palette_move_item.bl_idname,
+                text='', icon='TRIA_UP'
+            )
+            o.direction = 'UP'
+            o = sub_col.operator(
+                VIEW3D_OT_toon_palette_move_item.bl_idname,
+                text='', icon='TRIA_DOWN'
+            )
+            o.direction = 'DOWN'
 
     def _draw_palette_props(self, layout: UILayout, state: ToonPaletteUIPaletteState):
         item = state.active_item()

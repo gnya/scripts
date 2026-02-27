@@ -5,6 +5,7 @@ from toon.utils import override
 if TYPE_CHECKING:
     from bpy._typing.rna_enums import OperatorReturnItems
 
+from bpy.props import EnumProperty
 from bpy.types import Context, Operator
 
 from toon.palette import ToonPaletteFacade
@@ -148,4 +149,44 @@ class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
         max_index = item.header_index + len(list(group.colors()))
         state.active_index = min(state.active_index, max_index)
 
+        return True
+
+
+class VIEW3D_OT_toon_palette_move(ToonPaletteOperator):
+    bl_idname = 'view3d.toon_palette_move'
+    bl_label = 'Move Palette'
+    bl_description = 'Move the context palette'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    direction_types = [
+        ('UP', 'Up', ''),
+        ('DOWN', 'Down', '')
+    ]
+
+    direction: EnumProperty(
+        items=direction_types, options={'HIDDEN'}
+    )
+
+    @override
+    def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        return True
+
+
+class VIEW3D_OT_toon_palette_move_item(ToonPaletteOperator):
+    bl_idname = 'view3d.toon_palette_move_item'
+    bl_label = 'Move Palette Item'
+    bl_description = 'Move the context group or color'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    direction_types = [
+        ('UP', 'Up', ''),
+        ('DOWN', 'Down', '')
+    ]
+
+    direction: EnumProperty(
+        items=direction_types, options={'HIDDEN'}
+    )
+
+    @override
+    def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         return True
