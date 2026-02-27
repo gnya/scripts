@@ -36,19 +36,21 @@ class ToonPaletteColor:
     @property
     def type(self) -> ToonPaletteColorTypes:
         socket = self._socket()
-        socket_type = self._socket_interface().bl_socket_idname
 
-        if socket_type == 'NodeSocketColor':
-            if len(socket.links) == 0:
+        if len(socket.links) == 0:
+            type = self._socket_interface().bl_socket_idname
+
+            if type == 'NodeSocketColor':
                 return 'COLOR'
-            else:
-                return 'TEXTURE'
-        elif socket_type == 'NodeSocketVector':
-            return 'VECTOR'
-        elif socket_type == 'NodeSocketFloat':
-            return 'VALUE'
+            elif type == 'NodeSocketVector':
+                return 'VECTOR'
+            elif type == 'NodeSocketFloat':
+                return 'VALUE'
+
+        if search_node(socket, 'ShaderNodeTexImage') is not None:
+            return 'TEXTURE'
         else:
-            raise ValueError(f'Unknown socket type. : {socket_type}')
+            raise ValueError(f'Unknown socket type. : {socket}')
 
     @type.setter
     def type(self, value: ToonPaletteColorTypes):
