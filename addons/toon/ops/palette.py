@@ -51,7 +51,7 @@ class VIEW3D_OT_toon_palette_add(Operator):
 class VIEW3D_OT_toon_palette_remove(ToonPaletteOperator):
     bl_idname = 'view3d.toon_palette_remove'
     bl_label = 'Remove Palette'
-    bl_description = 'Remove the palette'
+    bl_description = 'Remove the context palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
@@ -62,7 +62,7 @@ class VIEW3D_OT_toon_palette_remove(ToonPaletteOperator):
 class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
     bl_idname = 'view3d.toon_palette_add_group'
     bl_label = 'Add Palette Group'
-    bl_description = 'Add a empty palette group'
+    bl_description = 'Add a empty group to the context palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
@@ -82,7 +82,7 @@ class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
 class VIEW3D_OT_toon_palette_remove_group(ToonPaletteOperator):
     bl_idname = 'view3d.toon_palette_remove_group'
     bl_label = 'Remove Palette Group'
-    bl_description = 'Remove the palette group'
+    bl_description = 'Remove the context group from the context palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
@@ -103,7 +103,7 @@ class VIEW3D_OT_toon_palette_remove_group(ToonPaletteOperator):
 class VIEW3D_OT_toon_palette_add_color(ToonPaletteOperator):
     bl_idname = 'view3d.toon_palette_add_color'
     bl_label = 'Add Palette Color'
-    bl_description = 'Add a empty palette color'
+    bl_description = 'Add a color to the context palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
@@ -129,7 +129,7 @@ class VIEW3D_OT_toon_palette_add_color(ToonPaletteOperator):
 class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
     bl_idname = 'view3d.toon_palette_remove_color'
     bl_label = 'Remove Palette Color'
-    bl_description = 'Remove the palette color'
+    bl_description = 'Remove the context color from the context palette'
     bl_options = {'REGISTER', 'UNDO'}
 
     @override
