@@ -9,7 +9,7 @@ from toon.utils import change_socket_type
 from .utils import ToonPaletteColorTypes
 
 
-class ToonPaletteColor(object):
+class ToonPaletteColor:
     def __init__(self, index: int, node_tree: NodeTree) -> None:
         self.socket_index = index
         self.node_tree = node_tree

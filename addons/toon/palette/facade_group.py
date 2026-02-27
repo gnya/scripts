@@ -8,7 +8,7 @@ from .utils import is_palette
 from .utils import get_group_name
 
 
-class ToonPaletteGroup(object):
+class ToonPaletteGroup:
     def __init__(self, node_tree: NodeTree):
         self.node_tree = node_tree
 

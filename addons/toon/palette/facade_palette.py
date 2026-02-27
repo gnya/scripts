@@ -12,7 +12,7 @@ from .utils import get_palette_name
 from .utils import filter_node_trees
 
 
-class ToonPalette(object):
+class ToonPalette:
     def __init__(self, header: NodeTree, node_trees: list[NodeTree]):
         self.header = header
         self.node_trees = node_trees

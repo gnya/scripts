@@ -9,7 +9,7 @@ from .utils import build_node_tree_name
 from .utils import filter_node_trees
 
 
-class ToonPaletteFacade(object):
+class ToonPaletteFacade:
     @staticmethod
     def add(palette_name: str) -> bool:
         if palette_name == '':
