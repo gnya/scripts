@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator
 
-from .facade_group import ToonPaletteGroup
+from .group import ToonPaletteGroup
 from .utils import build_node_tree_name, get_palette_name
 
 if TYPE_CHECKING:

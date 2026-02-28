@@ -1,7 +1,7 @@
-from .facade import ToonPaletteFacade
-from .facade_color import ToonPaletteColor
-from .facade_group import ToonPaletteGroup
-from .facade_palette import ToonPalette
+from .color import ToonPaletteColor
+from .group import ToonPaletteGroup
+from .model import ToonPaletteFacade
+from .palette import ToonPalette
 from .utils import (
     color_type_to_int,
     get_group_name,

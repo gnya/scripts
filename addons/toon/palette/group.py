@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator
 
-from .facade_color import ToonPaletteColor
+from .color import ToonPaletteColor
 from .utils import get_group_name
 
 if TYPE_CHECKING:
