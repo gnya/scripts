@@ -1,10 +1,8 @@
 from typing import Any, Iterator, Literal
 
-from bpy.types import bpy_prop_array
-from bpy.types import Node, NodeSocket, NodeTree
+from bpy.types import Node, NodeSocket, NodeTree, bpy_prop_array
 
-from .node import node_itr, all_node_users_itr
-
+from .node import all_node_users_itr, node_itr
 
 SocketValue = int | float | list[int | float]
 SocketBinder = dict[str, tuple[SocketValue, list[NodeSocket]]]
@@ -27,10 +25,9 @@ def _rebind_outputs(node_tree: NodeTree, node: Node, old_id: int, new_id: int):
 
 
 def change_socket_type(
-    node_tree: NodeTree, socket_id: int,
-    type: str, in_out: Literal['IN', 'OUT']
+    node_tree: NodeTree, socket_id: int, type: str, in_out: Literal["IN", "OUT"]
 ):
-    if in_out == 'IN':
+    if in_out == "IN":
         sockets = node_tree.inputs
     else:
         sockets = node_tree.outputs
@@ -45,12 +42,12 @@ def change_socket_type(
     sockets.new(type, old_interface.name)
     new_id = len(sockets) - 1
 
-    if in_out == 'IN':
-        inner_node_type = 'NodeGroupInput'
+    if in_out == "IN":
+        inner_node_type = "NodeGroupInput"
         inner_rebinder = _rebind_outputs
         outer_rebinder = _rebind_inputs
     else:
-        inner_node_type = 'NodeGroupOutput'
+        inner_node_type = "NodeGroupOutput"
         inner_rebinder = _rebind_inputs
         outer_rebinder = _rebind_outputs
 
@@ -72,7 +69,7 @@ def _bind_sockets(
 ):
     for socket in sockets:
         if socket.enabled:
-            value = getattr(socket, 'default_value', None)
+            value = getattr(socket, "default_value", None)
 
             if isinstance(value, bpy_prop_array):
                 value = list(value)
@@ -100,7 +97,7 @@ def _rebind_sockets(
             value, binded_sockets = binder[socket.name]
 
             try:
-                setattr(socket, 'default_value', value)
+                setattr(socket, "default_value", value)
             except TypeError:
                 pass
             except AttributeError:
@@ -114,7 +111,7 @@ def _rebind_sockets(
                     node_tree.links.new(s, socket)
 
 
-class NodeLinkRebinder():
+class NodeLinkRebinder:
     def __init__(self, node: Node):
         self.node = node
         self.inputs: SocketBinder = {}

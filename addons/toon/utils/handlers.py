@@ -1,26 +1,24 @@
 from typing import Callable
 
 import bpy
-
 from bpy.app.handlers import depsgraph_update_post, load_post, persistent
 from bpy.types import Depsgraph, NodeTree, Object, Scene
 
+_object_last_names: dict[int, str] = {}
 
 object_rename_post: list[Callable[[Object, str], None]] = []
 node_group_update_post: list[Callable[[NodeTree], None]] = []
 
-_object_last_names: dict[int, str] = {}
-
 
 def _poll_object_rename(graph: Depsgraph) -> bool:
-    if graph.mode != 'VIEWPORT':
+    if graph.mode != "VIEWPORT":
         return False
 
     for update in graph.updates:
         if (
-            update.is_updated_geometry or
-            update.is_updated_shading or
-            update.is_updated_transform
+            update.is_updated_geometry
+            or update.is_updated_shading
+            or update.is_updated_transform
         ):
             return False
 
@@ -37,7 +35,7 @@ def _object_rename(graph: Depsgraph):
 
     for o in graph.objects:
         p = o.as_pointer()
-        last_name = _object_last_names.get(p, '')
+        last_name = _object_last_names.get(p, "")
         name = o.original.name
         last_names[p] = name
 
@@ -51,7 +49,7 @@ def _object_rename(graph: Depsgraph):
 
 
 def _poll_node_group_update(graph: Depsgraph) -> bool:
-    if graph.mode != 'VIEWPORT':
+    if graph.mode != "VIEWPORT":
         return False
 
     for update in graph.updates:
@@ -70,9 +68,9 @@ def _node_group_update(graph: Depsgraph):
 
         if not isinstance(update.id, NodeTree):
             continue
-        if origin.type != 'SHADER':
+        if origin.type != "SHADER":
             continue
-        elif origin.name == 'Shader Nodetree':
+        elif origin.name == "Shader Nodetree":
             continue
 
         for callback in node_group_update_post:

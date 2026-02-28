@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
+
 from toon.utils import override
 
 if TYPE_CHECKING:
@@ -9,9 +11,11 @@ from bpy.props import EnumProperty
 from bpy.types import Context, Operator
 
 from toon.palette import ToonPaletteFacade
-from toon.props import ToonPaletteSearchIndex
-from toon.props import ToonPaletteUIPaletteState
-from toon.props import ToonPaletteUIState
+from toon.props import (
+    ToonPaletteSearchIndex,
+    ToonPaletteUIPaletteState,
+    ToonPaletteUIState,
+)
 
 
 class ToonPaletteOperator(Operator):
@@ -20,39 +24,39 @@ class ToonPaletteOperator(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        if not hasattr(context, 'palette_state'):
-            return {'CANCELLED'}
+        if not hasattr(context, "palette_state"):
+            return {"CANCELLED"}
         elif not self._execute_impl(context.palette_state):
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
         ToonPaletteUIState.request_update()
         ToonPaletteSearchIndex.request_update()
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class VIEW3D_OT_toon_palette_add(Operator):
-    bl_idname = 'view3d.toon_palette_add'
-    bl_label = 'Add Palette'
-    bl_description = 'Add a empty palette'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_add"
+    bl_label = "Add Palette"
+    bl_description = "Add a empty palette"
+    bl_options = {"REGISTER", "UNDO"}
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        if not ToonPaletteFacade.add('Palette'):
-            return {'CANCELLED'}
+        if not ToonPaletteFacade.add("Palette"):
+            return {"CANCELLED"}
 
         ToonPaletteUIState.request_update()
         ToonPaletteSearchIndex.request_update()
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class VIEW3D_OT_toon_palette_remove(ToonPaletteOperator):
-    bl_idname = 'view3d.toon_palette_remove'
-    bl_label = 'Remove Palette'
-    bl_description = 'Remove the context palette'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_remove"
+    bl_label = "Remove Palette"
+    bl_description = "Remove the context palette"
+    bl_options = {"REGISTER", "UNDO"}
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
@@ -60,10 +64,10 @@ class VIEW3D_OT_toon_palette_remove(ToonPaletteOperator):
 
 
 class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
-    bl_idname = 'view3d.toon_palette_add_group'
-    bl_label = 'Add Palette Group'
-    bl_description = 'Add a empty group to the context palette'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_add_group"
+    bl_label = "Add Palette Group"
+    bl_description = "Add a empty group to the context palette"
+    bl_options = {"REGISTER", "UNDO"}
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
@@ -71,7 +75,7 @@ class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
 
         if palette is None:
             return False
-        elif not palette.add('Group'):
+        elif not palette.add("Group"):
             return False
 
         state.active_index = len(state.list_items)
@@ -80,10 +84,10 @@ class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
 
 
 class VIEW3D_OT_toon_palette_remove_group(ToonPaletteOperator):
-    bl_idname = 'view3d.toon_palette_remove_group'
-    bl_label = 'Remove Palette Group'
-    bl_description = 'Remove the context group from the context palette'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_remove_group"
+    bl_label = "Remove Palette Group"
+    bl_description = "Remove the context group from the context palette"
+    bl_options = {"REGISTER", "UNDO"}
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
@@ -101,10 +105,10 @@ class VIEW3D_OT_toon_palette_remove_group(ToonPaletteOperator):
 
 
 class VIEW3D_OT_toon_palette_add_color(ToonPaletteOperator):
-    bl_idname = 'view3d.toon_palette_add_color'
-    bl_label = 'Add Palette Color'
-    bl_description = 'Add a color to the context palette'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_add_color"
+    bl_label = "Add Palette Color"
+    bl_description = "Add a color to the context palette"
+    bl_options = {"REGISTER", "UNDO"}
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
@@ -117,7 +121,7 @@ class VIEW3D_OT_toon_palette_add_color(ToonPaletteOperator):
 
         if group is None:
             return False
-        elif not group.add('Color'):
+        elif not group.add("Color"):
             return False
 
         item.show_expanded = True
@@ -127,16 +131,16 @@ class VIEW3D_OT_toon_palette_add_color(ToonPaletteOperator):
 
 
 class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
-    bl_idname = 'view3d.toon_palette_remove_color'
-    bl_label = 'Remove Palette Color'
-    bl_description = 'Remove the context color from the context palette'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_remove_color"
+    bl_label = "Remove Palette Color"
+    bl_description = "Remove the context color from the context palette"
+    bl_options = {"REGISTER", "UNDO"}
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         item = state.active_item()
 
-        if item is None or item.type != 'COLOR':
+        if item is None or item.type != "COLOR":
             return False
 
         group = item.group_data()
@@ -153,19 +157,14 @@ class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
 
 
 class VIEW3D_OT_toon_palette_move(ToonPaletteOperator):
-    bl_idname = 'view3d.toon_palette_move'
-    bl_label = 'Move Palette'
-    bl_description = 'Move the context palette'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_move"
+    bl_label = "Move Palette"
+    bl_description = "Move the context palette"
+    bl_options = {"REGISTER", "UNDO"}
 
-    direction_types = [
-        ('UP', 'Up', ''),
-        ('DOWN', 'Down', '')
-    ]
+    direction_types = [("UP", "Up", ""), ("DOWN", "Down", "")]
 
-    direction: EnumProperty(
-        items=direction_types, options={'HIDDEN'}
-    )
+    direction: EnumProperty(items=direction_types, options={"HIDDEN"})
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
@@ -173,25 +172,20 @@ class VIEW3D_OT_toon_palette_move(ToonPaletteOperator):
 
 
 class VIEW3D_OT_toon_palette_move_item(ToonPaletteOperator):
-    bl_idname = 'view3d.toon_palette_move_item'
-    bl_label = 'Move Palette Item'
-    bl_description = 'Move the context group or color'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname = "view3d.toon_palette_move_item"
+    bl_label = "Move Palette Item"
+    bl_description = "Move the context group or color"
+    bl_options = {"REGISTER", "UNDO"}
 
-    direction_types = [
-        ('UP', 'Up', ''),
-        ('DOWN', 'Down', '')
-    ]
+    direction_types = [("UP", "Up", ""), ("DOWN", "Down", "")]
 
-    direction: EnumProperty(
-        items=direction_types, options={'HIDDEN'}
-    )
+    direction: EnumProperty(items=direction_types, options={"HIDDEN"})
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         item = state.active_item()
 
-        if item is None or item.type != 'COLOR':
+        if item is None or item.type != "COLOR":
             return False
 
         group = item.group_data()
@@ -199,7 +193,7 @@ class VIEW3D_OT_toon_palette_move_item(ToonPaletteOperator):
         if group is None:
             return False
 
-        offset = -1 if self.direction == 'UP' else 1
+        offset = -1 if self.direction == "UP" else 1
         index = item.socket_index
 
         if group.move(index, index + offset):

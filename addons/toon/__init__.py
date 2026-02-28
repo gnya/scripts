@@ -1,21 +1,15 @@
 bl_info = {
-    'name': 'Toon',
-    'author': 'gnya',
-    'version': (0, 1, 12),
-    'blender': (3, 6, 0),
-    'description':
-        'Add shader script wrappers and other features '
-        'to make the toon shader easier to use. (For my personal project.)',
-    'category': 'Material'
+    "name": "Toon",
+    "author": "gnya",
+    "version": (0, 1, 12),
+    "blender": (3, 6, 0),
+    "description": "Add shader script wrappers and other features "
+    "to make the toon shader easier to use. (For my personal project.)",
+    "category": "Material",
 }
 
 
-from . import nodes
-from . import ops
-from . import props
-from . import shaders
-from . import ui
-from . import utils
+from . import nodes, ops, props, shaders, ui, utils
 
 
 def register():

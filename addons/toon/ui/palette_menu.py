@@ -1,15 +1,16 @@
-from toon.utils import override
-
 from bpy.types import Context, Menu
 
-from toon.ops import VIEW3D_OT_toon_palette_add_group
-from toon.ops import VIEW3D_OT_toon_palette_remove_group
-from toon.ops import VIEW3D_OT_toon_palette_move
+from toon.ops import (
+    VIEW3D_OT_toon_palette_add_group,
+    VIEW3D_OT_toon_palette_move,
+    VIEW3D_OT_toon_palette_remove_group,
+)
+from toon.utils import override
 
 
 class VIEW3D_MT_toon_palette(Menu):
-    bl_idname = 'VIEW3D_MT_toon_palette_menu'
-    bl_label = 'Palette Specials'
+    bl_idname = "VIEW3D_MT_toon_palette_menu"
+    bl_label = "Palette Specials"
 
     @override
     def draw(self, context: Context):
@@ -25,30 +26,28 @@ class VIEW3D_MT_toon_palette(Menu):
         # )
         layout.separator()
         o = layout.operator(
-            VIEW3D_OT_toon_palette_move.bl_idname,
-            text='Move Palette', icon='TRIA_UP'
+            VIEW3D_OT_toon_palette_move.bl_idname, text="Move Palette", icon="TRIA_UP"
         )
-        o.direction = 'UP'
+        o.direction = "UP"
         o = layout.operator(
-            VIEW3D_OT_toon_palette_move.bl_idname,
-            text='Move Palette', icon='TRIA_DOWN'
+            VIEW3D_OT_toon_palette_move.bl_idname, text="Move Palette", icon="TRIA_DOWN"
         )
-        o.direction = 'DOWN'
+        o.direction = "DOWN"
 
 
 class VIEW3D_MT_toon_palette_group(Menu):
-    bl_idname = 'VIEW3D_MT_toon_palette_group_menu'
-    bl_label = 'Group Specials'
+    bl_idname = "VIEW3D_MT_toon_palette_group_menu"
+    bl_label = "Group Specials"
 
     @override
     def draw(self, context: Context):
         layout = self.layout
 
         layout.operator(
-            VIEW3D_OT_toon_palette_add_group.bl_idname,
-            text='Add Group', icon='ADD'
+            VIEW3D_OT_toon_palette_add_group.bl_idname, text="Add Group", icon="ADD"
         )
         layout.operator(
             VIEW3D_OT_toon_palette_remove_group.bl_idname,
-            text='Remove Group', icon='REMOVE'
+            text="Remove Group",
+            icon="REMOVE",
         )

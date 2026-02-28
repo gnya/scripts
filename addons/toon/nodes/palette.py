@@ -1,23 +1,23 @@
-from toon.utils import override
-
 from bpy.props import StringProperty
 from bpy.types import Context, ShaderNodeCustomGroup, UILayout
 
-from toon.palette import ToonPalette
-from toon.palette import ToonPaletteFacade
-from toon.palette import get_group_name
-from toon.palette import get_palette_name
+from toon.palette import (
+    ToonPalette,
+    ToonPaletteFacade,
+    get_group_name,
+    get_palette_name,
+)
 from toon.props import ToonPaletteSearchIndex
-from toon.utils import NodeLinkRebinder
+from toon.utils import NodeLinkRebinder, override
 
 
 class ToonNodePalette(ShaderNodeCustomGroup):
-    bl_idname = 'ToonNodePalette'
-    bl_label = 'Palette'
+    bl_idname = "ToonNodePalette"
+    bl_label = "Palette"
 
     def _get_palette_name(self) -> str:
         if self.node_tree is None:
-            return ''
+            return ""
 
         return get_palette_name(self.node_tree)
 
@@ -29,13 +29,12 @@ class ToonNodePalette(ShaderNodeCustomGroup):
                 self.node_tree = palette.header
 
     palette_name: StringProperty(
-        name='Palette Name',
-        get=_get_palette_name, set=_set_palette_name
+        name="Palette Name", get=_get_palette_name, set=_set_palette_name
     )
 
     def _get_group_name(self) -> str:
         if self.node_tree is None:
-            return ''
+            return ""
 
         return get_group_name(self.node_tree)
 
@@ -55,8 +54,7 @@ class ToonNodePalette(ShaderNodeCustomGroup):
                 self.node_tree = group.node_tree
 
     group_name: StringProperty(
-        name='Group Name',
-        get=_get_group_name, set=_set_group_name
+        name="Group Name", get=_get_group_name, set=_set_group_name
     )
 
     @override
@@ -64,16 +62,12 @@ class ToonNodePalette(ShaderNodeCustomGroup):
         states = ToonPaletteSearchIndex.current()
 
         layout.prop_search(
-            self, 'palette_name',
-            states, 'palettes',
-            text='', icon='COLOR'
+            self, "palette_name", states, "palettes", text="", icon="COLOR"
         )
 
         state = states.palettes.get(self.palette_name)
 
         if state is not None:
             layout.prop_search(
-                self, 'group_name',
-                state, 'groups',
-                text='', icon='GROUP'
+                self, "group_name", state, "groups", text="", icon="GROUP"
             )

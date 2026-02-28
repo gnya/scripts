@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import bpy
-
 from bpy.app.handlers import persistent, redo_post, undo_post
 from bpy.props import BoolProperty, CollectionProperty, PointerProperty
 from bpy.types import PropertyGroup, Scene, WindowManager
 
-from toon.palette import ToonPalette
-from toon.palette import ToonPaletteFacade
+from toon.palette import ToonPalette, ToonPaletteFacade
 
 
 class ToonPaletteSearchGroup(PropertyGroup):
@@ -26,7 +24,7 @@ class ToonPaletteSearchPalette(PropertyGroup):
 
 
 class ToonPaletteSearchIndex(PropertyGroup):
-    PROP_NAME = 'toon_palette_node_state'
+    PROP_NAME = "toon_palette_node_state"
 
     palettes: CollectionProperty(type=ToonPaletteSearchPalette)
 
@@ -73,8 +71,9 @@ class ToonPaletteSearchIndex(PropertyGroup):
     @staticmethod
     def register():
         setattr(
-            WindowManager, ToonPaletteSearchIndex.PROP_NAME,
-            PointerProperty(type=ToonPaletteSearchIndex)
+            WindowManager,
+            ToonPaletteSearchIndex.PROP_NAME,
+            PointerProperty(type=ToonPaletteSearchIndex),
         )
 
         redo_post.append(ToonPaletteSearchIndex._sync_state)

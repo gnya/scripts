@@ -1,33 +1,31 @@
-from toon.utils import override
-
 from bpy import types
 from bpy.types import Context, Panel
 
-from toon.ops import NODE_OT_toon_node_compile_all
-from toon.ops import NODE_OT_toon_node_reload_all
-from toon.ops import NODE_OT_toon_node_setup_osl_render
+from toon.ops import (
+    NODE_OT_toon_node_compile_all,
+    NODE_OT_toon_node_reload_all,
+    NODE_OT_toon_node_setup_osl_render,
+)
 from toon.props import ToonNodeSettings
+from toon.utils import override
 
 
 def _draw_pass_index_warning(self: Panel, context: Context):
-    if (
-        context.scene.render.engine == 'CYCLES' and
-        context.scene.cycles.shading_system
-    ):
+    if context.scene.render.engine == "CYCLES" and context.scene.cycles.shading_system:
         layout = self.layout
         warning_box = layout.box()
 
         warning_box.label(
-            text='Do not modify the pass index number directly.', icon='ERROR'
+            text="Do not modify the pass index number directly.", icon="ERROR"
         )
 
 
 class OBJECT_PT_toon_node(Panel):
-    bl_idname = 'OBJECT_PT_toon'
-    bl_label = 'Toon'
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = 'object'
+    bl_idname = "OBJECT_PT_toon"
+    bl_label = "Toon"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "object"
 
     @override
     def draw(self, context: Context):
@@ -40,9 +38,9 @@ class OBJECT_PT_toon_node(Panel):
 
         col = layout.column()
         col.use_property_split = True
-        col.prop(settings, 'cast_shadows', text='Cast Shadows')
-        col.prop(settings, 'shadow_id', text='Shadow ID')
-        col.prop(settings, 'transparent_id', text='Transparent ID')
+        col.prop(settings, "cast_shadows", text="Cast Shadows")
+        col.prop(settings, "shadow_id", text="Shadow ID")
+        col.prop(settings, "transparent_id", text="Transparent ID")
 
     @staticmethod
     def register():
@@ -54,11 +52,11 @@ class OBJECT_PT_toon_node(Panel):
 
 
 class MATERIAL_PT_toon_node(Panel):
-    bl_idname = 'MATERIAL_PT_toon'
-    bl_label = 'Toon'
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = 'material'
+    bl_idname = "MATERIAL_PT_toon"
+    bl_label = "Toon"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "material"
 
     @override
     def draw(self, context: Context):
@@ -74,38 +72,38 @@ class MATERIAL_PT_toon_node(Panel):
         col.use_property_split = True
 
         row = col.row()
-        row.prop(settings, 'cast_shadows', text='Cast Shadows')
+        row.prop(settings, "cast_shadows", text="Cast Shadows")
         row.active = int(object_settings.cast_shadows) == 0
 
         row = col.row()
-        row.prop(settings, 'shadow_id', text='Shadow ID')
+        row.prop(settings, "shadow_id", text="Shadow ID")
         row.active = object_settings.shadow_id == 0
 
         row = col.row()
-        row.prop(settings, 'transparent_id', text='Transparent ID')
+        row.prop(settings, "transparent_id", text="Transparent ID")
         row.active = object_settings.transparent_id == 0
 
     @staticmethod
     def register():
         types.EEVEE_MATERIAL_PT_viewport_settings.append(_draw_pass_index_warning)
 
-        if hasattr(types, 'CYCLES_MATERIAL_PT_settings'):
+        if hasattr(types, "CYCLES_MATERIAL_PT_settings"):
             types.CYCLES_MATERIAL_PT_settings.append(_draw_pass_index_warning)
 
     @staticmethod
     def unregister():
         types.EEVEE_MATERIAL_PT_viewport_settings.remove(_draw_pass_index_warning)
 
-        if hasattr(types, 'CYCLES_MATERIAL_PT_settings'):
+        if hasattr(types, "CYCLES_MATERIAL_PT_settings"):
             types.CYCLES_MATERIAL_PT_settings.remove(_draw_pass_index_warning)
 
 
 class VIEW3D_PT_toon_node(Panel):
-    bl_idname = 'VIEW3D_PT_toon_node'
-    bl_label = 'Shader'
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Toon'
+    bl_idname = "VIEW3D_PT_toon_node"
+    bl_label = "Shader"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Toon"
 
     @override
     def draw(self, context: Context):
@@ -113,13 +111,16 @@ class VIEW3D_PT_toon_node(Panel):
 
         layout.operator(
             NODE_OT_toon_node_setup_osl_render.bl_idname,
-            text='Setup OSL Render', icon='PREFERENCES'
+            text="Setup OSL Render",
+            icon="PREFERENCES",
         )
         layout.operator(
             NODE_OT_toon_node_reload_all.bl_idname,
-            text='Reload All Nodes', icon='FILE_REFRESH'
+            text="Reload All Nodes",
+            icon="FILE_REFRESH",
         )
         layout.operator(
             NODE_OT_toon_node_compile_all.bl_idname,
-            text='Compile All Shaders', icon='FILE_CACHE'
+            text="Compile All Shaders",
+            icon="FILE_CACHE",
         )

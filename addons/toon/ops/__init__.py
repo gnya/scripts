@@ -1,15 +1,18 @@
-from .node import NODE_OT_toon_node_compile_all
-from .node import NODE_OT_toon_node_reload_all
-from .node import NODE_OT_toon_node_setup_osl_render
-from .palette import VIEW3D_OT_toon_palette_add
-from .palette import VIEW3D_OT_toon_palette_remove
-from .palette import VIEW3D_OT_toon_palette_add_group
-from .palette import VIEW3D_OT_toon_palette_remove_group
-from .palette import VIEW3D_OT_toon_palette_add_color
-from .palette import VIEW3D_OT_toon_palette_remove_color
-from .palette import VIEW3D_OT_toon_palette_move
-from .palette import VIEW3D_OT_toon_palette_move_item
-
+from .node import (
+    NODE_OT_toon_node_compile_all,
+    NODE_OT_toon_node_reload_all,
+    NODE_OT_toon_node_setup_osl_render,
+)
+from .palette import (
+    VIEW3D_OT_toon_palette_add,
+    VIEW3D_OT_toon_palette_add_color,
+    VIEW3D_OT_toon_palette_add_group,
+    VIEW3D_OT_toon_palette_move,
+    VIEW3D_OT_toon_palette_move_item,
+    VIEW3D_OT_toon_palette_remove,
+    VIEW3D_OT_toon_palette_remove_color,
+    VIEW3D_OT_toon_palette_remove_group,
+)
 
 classes = (
     NODE_OT_toon_node_compile_all,
@@ -22,7 +25,7 @@ classes = (
     VIEW3D_OT_toon_palette_add_color,
     VIEW3D_OT_toon_palette_remove_color,
     VIEW3D_OT_toon_palette_move,
-    VIEW3D_OT_toon_palette_move_item
+    VIEW3D_OT_toon_palette_move_item,
 )
 
 

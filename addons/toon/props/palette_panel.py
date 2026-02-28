@@ -1,8 +1,8 @@
 from __future__ import annotations
+
 from typing import Any, Iterator
 
 import bpy
-
 from bpy.app.handlers import persistent, redo_post, undo_post
 from bpy.props import (
     BoolProperty,
@@ -10,25 +10,27 @@ from bpy.props import (
     EnumProperty,
     IntProperty,
     PointerProperty,
-    StringProperty
+    StringProperty,
 )
 from bpy.types import NodeTree, PropertyGroup, Scene, WindowManager
 
-from toon.palette import ToonPaletteColor
-from toon.palette import ToonPaletteGroup
-from toon.palette import ToonPalette
-from toon.palette import ToonPaletteFacade
-from toon.palette import color_type_to_int
-from toon.palette import int_to_color_type
-from toon.palette import get_palette_name
-from toon.palette import get_group_name
+from toon.palette import (
+    ToonPalette,
+    ToonPaletteColor,
+    ToonPaletteFacade,
+    ToonPaletteGroup,
+    color_type_to_int,
+    get_group_name,
+    get_palette_name,
+    int_to_color_type,
+)
 from toon.utils import node_group_update_post
 
 from .palette_node import ToonPaletteSearchIndex
 
 
 class ToonPaletteViewSettings(PropertyGroup):
-    PROP_NAME = 'toon_palette_view_settings'
+    PROP_NAME = "toon_palette_view_settings"
 
     active_index: IntProperty(default=-1)
 
@@ -41,8 +43,9 @@ class ToonPaletteViewSettings(PropertyGroup):
     @staticmethod
     def register():
         setattr(
-            NodeTree, ToonPaletteViewSettings.PROP_NAME,
-            PointerProperty(type=ToonPaletteViewSettings)
+            NodeTree,
+            ToonPaletteViewSettings.PROP_NAME,
+            PointerProperty(type=ToonPaletteViewSettings),
         )
 
     @staticmethod
@@ -51,10 +54,7 @@ class ToonPaletteViewSettings(PropertyGroup):
 
 
 class ToonPaletteUIItem(PropertyGroup):
-    item_types = [
-        ('GROUP', '', ''),
-        ('COLOR', '', '')
-    ]
+    item_types = [("GROUP", "", ""), ("COLOR", "", "")]
 
     type: EnumProperty(items=item_types)
 
@@ -73,15 +73,13 @@ class ToonPaletteUIItem(PropertyGroup):
 
             ToonPaletteSearchIndex.request_update()
 
-    group_name: StringProperty(
-        get=_get_group_name, set=_set_group_name
-    )
+    group_name: StringProperty(get=_get_group_name, set=_set_group_name)
 
     def _get_color_name(self) -> str:
         if (color := self.color_data()) is not None:
             return color.name
         else:
-            return ''
+            return ""
 
     def _set_color_name(self, value: str):
         if (color := self.color_data()) is not None:
@@ -89,15 +87,13 @@ class ToonPaletteUIItem(PropertyGroup):
         else:
             pass
 
-    color_name: StringProperty(
-        get=_get_color_name, set=_set_color_name
-    )
+    color_name: StringProperty(get=_get_color_name, set=_set_color_name)
 
     color_types = [
-        ('COLOR', 'Color', ''),
-        ('TEXTURE', 'Texture', ''),
-        ('VECTOR', 'Vector', ''),
-        ('VALUE', 'Value', '')
+        ("COLOR", "Color", ""),
+        ("TEXTURE", "Texture", ""),
+        ("VECTOR", "Vector", ""),
+        ("VALUE", "Value", ""),
     ]
 
     def _get_color_type(self) -> int:
@@ -113,9 +109,12 @@ class ToonPaletteUIItem(PropertyGroup):
             pass
 
     color_type: EnumProperty(
-        name='Type', description='Type of color',
-        items=color_types, default='COLOR',
-        get=_get_color_type, set=_set_color_type
+        name="Type",
+        description="Type of color",
+        items=color_types,
+        default="COLOR",
+        get=_get_color_type,
+        set=_set_color_type,
     )
 
     @property
@@ -123,21 +122,21 @@ class ToonPaletteUIItem(PropertyGroup):
         if (color := self.color_data()) is not None:
             return color.color_ptr
         else:
-            return None, ''
+            return None, ""
 
     @property
     def texture_ptr(self) -> tuple[Any, str]:
         if (color := self.color_data()) is not None:
             return color.texture_ptr
         else:
-            return None, ''
+            return None, ""
 
     @property
     def uv_map_ptr(self) -> tuple[Any, str]:
         if (color := self.color_data()) is not None:
             return color.uv_map_ptr
         else:
-            return None, ''
+            return None, ""
 
     def _view_settings(self) -> ToonPaletteViewSettings:
         return ToonPaletteViewSettings.instance(self.node_tree)
@@ -148,9 +147,7 @@ class ToonPaletteUIItem(PropertyGroup):
     def _set_show_expanded(self, value: bool):
         self._view_settings().show_expanded = value
 
-    show_expanded: BoolProperty(
-        get=_get_show_expanded, set=_set_show_expanded
-    )
+    show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
     header_index: IntProperty(default=-1)
 
@@ -164,19 +161,21 @@ class ToonPaletteUIItem(PropertyGroup):
             yield from group.colors()
 
     def color_data(self) -> ToonPaletteColor | None:
-        if self.type != 'COLOR' or self.socket_index < 0:
+        if self.type != "COLOR" or self.socket_index < 0:
             return None
 
         return ToonPaletteColor(self.socket_index, self.node_tree)
 
-    def init(self, group: ToonPaletteGroup, color: ToonPaletteColor | None, header_index: int):
+    def init(
+        self, group: ToonPaletteGroup, color: ToonPaletteColor | None, header_index: int
+    ):
         self.node_tree = group.node_tree
         self.header_index = header_index
 
         if color is None:
-            self.type = 'GROUP'
+            self.type = "GROUP"
         else:
-            self.type = 'COLOR'
+            self.type = "COLOR"
             self.socket_index = color.socket_index
 
     @staticmethod
@@ -232,9 +231,7 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
             ToonPaletteSearchIndex.request_update()
 
-    palette_name: StringProperty(
-        get=_get_palette_name, set=_set_palette_name
-    )
+    palette_name: StringProperty(get=_get_palette_name, set=_set_palette_name)
 
     def _view_settings(self) -> ToonPaletteViewSettings:
         return ToonPaletteViewSettings.instance(self.node_tree)
@@ -260,13 +257,9 @@ class ToonPaletteUIPaletteState(PropertyGroup):
         self._view_settings().show_expanded = value
 
     # TODO return: -1 ~ len(list_items) - 1
-    active_index: IntProperty(
-        get=_get_active_index, set=_set_active_index
-    )
+    active_index: IntProperty(get=_get_active_index, set=_set_active_index)
 
-    show_expanded: BoolProperty(
-        get=_get_show_expanded, set=_set_show_expanded
-    )
+    show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
     def active_item(self) -> ToonPaletteUIItem | None:
         if (index := self.active_index) < 0:
@@ -294,7 +287,7 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
 
 class ToonPaletteUIState(PropertyGroup):
-    PROP_NAME = 'toon_palette_ui_state'
+    PROP_NAME = "toon_palette_ui_state"
 
     list_states: CollectionProperty(type=ToonPaletteUIPaletteState)
 
@@ -342,8 +335,9 @@ class ToonPaletteUIState(PropertyGroup):
     @staticmethod
     def register():
         setattr(
-            WindowManager, ToonPaletteUIState.PROP_NAME,
-            PointerProperty(type=ToonPaletteUIState)
+            WindowManager,
+            ToonPaletteUIState.PROP_NAME,
+            PointerProperty(type=ToonPaletteUIState),
         )
 
         redo_post.append(ToonPaletteUIState._sync_state)

@@ -1,11 +1,11 @@
 from __future__ import annotations
+
 from typing import Iterator
 
 from bpy.types import NodeTree
 
 from .facade_color import ToonPaletteColor
-from .utils import is_palette
-from .utils import get_group_name
+from .utils import get_group_name, is_palette
 
 
 class ToonPaletteGroup:
@@ -20,17 +20,17 @@ class ToonPaletteGroup:
     def name(self, value: str):
         if value == self.name:
             return
-        elif value == '':
-            value = 'Group'
+        elif value == "":
+            value = "Group"
         else:
-            value = value.replace('|', '_')
+            value = value.replace("|", "_")
 
-        names = self.node_tree.name.split('|', 2)
+        names = self.node_tree.name.split("|", 2)
         names[2] = value
-        self.node_tree.name = '|'.join(names)
+        self.node_tree.name = "|".join(names)
 
     def add(self, color_name: str) -> bool:
-        self.node_tree.outputs.new('NodeSocketColor', color_name)
+        self.node_tree.outputs.new("NodeSocketColor", color_name)
         index = len(self.node_tree.outputs) - 1
         ToonPaletteColor(index, self.node_tree).init()
 
@@ -61,7 +61,7 @@ class ToonPaletteGroup:
         return True
 
     def init(self):
-        self.node_tree.nodes.new('NodeGroupOutput')
+        self.node_tree.nodes.new("NodeGroupOutput")
 
     @staticmethod
     def from_node_tree(node_tree: NodeTree) -> ToonPaletteGroup | None:

@@ -1,15 +1,12 @@
 from __future__ import annotations
+
 from typing import Iterator
 
 import bpy
-
 from bpy.types import NodeTree
 
 from .facade_group import ToonPaletteGroup
-from .utils import is_palette
-from .utils import build_node_tree_name
-from .utils import get_palette_name
-from .utils import filter_node_trees
+from .utils import build_node_tree_name, filter_node_trees, get_palette_name, is_palette
 
 
 class ToonPalette:
@@ -25,13 +22,13 @@ class ToonPalette:
     def name(self, value: str):
         if value == self.name:
             return
-        elif value == '':
-            value = 'Palette'
+        elif value == "":
+            value = "Palette"
         else:
-            value = value.replace('|', '_')
+            value = value.replace("|", "_")
 
-        name = build_node_tree_name(self.name, '')
-        new_name = build_node_tree_name(value, '', True)
+        name = build_node_tree_name(self.name, "")
+        new_name = build_node_tree_name(value, "", True)
 
         self.header.name = self.header.name.replace(name, new_name, 1)
 
@@ -39,11 +36,11 @@ class ToonPalette:
             node_tree.name = node_tree.name.replace(name, new_name, 1)
 
     def add(self, group_name: str) -> bool:
-        if group_name == '':
+        if group_name == "":
             return False
 
         name = build_node_tree_name(self.name, group_name)
-        node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
+        node_tree = bpy.data.node_groups.new(name, "ShaderNodeTree")
         node_tree.use_fake_user = True
         ToonPaletteGroup(node_tree).init()
 
@@ -52,7 +49,7 @@ class ToonPalette:
         return True
 
     def remove(self, group_name: str) -> bool:
-        if group_name == '':
+        if group_name == "":
             return False
 
         name = build_node_tree_name(self.name, group_name)
@@ -67,7 +64,7 @@ class ToonPalette:
 
     def get(self, group_name: str) -> ToonPaletteGroup | None:
         for node_tree in self.node_trees:
-            if node_tree.name.split('|', 2)[2] == group_name:
+            if node_tree.name.split("|", 2)[2] == group_name:
                 return ToonPaletteGroup(node_tree)
 
         return None
@@ -79,7 +76,7 @@ class ToonPalette:
     @staticmethod
     def from_node_tree(node_tree: NodeTree) -> ToonPalette | None:
         if is_palette(node_tree):
-            names = node_tree.name.split('|', 2)
+            names = node_tree.name.split("|", 2)
             node_trees = list(filter_node_trees(names[1]))
 
             return ToonPalette(node_trees[0], node_trees[1:])

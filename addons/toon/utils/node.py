@@ -1,11 +1,10 @@
 from typing import Iterator
 
 import bpy
-
 from bpy.types import ID, Node, NodeSocket, NodeTree
 
 
-def node_itr(node_tree: NodeTree, type: str = '') -> Iterator[Node]:
+def node_itr(node_tree: NodeTree, type: str = "") -> Iterator[Node]:
     if not type:
         for node in node_tree.nodes:
             yield node
@@ -17,7 +16,7 @@ def node_itr(node_tree: NodeTree, type: str = '') -> Iterator[Node]:
 
 def node_tree_itr(collection: Iterator[ID]) -> Iterator[Node]:
     for data in collection:
-        node_tree = getattr(data, 'node_tree', data)
+        node_tree = getattr(data, "node_tree", data)
 
         if not isinstance(node_tree, NodeTree):
             continue
@@ -37,7 +36,7 @@ def all_node_itr() -> Iterator[Node]:
 
 def all_node_users_itr(node_tree: NodeTree) -> Iterator[Node]:
     for node in all_node_itr():
-        if node_tree == getattr(node, 'node_tree', None):
+        if node_tree == getattr(node, "node_tree", None):
             yield node
 
 

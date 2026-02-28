@@ -1,19 +1,16 @@
-from toon.utils import override
-
 import bpy
-
 from bpy.props import BoolProperty
 from bpy.types import Context, NodeTree, ShaderNodeCustomGroup, UILayout
 
 from toon.ops import NODE_OT_toon_node_reload_all
-from toon.utils import NodeLinkRebinder
+from toon.utils import NodeLinkRebinder, override
 
 
 class ToonNode(ShaderNodeCustomGroup):
     node_ready: BoolProperty(default=False)
 
     def node_tree_key(self) -> tuple[str, str]:
-        return f'.{self.bl_idname}', ''
+        return f".{self.bl_idname}", ""
 
     def new_node_tree(self, name: str) -> tuple[NodeTree, bool]:
         raise NotImplementedError()
@@ -34,8 +31,8 @@ class ToonNode(ShaderNodeCustomGroup):
         if self.node_tree is None:
             return
 
-        if not self.node_tree.name.startswith('.ToonNodeObsolete'):
-            self.node_tree.name = f'.ToonNodeObsolete{self.node_tree.name}'
+        if not self.node_tree.name.startswith(".ToonNodeObsolete"):
+            self.node_tree.name = f".ToonNodeObsolete{self.node_tree.name}"
 
         with NodeLinkRebinder(self):
             self.free()
@@ -58,5 +55,6 @@ class ToonNode(ShaderNodeCustomGroup):
         if not self.node_ready:
             layout.operator(
                 NODE_OT_toon_node_reload_all.bl_idname,
-                text='Reload', icon='FILE_REFRESH'
+                text="Reload",
+                icon="FILE_REFRESH",
             )

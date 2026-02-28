@@ -1,52 +1,58 @@
 from typing import Any
-from toon.utils import override
 
 from bpy.props import StringProperty
 from bpy.types import Context, UILayout, UIList
 
-from toon.props import ToonPaletteUIItem
-from toon.props import ToonPaletteUIPaletteState
+from toon.props import ToonPaletteUIItem, ToonPaletteUIPaletteState
+from toon.utils import override
 
 
 class VIEW3D_UL_toon_palette_entry(UIList):
-    bl_idname = 'VIEW3D_UL_toon_palette_entry'
+    bl_idname = "VIEW3D_UL_toon_palette_entry"
 
     filter_name: StringProperty(
-        name='Filter by Name', default='', options={'TEXTEDIT_UPDATE'}
+        name="Filter by Name", default="", options={"TEXTEDIT_UPDATE"}
     )
 
     @override
     def draw_item(
-        self, context: Context, layout: UILayout, data: ToonPaletteUIPaletteState | None,
-        item: ToonPaletteUIItem | None, icon: int | None, active_data: Any,
-        active_property: str | None, index: int | None = 0, flt_flag: int | None = 0
+        self,
+        context: Context,
+        layout: UILayout,
+        data: ToonPaletteUIPaletteState | None,
+        item: ToonPaletteUIItem | None,
+        icon: int | None,
+        active_data: Any,
+        active_property: str | None,
+        index: int | None = 0,
+        flt_flag: int | None = 0,
     ):
         if data is None or item is None:
             return
 
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+        if self.layout_type in {"DEFAULT", "COMPACT"}:
             row = layout.row(align=True)
 
-            if item.type == 'GROUP':
-                i = 'DOWNARROW_HLT' if item.show_expanded else 'RIGHTARROW'
-                row.prop(item, 'show_expanded', text='', emboss=False, icon=i)
-                row.prop(item, 'group_name', text='', emboss=False)
-            elif item.type == 'COLOR':
+            if item.type == "GROUP":
+                i = "DOWNARROW_HLT" if item.show_expanded else "RIGHTARROW"
+                row.prop(item, "show_expanded", text="", emboss=False, icon=i)
+                row.prop(item, "group_name", text="", emboss=False)
+            elif item.type == "COLOR":
                 row.separator(factor=3.0)
                 left = row.row()
                 left.ui_units_x = 8.0
 
-                if item.color_type == 'COLOR':
-                    left.prop(*item.color_ptr, text='')
-                elif item.color_type == 'TEXTURE':
-                    left.prop(*item.texture_ptr, text='')
-                elif item.color_type == 'VECTOR':
-                    left.prop(*item.color_ptr, text='', slider=True)
-                elif item.color_type == 'VALUE':
-                    left.prop(*item.color_ptr, text='', slider=True)
+                if item.color_type == "COLOR":
+                    left.prop(*item.color_ptr, text="")
+                elif item.color_type == "TEXTURE":
+                    left.prop(*item.texture_ptr, text="")
+                elif item.color_type == "VECTOR":
+                    left.prop(*item.color_ptr, text="", slider=True)
+                elif item.color_type == "VALUE":
+                    left.prop(*item.color_ptr, text="", slider=True)
 
-                row.prop(item, 'color_name', text='', emboss=False)
-        elif self.layout_type in {'GRID'}:
+                row.prop(item, "color_name", text="", emboss=False)
+        elif self.layout_type in {"GRID"}:
             pass
 
     def _filter_name(self, name: str, filter_name: str):
@@ -56,7 +62,7 @@ class VIEW3D_UL_toon_palette_entry(UIList):
             return filter_name.lower() not in name.lower()
 
     def _filter_item(self, item: ToonPaletteUIItem) -> bool:
-        if item.type == 'GROUP':
+        if item.type == "GROUP":
             if not self.filter_name:
                 return True
 
@@ -66,7 +72,7 @@ class VIEW3D_UL_toon_palette_entry(UIList):
             for color in item.colors_data():
                 if self._filter_name(color.name, self.filter_name):
                     return True
-        elif item.type == 'COLOR':
+        elif item.type == "COLOR":
             if not self.filter_name:
                 return item.show_expanded
 

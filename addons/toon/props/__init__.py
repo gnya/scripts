@@ -1,12 +1,15 @@
 from .node import ToonNodeSettings
-from .palette_node import ToonPaletteSearchGroup
-from .palette_node import ToonPaletteSearchPalette
-from .palette_node import ToonPaletteSearchIndex
-from .palette_panel import ToonPaletteViewSettings
-from .palette_panel import ToonPaletteUIItem
-from .palette_panel import ToonPaletteUIPaletteState
-from .palette_panel import ToonPaletteUIState
-
+from .palette_node import (
+    ToonPaletteSearchGroup,
+    ToonPaletteSearchIndex,
+    ToonPaletteSearchPalette,
+)
+from .palette_panel import (
+    ToonPaletteUIItem,
+    ToonPaletteUIPaletteState,
+    ToonPaletteUIState,
+    ToonPaletteViewSettings,
+)
 
 __all__ = [
     ToonNodeSettings,
@@ -16,7 +19,7 @@ __all__ = [
     ToonPaletteViewSettings,
     ToonPaletteUIItem,
     ToonPaletteUIPaletteState,
-    ToonPaletteUIState
+    ToonPaletteUIState,
 ]
 
 
@@ -28,7 +31,7 @@ classes = (
     ToonPaletteViewSettings,
     ToonPaletteUIItem,
     ToonPaletteUIPaletteState,
-    ToonPaletteUIState
+    ToonPaletteUIState,
 )
 
 
