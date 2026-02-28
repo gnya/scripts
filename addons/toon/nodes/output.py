@@ -1,8 +1,13 @@
-from bpy.types import Node, NodeTree
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from toon.utils import override
 
 from .base import ToonNodeOSL
+
+if TYPE_CHECKING:
+    from bpy.types import Node, NodeTree
 
 
 class ToonNodeOutput(ToonNodeOSL):

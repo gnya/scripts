@@ -1,10 +1,13 @@
-from typing import Any
+from __future__ import annotations
 
-from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
+from typing import TYPE_CHECKING, Any
 
 from toon.utils import change_socket_type, remove_nodes, search_node
 
-from .utils import ToonPaletteColorTypes
+if TYPE_CHECKING:
+    from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
+
+    from .utils import ToonPaletteColorTypes
 
 
 class ToonPaletteColor:

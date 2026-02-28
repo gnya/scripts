@@ -1,4 +1,8 @@
-from bpy.types import Context, Menu
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from bpy.types import Menu
 
 from toon.ops import (
     VIEW3D_OT_toon_palette_add_group,
@@ -6,6 +10,9 @@ from toon.ops import (
     VIEW3D_OT_toon_palette_remove_group,
 )
 from toon.utils import override
+
+if TYPE_CHECKING:
+    from bpy.types import Context
 
 
 class VIEW3D_MT_toon_palette(Menu):

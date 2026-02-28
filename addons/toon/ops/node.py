@@ -2,15 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from toon.utils import override
+from bpy.types import Operator
+
+from toon.shaders import compile_all_shaders, register_shaders
+from toon.utils import all_node_itr, override
 
 if TYPE_CHECKING:
     from bpy._typing.rna_enums import OperatorReturnItems
-
-from bpy.types import Context, Operator
-
-from toon.shaders import compile_all_shaders, register_shaders
-from toon.utils import all_node_itr
+    from bpy.types import Context
 
 
 class NODE_OT_toon_node_reload_all(Operator):

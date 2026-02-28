@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import bpy
-from bpy.types import Node, NodeTree
 
 from toon.shaders import shader_filepath
 from toon.utils import override
 
 from .node import ToonNode
+
+if TYPE_CHECKING:
+    from bpy.types import Node, NodeTree
 
 
 class ToonNodeOSL(ToonNode):

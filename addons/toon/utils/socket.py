@@ -1,11 +1,15 @@
-from typing import Any, Iterator, Literal
+from __future__ import annotations
 
-from bpy.types import Node, NodeSocket, NodeTree, bpy_prop_array
+from typing import TYPE_CHECKING, Any, Iterator, Literal
+
+from bpy.types import bpy_prop_array
 
 from .node import all_node_users_itr, node_itr
 
-SocketValue = int | float | list[int | float]
-SocketBinder = dict[str, tuple[SocketValue, list[NodeSocket]]]
+if TYPE_CHECKING:
+    from bpy.types import Node, NodeSocket, NodeTree
+
+    _SocketBinder = dict[str, tuple[int | float | list[int | float], list[NodeSocket]]]
 
 
 def _rebind_inputs(node_tree: NodeTree, node: Node, old_id: int, new_id: int):
@@ -65,8 +69,9 @@ def change_socket_type(
 
 
 def _bind_sockets(
-    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: SocketBinder
+    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: _SocketBinder
 ):
+
     for socket in sockets:
         if socket.enabled:
             value = getattr(socket, "default_value", None)
@@ -90,7 +95,7 @@ def _bind_sockets(
 
 
 def _rebind_sockets(
-    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: SocketBinder
+    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: _SocketBinder
 ):
     for socket in sockets:
         if socket.enabled and socket.name in binder:
@@ -114,8 +119,8 @@ def _rebind_sockets(
 class NodeLinkRebinder:
     def __init__(self, node: Node):
         self.node = node
-        self.inputs: SocketBinder = {}
-        self.outputs: SocketBinder = {}
+        self.inputs: _SocketBinder = {}
+        self.outputs: _SocketBinder = {}
 
     def __enter__(self):
         node_tree = self.node.id_data

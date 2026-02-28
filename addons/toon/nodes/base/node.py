@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import bpy
 from bpy.props import BoolProperty
-from bpy.types import Context, NodeTree, ShaderNodeCustomGroup, UILayout
+from bpy.types import ShaderNodeCustomGroup
 
 from toon.ops import NODE_OT_toon_node_reload_all
 from toon.utils import NodeLinkRebinder, override
+
+if TYPE_CHECKING:
+    from bpy.types import Context, NodeTree, UILayout
 
 
 class ToonNode(ShaderNodeCustomGroup):

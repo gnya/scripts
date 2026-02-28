@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 from re import sub
-from typing import Iterator, Literal, get_args
+from typing import TYPE_CHECKING, Iterator, Literal, get_args
 
 import bpy
-from bpy.types import NodeTree
+
+if TYPE_CHECKING:
+    from bpy.types import NodeTree
 
 TOON_PALETTE_PREFIX = ".ToonPalette"
 

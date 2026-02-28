@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Iterator
-
-from bpy.types import NodeTree
+from typing import TYPE_CHECKING, Iterator
 
 from .facade_color import ToonPaletteColor
 from .utils import get_group_name, is_palette
+
+if TYPE_CHECKING:
+    from bpy.types import NodeTree
 
 
 class ToonPaletteGroup:

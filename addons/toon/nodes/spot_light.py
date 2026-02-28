@@ -1,10 +1,14 @@
-import math
+from __future__ import annotations
 
-from bpy.types import Node, NodeTree
+import math
+from typing import TYPE_CHECKING
 
 from toon.utils import override
 
 from .base import ToonNodeOSLLight
+
+if TYPE_CHECKING:
+    from bpy.types import Node, NodeTree
 
 
 class ToonNodeLightSpot(ToonNodeOSLLight):

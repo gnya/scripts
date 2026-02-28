@@ -1,10 +1,16 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from bpy.props import StringProperty
-from bpy.types import Context, UILayout, UIList
+from bpy.types import UIList
 
-from toon.props import ToonPaletteUIItem, ToonPaletteUIPaletteState
 from toon.utils import override
+
+if TYPE_CHECKING:
+    from bpy.types import Context, UILayout
+
+    from toon.props import ToonPaletteUIItem, ToonPaletteUIPaletteState
 
 
 class VIEW3D_UL_toon_palette_entry(UIList):

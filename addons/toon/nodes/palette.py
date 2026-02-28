@@ -1,5 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from bpy.props import StringProperty
-from bpy.types import Context, ShaderNodeCustomGroup, UILayout
+from bpy.types import ShaderNodeCustomGroup
 
 from toon.palette import (
     ToonPalette,
@@ -9,6 +13,9 @@ from toon.palette import (
 )
 from toon.props import ToonPaletteSearchIndex
 from toon.utils import NodeLinkRebinder, override
+
+if TYPE_CHECKING:
+    from bpy.types import Context, UILayout
 
 
 class ToonNodePalette(ShaderNodeCustomGroup):

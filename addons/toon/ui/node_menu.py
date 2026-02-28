@@ -1,4 +1,8 @@
-from bpy.types import Context, Menu, Node, UILayout
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from bpy.types import Menu, Node
 
 from toon.nodes import (
     ToonNodeHSVJitter,
@@ -15,6 +19,9 @@ from toon.nodes import (
     ToonNodeVisualize,
 )
 from toon.utils import override
+
+if TYPE_CHECKING:
+    from bpy.types import Context, UILayout
 
 
 class NODE_MT_toon_node_category(Menu):

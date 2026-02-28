@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import bpy
 from bpy.app.handlers import persistent, redo_post, undo_post
 from bpy.props import BoolProperty, CollectionProperty, PointerProperty
-from bpy.types import PropertyGroup, Scene, WindowManager
+from bpy.types import PropertyGroup, WindowManager
 
-from toon.palette import ToonPalette, ToonPaletteFacade
+from toon.palette import ToonPaletteFacade
+
+if TYPE_CHECKING:
+    from bpy.types import Scene
+
+    from toon.palette import ToonPalette
 
 
 class ToonPaletteSearchGroup(PropertyGroup):

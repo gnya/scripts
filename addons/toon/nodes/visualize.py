@@ -1,9 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from bpy.props import EnumProperty
-from bpy.types import Context, Node, NodeTree, UILayout
 
 from toon.utils import NodeLinkRebinder, override
 
 from .base import ToonNodeOSL
+
+if TYPE_CHECKING:
+    from bpy.types import Context, Node, NodeTree, UILayout
 
 
 class ToonNodeVisualize(ToonNodeOSL):

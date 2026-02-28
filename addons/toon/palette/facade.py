@@ -1,10 +1,14 @@
-from typing import Iterator
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Iterator
 
 import bpy
-from bpy.types import NodeTree
 
 from .facade_palette import ToonPalette
 from .utils import build_node_tree_name, filter_node_trees
+
+if TYPE_CHECKING:
+    from bpy.types import NodeTree
 
 
 class ToonPaletteFacade:

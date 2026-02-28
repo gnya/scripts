@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Iterator
+from typing import TYPE_CHECKING, Any, Iterator
 
 import bpy
 from bpy.app.handlers import persistent, redo_post, undo_post
@@ -12,7 +12,7 @@ from bpy.props import (
     PointerProperty,
     StringProperty,
 )
-from bpy.types import NodeTree, PropertyGroup, Scene, WindowManager
+from bpy.types import NodeTree, PropertyGroup, WindowManager
 
 from toon.palette import (
     ToonPalette,
@@ -27,6 +27,9 @@ from toon.palette import (
 from toon.utils import node_group_update_post
 
 from .palette_node import ToonPaletteSearchIndex
+
+if TYPE_CHECKING:
+    from bpy.types import Scene
 
 
 class ToonPaletteViewSettings(PropertyGroup):

@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import re
+from typing import TYPE_CHECKING
 
 import bpy
 from bpy.props import PointerProperty, StringProperty
-from bpy.types import Context, Node, NodeTree, Object, UILayout
+from bpy.types import Object
 
 from toon.utils import NodeLinkRebinder, object_rename_post, override
 
 from .osl import ToonNodeOSL
+
+if TYPE_CHECKING:
+    from bpy.types import Context, Node, NodeTree, UILayout
 
 
 class ToonNodeOSLLight(ToonNodeOSL):

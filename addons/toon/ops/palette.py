@@ -2,20 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from bpy.props import EnumProperty
+from bpy.types import Operator
+
+from toon.palette import ToonPaletteFacade
+from toon.props import ToonPaletteSearchIndex, ToonPaletteUIState
 from toon.utils import override
 
 if TYPE_CHECKING:
     from bpy._typing.rna_enums import OperatorReturnItems
+    from bpy.types import Context
 
-from bpy.props import EnumProperty
-from bpy.types import Context, Operator
-
-from toon.palette import ToonPaletteFacade
-from toon.props import (
-    ToonPaletteSearchIndex,
-    ToonPaletteUIPaletteState,
-    ToonPaletteUIState,
-)
+    from toon.props import ToonPaletteUIPaletteState
 
 
 class ToonPaletteOperator(Operator):

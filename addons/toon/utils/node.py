@@ -1,7 +1,12 @@
-from typing import Iterator
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Iterator
 
 import bpy
-from bpy.types import ID, Node, NodeSocket, NodeTree
+from bpy.types import NodeTree
+
+if TYPE_CHECKING:
+    from bpy.types import ID, Node, NodeSocket
 
 
 def node_itr(node_tree: NodeTree, type: str = "") -> Iterator[Node]:

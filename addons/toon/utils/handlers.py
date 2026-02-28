@@ -1,8 +1,13 @@
-from typing import Callable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Callable
 
 import bpy
 from bpy.app.handlers import depsgraph_update_post, load_post, persistent
-from bpy.types import Depsgraph, NodeTree, Object, Scene
+from bpy.types import NodeTree
+
+if TYPE_CHECKING:
+    from bpy.types import Depsgraph, Object, Scene
 
 _object_last_names: dict[int, str] = {}
 

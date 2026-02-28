@@ -1,4 +1,8 @@
-from bpy.types import Context, Panel, UILayout
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from bpy.types import Panel
 
 from toon.ops import (
     VIEW3D_OT_toon_palette_add,
@@ -7,11 +11,16 @@ from toon.ops import (
     VIEW3D_OT_toon_palette_remove,
     VIEW3D_OT_toon_palette_remove_color,
 )
-from toon.props import ToonPaletteUIPaletteState, ToonPaletteUIState
+from toon.props import ToonPaletteUIState
 from toon.utils import override
 
 from .palette_list import VIEW3D_UL_toon_palette_entry
 from .palette_menu import VIEW3D_MT_toon_palette, VIEW3D_MT_toon_palette_group
+
+if TYPE_CHECKING:
+    from bpy.types import Context, UILayout
+
+    from toon.props import ToonPaletteUIPaletteState
 
 
 class VIEW3D_PT_toon_palette(Panel):

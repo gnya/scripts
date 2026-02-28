@@ -1,5 +1,8 @@
-from bpy import types
-from bpy.types import Context, Panel
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from bpy.types import Panel
 
 from toon.ops import (
     NODE_OT_toon_node_compile_all,
@@ -8,6 +11,9 @@ from toon.ops import (
 )
 from toon.props import ToonNodeSettings
 from toon.utils import override
+
+if TYPE_CHECKING:
+    from bpy.types import Context
 
 
 def _draw_pass_index_warning(self: Panel, context: Context):
@@ -44,11 +50,15 @@ class OBJECT_PT_toon_node(Panel):
 
     @staticmethod
     def register():
-        types.OBJECT_PT_relations.append(_draw_pass_index_warning)
+        from bpy.types import OBJECT_PT_relations
+
+        OBJECT_PT_relations.append(_draw_pass_index_warning)
 
     @staticmethod
     def unregister():
-        types.OBJECT_PT_relations.remove(_draw_pass_index_warning)
+        from bpy.types import OBJECT_PT_relations
+
+        OBJECT_PT_relations.remove(_draw_pass_index_warning)
 
 
 class MATERIAL_PT_toon_node(Panel):
@@ -85,14 +95,20 @@ class MATERIAL_PT_toon_node(Panel):
 
     @staticmethod
     def register():
-        types.EEVEE_MATERIAL_PT_viewport_settings.append(_draw_pass_index_warning)
+        from bpy import types
+        from bpy.types import EEVEE_MATERIAL_PT_viewport_settings
+
+        EEVEE_MATERIAL_PT_viewport_settings.append(_draw_pass_index_warning)
 
         if hasattr(types, "CYCLES_MATERIAL_PT_settings"):
             types.CYCLES_MATERIAL_PT_settings.append(_draw_pass_index_warning)
 
     @staticmethod
     def unregister():
-        types.EEVEE_MATERIAL_PT_viewport_settings.remove(_draw_pass_index_warning)
+        from bpy import types
+        from bpy.types import EEVEE_MATERIAL_PT_viewport_settings
+
+        EEVEE_MATERIAL_PT_viewport_settings.remove(_draw_pass_index_warning)
 
         if hasattr(types, "CYCLES_MATERIAL_PT_settings"):
             types.CYCLES_MATERIAL_PT_settings.remove(_draw_pass_index_warning)
