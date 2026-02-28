@@ -36,11 +36,11 @@ class ToonPaletteGroup:
 
         return True
 
-    def remove(self, socket_index: int) -> bool:
-        if socket_index < 0 or socket_index >= len(self.node_tree.outputs):
+    def remove(self, index: int) -> bool:
+        if index < 0 or index >= len(self.node_tree.outputs):
             return False
 
-        socket = self.node_tree.outputs[socket_index]
+        socket = self.node_tree.outputs[index]
         self.node_tree.outputs.remove(socket)
 
         return True
@@ -48,6 +48,17 @@ class ToonPaletteGroup:
     def colors(self) -> Iterator[ToonPaletteColor]:
         for index in range(len(self.node_tree.outputs)):
             yield ToonPaletteColor(index, self.node_tree)
+
+    def move(self, src_index: int, dst_index: int) -> bool:
+        if src_index < 0 or src_index >= len(self.node_tree.outputs):
+            return False
+
+        if dst_index < 0 or dst_index >= len(self.node_tree.outputs):
+            return False
+
+        self.node_tree.outputs.move(src_index, dst_index)
+
+        return True
 
     def init(self):
         self.node_tree.nodes.new('NodeGroupOutput')

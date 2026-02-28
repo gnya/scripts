@@ -189,4 +189,20 @@ class VIEW3D_OT_toon_palette_move_item(ToonPaletteOperator):
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        item = state.active_item()
+
+        if item is None or item.type != 'COLOR':
+            return False
+
+        group = item.group_data()
+
+        if group is None:
+            return False
+
+        offset = -1 if self.direction == 'UP' else 1
+        index = item.socket_index
+
+        if group.move(index, index + offset):
+            state.active_index += offset
+
         return True
