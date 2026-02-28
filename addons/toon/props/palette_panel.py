@@ -182,7 +182,7 @@ class ToonPaletteUIItem(PropertyGroup):
             self.socket_index = color.socket_index
 
     @staticmethod
-    def _update_texture_uv_snap(node_tree: NodeTree):
+    def _update_all_texture_uv_snap(node_tree: NodeTree):
         group = ToonPaletteGroup.from_node_tree(node_tree)
 
         if group is None:
@@ -209,13 +209,13 @@ class ToonPaletteUIItem(PropertyGroup):
 
     @classmethod
     def register(cls):
-        if ToonPaletteUIItem._update_texture_uv_snap not in node_group_update_post:
-            node_group_update_post.append(ToonPaletteUIItem._update_texture_uv_snap)
+        if ToonPaletteUIItem._update_all_texture_uv_snap not in node_group_update_post:
+            node_group_update_post.append(ToonPaletteUIItem._update_all_texture_uv_snap)
 
     @staticmethod
     def unregister():
-        if ToonPaletteUIItem._update_texture_uv_snap in node_group_update_post:
-            node_group_update_post.remove(ToonPaletteUIItem._update_texture_uv_snap)
+        if ToonPaletteUIItem._update_all_texture_uv_snap in node_group_update_post:
+            node_group_update_post.remove(ToonPaletteUIItem._update_all_texture_uv_snap)
 
 
 class ToonPaletteUIPaletteState(PropertyGroup):
