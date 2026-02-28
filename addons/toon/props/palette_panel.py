@@ -51,6 +51,8 @@ class ToonPaletteViewSettings(PropertyGroup):
 
     show_expanded: BoolProperty(default=True)
 
+    order: IntProperty(default=-1)
+
     @staticmethod
     def instance(id: NodeTree) -> ToonPaletteViewSettings:
         return getattr(id, ToonPaletteViewSettings.PROP_NAME)
@@ -66,6 +68,10 @@ class ToonPaletteViewSettings(PropertyGroup):
     @staticmethod
     def unregister():
         delattr(NodeTree, ToonPaletteViewSettings.PROP_NAME)
+
+
+def get_view_settings(node_tree: NodeTree) -> ToonPaletteViewSettings:
+    return ToonPaletteViewSettings.instance(node_tree)
 
 
 class ToonPaletteUIItem(PropertyGroup):
@@ -121,16 +127,21 @@ class ToonPaletteUIItem(PropertyGroup):
     def uv_map_ptr(self) -> tuple[Any, str]:
         return get_uv_map_ptr(self.node_tree, self.socket_index)
 
-    def _view_settings(self) -> ToonPaletteViewSettings:
-        return ToonPaletteViewSettings.instance(self.node_tree)
-
     def _get_show_expanded(self) -> bool:
-        return self._view_settings().show_expanded
+        return get_view_settings(self.node_tree).show_expanded
 
     def _set_show_expanded(self, value: bool):
-        self._view_settings().show_expanded = value
+        get_view_settings(self.node_tree).show_expanded = value
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
+
+    def _get_order(self) -> int:
+        return get_view_settings(self.node_tree).order
+
+    def _set_order(self, value: int):
+        get_view_settings(self.node_tree).order = value
+
+    order: IntProperty(get=_get_order, set=_set_order)
 
     header_index: IntProperty(default=-1)
 
@@ -181,11 +192,8 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     palette_name: StringProperty(get=_get_palette_name, set=_set_palette_name)
 
-    def _view_settings(self) -> ToonPaletteViewSettings:
-        return ToonPaletteViewSettings.instance(self.node_tree)
-
     def _get_active_index(self) -> int:
-        index = self._view_settings().active_index
+        index = get_view_settings(self.node_tree).active_index
         index = min(index, len(self.list_items) - 1)
 
         if index < 0:
@@ -196,24 +204,35 @@ class ToonPaletteUIPaletteState(PropertyGroup):
             return index
 
     def _set_active_index(self, value: int):
-        self._view_settings().active_index = value
-
-    def _get_show_expanded(self) -> bool:
-        return self._view_settings().show_expanded
-
-    def _set_show_expanded(self, value: bool):
-        self._view_settings().show_expanded = value
+        get_view_settings(self.node_tree).active_index = value
 
     # TODO return: -1 ~ len(list_items) - 1
     active_index: IntProperty(get=_get_active_index, set=_set_active_index)
 
+    def _get_show_expanded(self) -> bool:
+        return get_view_settings(self.node_tree).show_expanded
+
+    def _set_show_expanded(self, value: bool):
+        get_view_settings(self.node_tree).show_expanded = value
+
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
+
+    def _get_order(self) -> int:
+        return get_view_settings(self.node_tree).order
+
+    def _set_order(self, value: int):
+        get_view_settings(self.node_tree).order = value
+
+    order: IntProperty(get=_get_order, set=_set_order)
 
     def active_item(self) -> ToonPaletteUIItem | None:
         if (index := self.active_index) < 0:
             return None
         else:
             return self.list_items[index]
+
+    def palette_data(self) -> ToonPalette | None:
+        return get_palette(self.node_tree)
 
     def init(self, palette: ToonPalette):
         self.node_tree = palette.header
@@ -229,9 +248,6 @@ class ToonPaletteUIPaletteState(PropertyGroup):
                 item.init(group, color, header_index)
 
             header_index += len(colors) + 1
-
-    def palette_data(self) -> ToonPalette | None:
-        return get_palette(self.node_tree)
 
 
 class ToonPaletteUIState(PropertyGroup):
