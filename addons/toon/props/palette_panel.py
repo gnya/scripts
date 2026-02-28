@@ -15,15 +15,24 @@ from bpy.props import (
 from bpy.types import NodeTree, PropertyGroup, WindowManager
 
 from toon.palette import (
-    ToonPalette,
-    ToonPaletteColor,
-    ToonPaletteFacade,
-    ToonPaletteGroup,
-    color_type_to_int,
+    color_types,
+    get_color,
+    get_color_name,
+    get_color_ptr,
+    get_color_type,
+    get_colors,
+    get_group,
     get_group_name,
+    get_palette,
     get_palette_name,
-    int_to_color_type,
-    is_palette,
+    get_palettes,
+    get_texture_ptr,
+    get_uv_map_ptr,
+    set_color_name,
+    set_color_type,
+    set_group_name,
+    set_palette_name,
+    update_all_uv_pixel_snap,
 )
 from toon.utils import node_group_update_post
 
@@ -31,6 +40,8 @@ from .palette_node import ToonPaletteSearchIndex
 
 if TYPE_CHECKING:
     from bpy.types import Scene
+
+    from toon.palette import ToonPalette, ToonPaletteColor, ToonPaletteGroup
 
 
 class ToonPaletteViewSettings(PropertyGroup):
@@ -70,50 +81,29 @@ class ToonPaletteUIItem(PropertyGroup):
         return get_group_name(self.node_tree)
 
     def _set_group_name(self, value: str):
-        group = ToonPaletteGroup(self.node_tree)
-        group.name = value
-
+        set_group_name(self.node_tree, value)
         ToonPaletteSearchIndex.request_update()
 
     group_name: StringProperty(get=_get_group_name, set=_set_group_name)
 
     def _get_color_name(self) -> str:
-        if (color := self.color_data()) is not None:
-            return color.name
-        else:
-            return ""
+        return get_color_name(self.node_tree, self.socket_index)
 
     def _set_color_name(self, value: str):
-        if (color := self.color_data()) is not None:
-            color.name = value
-        else:
-            pass
+        set_color_name(self.node_tree, self.socket_index, value)
 
     color_name: StringProperty(get=_get_color_name, set=_set_color_name)
 
-    color_types = [
-        ("COLOR", "Color", ""),
-        ("TEXTURE", "Texture", ""),
-        ("VECTOR", "Vector", ""),
-        ("VALUE", "Value", ""),
-    ]
-
     def _get_color_type(self) -> int:
-        if (color := self.color_data()) is not None:
-            return color_type_to_int(color.type)
-        else:
-            return -1
+        return get_color_type(self.node_tree, self.socket_index)
 
     def _set_color_type(self, value: int):
-        if (color := self.color_data()) is not None:
-            color.type = int_to_color_type(value)
-        else:
-            pass
+        set_color_type(self.node_tree, self.socket_index, value)
 
     color_type: EnumProperty(
         name="Type",
         description="Type of color",
-        items=color_types,
+        items=color_types(),
         default="COLOR",
         get=_get_color_type,
         set=_set_color_type,
@@ -121,24 +111,15 @@ class ToonPaletteUIItem(PropertyGroup):
 
     @property
     def color_ptr(self) -> tuple[Any, str]:
-        if (color := self.color_data()) is not None:
-            return color.color_ptr
-        else:
-            return None, ""
+        return get_color_ptr(self.node_tree, self.socket_index)
 
     @property
     def texture_ptr(self) -> tuple[Any, str]:
-        if (color := self.color_data()) is not None:
-            return color.texture_ptr
-        else:
-            return None, ""
+        return get_texture_ptr(self.node_tree, self.socket_index)
 
     @property
     def uv_map_ptr(self) -> tuple[Any, str]:
-        if (color := self.color_data()) is not None:
-            return color.uv_map_ptr
-        else:
-            return None, ""
+        return get_uv_map_ptr(self.node_tree, self.socket_index)
 
     def _view_settings(self) -> ToonPaletteViewSettings:
         return ToonPaletteViewSettings.instance(self.node_tree)
@@ -154,19 +135,13 @@ class ToonPaletteUIItem(PropertyGroup):
     header_index: IntProperty(default=-1)
 
     def group_data(self) -> ToonPaletteGroup | None:
-        return ToonPaletteGroup(self.node_tree)
+        return get_group(self.node_tree)
 
     def colors_data(self) -> Iterator[ToonPaletteColor]:
-        group = self.group_data()
-
-        if group is not None:
-            yield from group.colors()
+        return get_colors(self.node_tree)
 
     def color_data(self) -> ToonPaletteColor | None:
-        if self.type != "COLOR" or self.socket_index < 0:
-            return None
-
-        return ToonPaletteColor(self.socket_index, self.node_tree)
+        return get_color(self.node_tree, self.socket_index)
 
     def init(
         self, group: ToonPaletteGroup, color: ToonPaletteColor | None, header_index: int
@@ -176,45 +151,20 @@ class ToonPaletteUIItem(PropertyGroup):
 
         if color is None:
             self.type = "GROUP"
+            self.socket_index = -1
         else:
             self.type = "COLOR"
             self.socket_index = color.socket_index
 
-    @staticmethod
-    def _update_all_texture_uv_snap(node_tree: NodeTree):
-        if not is_palette(node_tree):
-            return
-
-        group = ToonPaletteGroup(node_tree)
-
-        for color in group.colors():
-            data, prop = color.texture_ptr
-
-            if data is None:
-                continue
-
-            tex = getattr(data, prop)
-
-            if tex is None:
-                continue
-
-            (data_w, prop_w), (data_h, prop_h) = color.uv_pixel_snap_ptr
-
-            if data_w is None or data_h is None:
-                continue
-
-            setattr(data_w, prop_w, tex.size[0])
-            setattr(data_h, prop_h, tex.size[1])
-
     @classmethod
     def register(cls):
-        if ToonPaletteUIItem._update_all_texture_uv_snap not in node_group_update_post:
-            node_group_update_post.append(ToonPaletteUIItem._update_all_texture_uv_snap)
+        if update_all_uv_pixel_snap not in node_group_update_post:
+            node_group_update_post.append(update_all_uv_pixel_snap)
 
     @staticmethod
     def unregister():
-        if ToonPaletteUIItem._update_all_texture_uv_snap in node_group_update_post:
-            node_group_update_post.remove(ToonPaletteUIItem._update_all_texture_uv_snap)
+        if update_all_uv_pixel_snap in node_group_update_post:
+            node_group_update_post.remove(update_all_uv_pixel_snap)
 
 
 class ToonPaletteUIPaletteState(PropertyGroup):
@@ -226,13 +176,8 @@ class ToonPaletteUIPaletteState(PropertyGroup):
         return get_palette_name(self.node_tree)
 
     def _set_palette_name(self, value: str):
-        facade = ToonPaletteFacade(bpy.data.node_groups)
-        palette = facade.get(self.palette_name)
-
-        if palette is not None:
-            palette.name = value
-
-            ToonPaletteSearchIndex.request_update()
+        set_palette_name(self.node_tree, value)
+        ToonPaletteSearchIndex.request_update()
 
     palette_name: StringProperty(get=_get_palette_name, set=_set_palette_name)
 
@@ -286,9 +231,7 @@ class ToonPaletteUIPaletteState(PropertyGroup):
             header_index += len(colors) + 1
 
     def palette_data(self) -> ToonPalette | None:
-        facade = ToonPaletteFacade(bpy.data.node_groups)
-
-        return facade.get(self.palette_name)
+        return get_palette(self.node_tree)
 
 
 class ToonPaletteUIState(PropertyGroup):
@@ -304,9 +247,7 @@ class ToonPaletteUIState(PropertyGroup):
 
         self.list_states.clear()
 
-        facade = ToonPaletteFacade(bpy.data.node_groups)
-
-        for palette in facade.palettes():
+        for palette in get_palettes():
             # TODO Consider orphan groups.
             if palette.header is not None:
                 state = self.list_states.add()

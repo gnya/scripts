@@ -7,7 +7,7 @@ from bpy.app.handlers import persistent, redo_post, undo_post
 from bpy.props import BoolProperty, CollectionProperty, PointerProperty
 from bpy.types import PropertyGroup, WindowManager
 
-from toon.palette import ToonPaletteFacade
+from toon.palette import get_palettes
 
 if TYPE_CHECKING:
     from bpy.types import Scene
@@ -43,9 +43,7 @@ class ToonPaletteSearchIndex(PropertyGroup):
 
         self.palettes.clear()
 
-        facade = ToonPaletteFacade(bpy.data.node_groups)
-
-        for palette in facade.palettes():
+        for palette in get_palettes():
             # TODO Consider orphan groups.
             if palette.header is not None:
                 state = self.palettes.add()

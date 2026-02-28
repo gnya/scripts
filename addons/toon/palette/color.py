@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 
 class ToonPaletteColor:
-    def __init__(self, index: int, node_tree: NodeTree) -> None:
-        self.socket_index = index
+    def __init__(self, node_tree: NodeTree, index: int) -> None:
         self.node_tree = node_tree
+        self.socket_index = index
 
     @property
     def name(self) -> str:

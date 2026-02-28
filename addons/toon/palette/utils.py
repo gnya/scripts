@@ -20,9 +20,21 @@ def int_to_color_type(type: int) -> ToonPaletteColorTypes:
 
 
 def is_palette(node_tree: NodeTree):
+    if node_tree is None:
+        return False
+
     names = node_tree.name.split("|")
 
     return len(names) == 3 and names[0] == TOON_PALETTE_PREFIX
+
+
+def is_group(node_tree: NodeTree):
+    if node_tree is None:
+        return False
+
+    names = node_tree.name.split("|")
+
+    return len(names) == 3 and names[0] == TOON_PALETTE_PREFIX and names[2]
 
 
 def get_palette_name(node_tree: NodeTree) -> str:
@@ -33,7 +45,7 @@ def get_palette_name(node_tree: NodeTree) -> str:
 
 
 def get_group_name(node_tree: NodeTree) -> str:
-    if is_palette(node_tree):
+    if is_group(node_tree):
         return node_tree.name.split("|", 2)[2]
     else:
         return ""
@@ -42,25 +54,24 @@ def get_group_name(node_tree: NodeTree) -> str:
 def filter_node_trees(
     node_groups: BlendDataNodeTrees, palette_name: str = ""
 ) -> Iterator[NodeTree]:
-    for node_tree in node_groups:
-        if is_palette(node_tree):
-            if palette_name == "":
+    if palette_name == "":
+        for node_tree in node_groups:
+            if is_palette(node_tree):
                 yield node_tree
-            else:
-                names = node_tree.name.split("|", 2)
-
-                if names[1] == palette_name:
-                    yield node_tree
+    else:
+        for node_tree in node_groups:
+            if get_palette_name(node_tree) == palette_name:
+                yield node_tree
 
 
 def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
     palette_names = []
 
     for node_tree in filter_node_trees(node_groups):
-        names = node_tree.name.split("|", 2)
+        _, palette_name, group_name = node_tree.name.split("|", 2)
 
-        if names[2] == "":
-            palette_names.append(names[1])
+        if group_name == "":
+            palette_names.append(palette_name)
 
     return palette_names
 

@@ -63,7 +63,7 @@ class VIEW3D_OT_toon_palette_remove(ToonPaletteOperator):
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         facade = ToonPaletteFacade(bpy.data.node_groups)
 
-        return facade.remove(state.palette_name, bpy.data.node_groups)
+        return facade.remove(state.palette_name)
 
 
 class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
