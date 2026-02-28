@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import bpy
 from bpy.props import EnumProperty
 from bpy.types import Operator
 
@@ -41,7 +42,9 @@ class VIEW3D_OT_toon_palette_add(Operator):
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
-        if not ToonPaletteFacade.add("Palette"):
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+
+        if not facade.add("Palette"):
             return {"CANCELLED"}
 
         ToonPaletteUIState.request_update()
@@ -58,7 +61,9 @@ class VIEW3D_OT_toon_palette_remove(ToonPaletteOperator):
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
-        return ToonPaletteFacade.remove(state.palette_name)
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+
+        return facade.remove(state.palette_name, bpy.data.node_groups)
 
 
 class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):

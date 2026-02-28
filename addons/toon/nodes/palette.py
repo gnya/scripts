@@ -2,15 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import bpy
 from bpy.props import StringProperty
 from bpy.types import ShaderNodeCustomGroup
 
-from toon.palette import (
-    ToonPalette,
-    ToonPaletteFacade,
-    get_group_name,
-    get_palette_name,
-)
+from toon.palette import ToonPaletteFacade, get_group_name, get_palette_name
 from toon.props import ToonPaletteSearchIndex
 from toon.utils import NodeLinkRebinder, override
 
@@ -29,8 +25,10 @@ class ToonNodePalette(ShaderNodeCustomGroup):
         return get_palette_name(self.node_tree)
 
     def _set_palette_name(self, value: str):
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+
         with NodeLinkRebinder(self):
-            if (palette := ToonPaletteFacade.get(value)) is None:
+            if (palette := facade.get(value)) is None:
                 self.node_tree = None
             else:
                 self.node_tree = palette.header
@@ -49,7 +47,8 @@ class ToonNodePalette(ShaderNodeCustomGroup):
         if self.node_tree is None:
             return
 
-        palette = ToonPalette.from_node_tree(self.node_tree)
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+        palette = facade.get(self.palette_name)
 
         if palette is None:
             return

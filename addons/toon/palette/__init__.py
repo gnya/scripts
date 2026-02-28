@@ -7,6 +7,7 @@ from .utils import (
     get_group_name,
     get_palette_name,
     int_to_color_type,
+    is_palette,
 )
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     ToonPaletteFacade,
     color_type_to_int,
     int_to_color_type,
+    is_palette,
     get_palette_name,
     get_group_name,
 ]

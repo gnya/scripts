@@ -2,17 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator
 
-import bpy
-
 from .facade_group import ToonPaletteGroup
-from .utils import build_node_tree_name, filter_node_trees, get_palette_name, is_palette
+from .utils import build_node_tree_name, get_palette_name
 
 if TYPE_CHECKING:
-    from bpy.types import NodeTree
+    from bpy.types import BlendDataNodeTrees, NodeTree
 
 
 class ToonPalette:
-    def __init__(self, header: NodeTree, node_trees: list[NodeTree]):
+    def __init__(
+        self,
+        node_groups: BlendDataNodeTrees,
+        header: NodeTree,
+        node_trees: list[NodeTree],
+    ):
+        self.node_groups = node_groups
         self.header = header
         self.node_trees = node_trees
 
@@ -30,7 +34,7 @@ class ToonPalette:
             value = value.replace("|", "_")
 
         name = build_node_tree_name(self.name, "")
-        new_name = build_node_tree_name(value, "", True)
+        new_name = build_node_tree_name(value, "", True, self.node_groups)
 
         self.header.name = self.header.name.replace(name, new_name, 1)
 
@@ -42,7 +46,7 @@ class ToonPalette:
             return False
 
         name = build_node_tree_name(self.name, group_name)
-        node_tree = bpy.data.node_groups.new(name, "ShaderNodeTree")
+        node_tree = self.node_groups.new(name, "ShaderNodeTree")
         node_tree.use_fake_user = True
         ToonPaletteGroup(node_tree).init()
 
@@ -58,7 +62,7 @@ class ToonPalette:
 
         for node_tree in self.node_trees:
             if node_tree.name == name:
-                bpy.data.node_groups.remove(node_tree)
+                self.node_groups.remove(node_tree)
 
                 return True
 
@@ -74,13 +78,3 @@ class ToonPalette:
     def groups(self) -> Iterator[ToonPaletteGroup]:
         for node_tree in self.node_trees:
             yield ToonPaletteGroup(node_tree)
-
-    @staticmethod
-    def from_node_tree(node_tree: NodeTree) -> ToonPalette | None:
-        if is_palette(node_tree):
-            names = node_tree.name.split("|", 2)
-            node_trees = list(filter_node_trees(names[1]))
-
-            return ToonPalette(node_trees[0], node_trees[1:])
-        else:
-            return None

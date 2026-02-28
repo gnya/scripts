@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Iterator
 
 from .facade_color import ToonPaletteColor
-from .utils import get_group_name, is_palette
+from .utils import get_group_name
 
 if TYPE_CHECKING:
     from bpy.types import NodeTree
@@ -63,10 +63,3 @@ class ToonPaletteGroup:
 
     def init(self):
         self.node_tree.nodes.new("NodeGroupOutput")
-
-    @staticmethod
-    def from_node_tree(node_tree: NodeTree) -> ToonPaletteGroup | None:
-        if is_palette(node_tree):
-            return ToonPaletteGroup(node_tree)
-        else:
-            return None

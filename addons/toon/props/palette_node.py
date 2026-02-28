@@ -43,7 +43,9 @@ class ToonPaletteSearchIndex(PropertyGroup):
 
         self.palettes.clear()
 
-        for palette in ToonPaletteFacade.palettes():
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+
+        for palette in facade.palettes():
             # TODO Consider orphan groups.
             if palette.header is not None:
                 state = self.palettes.add()

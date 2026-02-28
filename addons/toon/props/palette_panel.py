@@ -23,6 +23,7 @@ from toon.palette import (
     get_group_name,
     get_palette_name,
     int_to_color_type,
+    is_palette,
 )
 from toon.utils import node_group_update_post
 
@@ -69,12 +70,10 @@ class ToonPaletteUIItem(PropertyGroup):
         return get_group_name(self.node_tree)
 
     def _set_group_name(self, value: str):
-        group = ToonPaletteGroup.from_node_tree(self.node_tree)
+        group = ToonPaletteGroup(self.node_tree)
+        group.name = value
 
-        if group is not None:
-            group.name = value
-
-            ToonPaletteSearchIndex.request_update()
+        ToonPaletteSearchIndex.request_update()
 
     group_name: StringProperty(get=_get_group_name, set=_set_group_name)
 
@@ -155,7 +154,7 @@ class ToonPaletteUIItem(PropertyGroup):
     header_index: IntProperty(default=-1)
 
     def group_data(self) -> ToonPaletteGroup | None:
-        return ToonPaletteGroup.from_node_tree(self.node_tree)
+        return ToonPaletteGroup(self.node_tree)
 
     def colors_data(self) -> Iterator[ToonPaletteColor]:
         group = self.group_data()
@@ -183,10 +182,10 @@ class ToonPaletteUIItem(PropertyGroup):
 
     @staticmethod
     def _update_all_texture_uv_snap(node_tree: NodeTree):
-        group = ToonPaletteGroup.from_node_tree(node_tree)
-
-        if group is None:
+        if not is_palette(node_tree):
             return
+
+        group = ToonPaletteGroup(node_tree)
 
         for color in group.colors():
             data, prop = color.texture_ptr
@@ -227,7 +226,8 @@ class ToonPaletteUIPaletteState(PropertyGroup):
         return get_palette_name(self.node_tree)
 
     def _set_palette_name(self, value: str):
-        palette = ToonPalette.from_node_tree(self.node_tree)
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+        palette = facade.get(self.palette_name)
 
         if palette is not None:
             palette.name = value
@@ -286,7 +286,9 @@ class ToonPaletteUIPaletteState(PropertyGroup):
             header_index += len(colors) + 1
 
     def palette_data(self) -> ToonPalette | None:
-        return ToonPalette.from_node_tree(self.node_tree)
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+
+        return facade.get(self.palette_name)
 
 
 class ToonPaletteUIState(PropertyGroup):
@@ -302,7 +304,9 @@ class ToonPaletteUIState(PropertyGroup):
 
         self.list_states.clear()
 
-        for palette in ToonPaletteFacade.palettes():
+        facade = ToonPaletteFacade(bpy.data.node_groups)
+
+        for palette in facade.palettes():
             # TODO Consider orphan groups.
             if palette.header is not None:
                 state = self.list_states.add()
