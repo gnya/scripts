@@ -145,6 +145,8 @@ class ToonPaletteUIItem(PropertyGroup):
 
     header_index: IntProperty(default=-1)
 
+    group_index: IntProperty(default=-1)
+
     def group_data(self) -> ToonPaletteGroup | None:
         return get_group(self.node_tree)
 
@@ -155,10 +157,15 @@ class ToonPaletteUIItem(PropertyGroup):
         return get_color(self.node_tree, self.socket_index)
 
     def init(
-        self, group: ToonPaletteGroup, color: ToonPaletteColor | None, header_index: int
+        self,
+        group: ToonPaletteGroup,
+        color: ToonPaletteColor | None,
+        header_index: int,
+        group_index: int,
     ):
         self.node_tree = group.node_tree
         self.header_index = header_index
+        self.group_index = group_index
 
         if color is None:
             self.type = "GROUP"
@@ -225,6 +232,8 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     order: IntProperty(get=_get_order, set=_set_order)
 
+    palette_index: IntProperty(default=-1)
+
     def active_item(self) -> ToonPaletteUIItem | None:
         if (index := self.active_index) < 0:
             return None
@@ -234,18 +243,19 @@ class ToonPaletteUIPaletteState(PropertyGroup):
     def palette_data(self) -> ToonPalette | None:
         return get_palette(self.node_tree)
 
-    def init(self, palette: ToonPalette):
+    def init(self, palette: ToonPalette, palette_index: int):
         self.node_tree = palette.header
+        self.palette_index = palette_index
         header_index = 0
 
-        for group in palette.groups():
+        for index, group in enumerate(palette.groups()):
             item = self.list_items.add()
-            item.init(group, None, header_index)
+            item.init(group, None, header_index, index)
             colors = list(group.colors())
 
             for color in colors:
                 item = self.list_items.add()
-                item.init(group, color, header_index)
+                item.init(group, color, header_index, index)
 
             header_index += len(colors) + 1
 
@@ -263,11 +273,11 @@ class ToonPaletteUIState(PropertyGroup):
 
         self.list_states.clear()
 
-        for palette in get_palettes():
+        for index, palette in enumerate(get_palettes()):
             # TODO Consider orphan groups.
             if palette.header is not None:
                 state = self.list_states.add()
-                state.init(palette)
+                state.init(palette, index)
 
         self.update_requested = False
 
