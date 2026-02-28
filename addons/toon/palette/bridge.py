@@ -21,8 +21,12 @@ if TYPE_CHECKING:
     from bpy.types import NodeTree
 
 
+def get_facade() -> ToonPaletteFacade:
+    return ToonPaletteFacade(bpy.data.node_groups)
+
+
 def _get_palette_by_name(name: str):
-    return ToonPaletteFacade(bpy.data.node_groups).get(name)
+    return get_facade().get(name)
 
 
 def get_palette(node_tree: NodeTree) -> ToonPalette | None:
@@ -137,7 +141,7 @@ def get_colors(node_tree: NodeTree) -> Iterator[ToonPaletteColor]:
 
 
 def get_palettes() -> Iterator[ToonPalette]:
-    yield from ToonPaletteFacade(bpy.data.node_groups).palettes()
+    yield from get_facade().palettes()
 
 
 def get_node_tree(palette_name: str, group_name: str = "") -> NodeTree | None:
