@@ -88,9 +88,9 @@ class ToonPalette:
             return True
 
     def get(self, group_name: str) -> ToonPaletteGroup | None:
-        for node_tree in self.node_trees:
-            if node_tree.name.split("|", 2)[2] == group_name:
-                return ToonPaletteGroup(node_tree)
+        for group in self._groups():
+            if group.name == group_name:
+                return group
 
         return None
 

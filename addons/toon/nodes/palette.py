@@ -53,3 +53,7 @@ class ToonNodePalette(ShaderNodeCustomGroup):
             layout.prop_search(
                 self, "group_name", state, "groups", text="", icon="GROUP"
             )
+        elif len(states.orphans) > 0:
+            layout.prop_search(
+                self, "group_name", states, "orphans", text="", icon="GROUP"
+            )

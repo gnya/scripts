@@ -35,6 +35,8 @@ class ToonPaletteSearchIndex(PropertyGroup):
 
     palettes: CollectionProperty(type=ToonPaletteSearchPalette)
 
+    orphans: CollectionProperty(type=ToonPaletteSearchGroup)
+
     update_requested: BoolProperty(default=True)
 
     def update(self):
@@ -42,29 +44,33 @@ class ToonPaletteSearchIndex(PropertyGroup):
             return
 
         self.palettes.clear()
+        self.orphans.clear()
 
         for palette in get_palettes():
-            # TODO Consider orphan groups.
-            if palette.header is not None:
+            if palette.header is None:
+                for group in palette.groups():
+                    state = self.orphans.add()
+                    state.name = group.name
+            else:
                 state = self.palettes.add()
                 state.init(palette)
 
         self.update_requested = False
 
     @staticmethod
-    def _instance() -> ToonPaletteSearchIndex:
+    def instance() -> ToonPaletteSearchIndex:
         id = bpy.context.window_manager
 
         return getattr(id, ToonPaletteSearchIndex.PROP_NAME)
 
     @staticmethod
     def request_update():
-        states = ToonPaletteSearchIndex._instance()
+        states = ToonPaletteSearchIndex.instance()
         states.update_requested = True
 
     @staticmethod
     def current() -> ToonPaletteSearchIndex:
-        states = ToonPaletteSearchIndex._instance()
+        states = ToonPaletteSearchIndex.instance()
         states.update()
 
         return states

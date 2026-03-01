@@ -19,15 +19,6 @@ def is_palette(node_tree: NodeTree | None):
     return len(names) == 3 and names[0] == _NODE_PREFIX
 
 
-def is_header(node_tree: NodeTree | None):
-    if node_tree is None:
-        return False
-
-    names = node_tree.name.split("|")
-
-    return len(names) == 3 and names[0] == _NODE_PREFIX and not names[2]
-
-
 def is_group(node_tree: NodeTree | None):
     if node_tree is None:
         return False
@@ -37,15 +28,19 @@ def is_group(node_tree: NodeTree | None):
     return len(names) == 3 and names[0] == _NODE_PREFIX and names[2]
 
 
-def get_palette_name(node_tree: NodeTree) -> str:
+def get_palette_name(node_tree: NodeTree | None) -> str:
     if is_palette(node_tree):
+        assert node_tree is not None
+
         return node_tree.name.split("|", 2)[1]
     else:
         return ""
 
 
-def get_group_name(node_tree: NodeTree) -> str:
+def get_group_name(node_tree: NodeTree | None) -> str:
     if is_group(node_tree):
+        assert node_tree is not None
+
         return node_tree.name.split("|", 2)[2]
     else:
         return ""
