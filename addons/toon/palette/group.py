@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, Iterator
 from toon.utils import within
 
 from .color import ToonPaletteColor
-from .utils import get_group_name, get_order, resolve_group_name, set_order
+from .naming import get_group_name, resolve_group_name
+from .types import get_order, set_order
 
 if TYPE_CHECKING:
     from bpy.types import NodeTree

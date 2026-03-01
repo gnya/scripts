@@ -5,14 +5,8 @@ from typing import TYPE_CHECKING, Iterator
 from toon.utils import slice_itr, within
 
 from .group import ToonPaletteGroup
-from .utils import (
-    build_node_tree_name,
-    get_order,
-    get_palette_name,
-    order_to_key,
-    resolve_palette_name,
-    set_order,
-)
+from .naming import build_node_tree_name, get_palette_name, resolve_palette_name
+from .types import get_order, order_to_key, set_order
 
 if TYPE_CHECKING:
     from bpy.types import BlendDataNodeTrees, NodeTree

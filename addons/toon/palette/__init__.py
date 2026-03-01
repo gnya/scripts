@@ -22,17 +22,12 @@ from .bridge import (
 from .color import ToonPaletteColor
 from .group import ToonPaletteGroup
 from .model import ToonPaletteFacade
+from .naming import get_group_name, get_palette_name
 from .palette import ToonPalette
-from .utils import (
-    TOON_PALETTE_ORDER,
-    color_type_to_int,
-    get_group_name,
-    get_palette_name,
-    int_to_color_type,
-)
+from .types import IToonPaletteProperty, color_type_to_int, int_to_color_type
 
 __all__ = [
-    TOON_PALETTE_ORDER,
+    IToonPaletteProperty,
     ToonPaletteColor,
     ToonPaletteGroup,
     ToonPalette,

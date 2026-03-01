@@ -7,15 +7,9 @@ import bpy
 from .color import ToonPaletteColor
 from .group import ToonPaletteGroup
 from .model import ToonPaletteFacade
+from .naming import get_palette_name, is_group, is_palette
 from .palette import ToonPalette
-from .utils import (
-    ToonPaletteColorTypes,
-    color_type_to_int,
-    get_palette_name,
-    int_to_color_type,
-    is_group,
-    is_palette,
-)
+from .types import ToonPaletteColorTypes, color_type_to_int, int_to_color_type
 
 if TYPE_CHECKING:
     from bpy.types import NodeTree

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterator, Literal, get_args
+from typing import TYPE_CHECKING, Iterator
 
 from toon.utils import unique_name
 
@@ -8,17 +8,6 @@ if TYPE_CHECKING:
     from bpy.types import BlendDataNodeTrees, NodeTree
 
 _NODE_PREFIX = ".ToonPalette"
-TOON_PALETTE_ORDER = "toon_palette_order"
-
-ToonPaletteColorTypes = Literal["COLOR", "TEXTURE", "VECTOR", "VALUE"]
-
-
-def color_type_to_int(type: ToonPaletteColorTypes) -> int:
-    return get_args(ToonPaletteColorTypes).index(type)
-
-
-def int_to_color_type(type: int) -> ToonPaletteColorTypes:
-    return get_args(ToonPaletteColorTypes)[type]
 
 
 def is_palette(node_tree: NodeTree):
@@ -62,28 +51,6 @@ def get_group_name(node_tree: NodeTree) -> str:
         return ""
 
 
-def get_order(node_tree: NodeTree) -> int:
-    if is_palette(node_tree):
-        settings = getattr(node_tree, TOON_PALETTE_ORDER)
-
-        if settings is not None:
-            return settings.order
-
-    return -1
-
-
-def set_order(node_tree: NodeTree, value: int):
-    if is_palette(node_tree):
-        settings = getattr(node_tree, TOON_PALETTE_ORDER)
-
-        if settings is not None:
-            settings.order = value
-
-
-def order_to_key(order: int) -> tuple[bool, int]:
-    return order == -1, order
-
-
 def filter_node_trees(
     node_groups: BlendDataNodeTrees, palette_name: str = ""
 ) -> Iterator[NodeTree]:
@@ -97,6 +64,13 @@ def filter_node_trees(
                 yield node_tree
 
 
+def resolve_group_name(name: str) -> str:
+    if name == "":
+        return "Group"
+    else:
+        return name.replace("|", "_")
+
+
 def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
     palette_names = []
 
@@ -107,13 +81,6 @@ def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
             palette_names.append(palette_name)
 
     return palette_names
-
-
-def resolve_group_name(name: str) -> str:
-    if name == "":
-        return "Group"
-    else:
-        return name.replace("|", "_")
 
 
 def resolve_palette_name(node_groups: BlendDataNodeTrees, name: str) -> str:

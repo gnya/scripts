@@ -7,7 +7,7 @@ from toon.utils import change_socket_type, remove_nodes, search_node
 if TYPE_CHECKING:
     from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
 
-    from .utils import ToonPaletteColorTypes
+    from .types import ToonPaletteColorTypes
 
 
 class ToonPaletteColor:

@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING, Iterator
 
 from toon.utils import slice_itr, within
 
-from .palette import ToonPalette
-from .utils import (
+from .naming import (
     build_node_tree_name,
     filter_node_trees,
     is_header,
-    order_to_key,
     resolve_palette_name,
 )
+from .palette import ToonPalette
+from .types import order_to_key
 
 if TYPE_CHECKING:
     from bpy.types import BlendDataNodeTrees, NodeTree
