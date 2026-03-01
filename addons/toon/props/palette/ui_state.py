@@ -23,7 +23,7 @@ from toon.palette import (
 
 from .node import ToonPaletteSearchIndex
 from .ui_item import ToonPaletteUIItem
-from .view import get_default_view_settings, get_view_settings
+from .view import get_view_settings
 
 if TYPE_CHECKING:
     from bpy.types import Scene
@@ -46,11 +46,7 @@ class ToonPaletteUIPaletteState(PropertyGroup):
     palette_name: StringProperty(get=_get_palette_name, set=_set_palette_name)
 
     def _get_active_index(self) -> int:
-        if self.header is None:
-            index = get_default_view_settings().active_index
-        else:
-            index = get_view_settings(self.header).active_index
-
+        index = get_view_settings(self.header).active_index
         index = min(index, len(self.list_items) - 1)
 
         if index < 0:
@@ -61,24 +57,15 @@ class ToonPaletteUIPaletteState(PropertyGroup):
             return index
 
     def _set_active_index(self, value: int):
-        if self.header is None:
-            get_default_view_settings().active_index = value
-        else:
-            get_view_settings(self.header).active_index = value
+        get_view_settings(self.header).active_index = value
 
     active_index: IntProperty(get=_get_active_index, set=_set_active_index)
 
     def _get_show_expanded(self) -> bool:
-        if self.header is None:
-            return get_default_view_settings().show_expanded
-        else:
-            return get_view_settings(self.header).show_expanded
+        return get_view_settings(self.header).show_expanded
 
     def _set_show_expanded(self, value: bool):
-        if self.header is None:
-            get_default_view_settings().show_expanded = value
-        else:
-            get_view_settings(self.header).show_expanded = value
+        get_view_settings(self.header).show_expanded = value
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 

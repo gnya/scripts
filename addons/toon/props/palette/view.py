@@ -31,11 +31,8 @@ class ToonPaletteViewSettings(PropertyGroup):
         delattr(WindowManager, ToonPaletteViewSettings.PROP_NAME)
 
 
-def get_view_settings(id: NodeTree) -> ToonPaletteViewSettings:
-    return getattr(id, ToonPaletteViewSettings.PROP_NAME)
-
-
-def get_default_view_settings() -> ToonPaletteViewSettings:
-    id = bpy.context.window_manager
+def get_view_settings(id: NodeTree | WindowManager | None) -> ToonPaletteViewSettings:
+    if id is None:
+        id = bpy.context.window_manager
 
     return getattr(id, ToonPaletteViewSettings.PROP_NAME)

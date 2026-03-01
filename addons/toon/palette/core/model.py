@@ -62,7 +62,7 @@ class ToonPaletteFacade:
         if (palette := self.get(palette_name)) is None:
             return False
         else:
-            if palette.header is not None:
+            if not palette.is_orphens:
                 self.node_groups.remove(palette.header)
 
             for node_tree in palette.node_trees:

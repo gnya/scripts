@@ -47,7 +47,7 @@ class ToonPaletteSearchIndex(PropertyGroup):
         self.orphans.clear()
 
         for palette in get_palettes():
-            if palette.header is None:
+            if palette.is_orphens:
                 for group in palette.groups():
                     state = self.orphans.add()
                     state.name = group.name

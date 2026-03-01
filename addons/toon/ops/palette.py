@@ -20,8 +20,20 @@ if TYPE_CHECKING:
 
 
 class ToonPaletteOperator(Operator):
+    @classmethod
+    def _poll_impl(cls, state: ToonPaletteUIPaletteState) -> bool:
+        return True
+
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         raise NotImplementedError()
+
+    @classmethod
+    @override
+    def poll(cls, context: Context) -> bool:
+        if not hasattr(context, "palette_state"):
+            return False
+
+        return cls._poll_impl(context.palette_state)
 
     @override
     def execute(self, context: Context) -> set[OperatorReturnItems]:
@@ -70,11 +82,16 @@ class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
     bl_description = "Add a empty group to the context palette"
     bl_options = {"REGISTER", "UNDO"}
 
+    @classmethod
+    @override
+    def _poll_impl(cls, state: ToonPaletteUIPaletteState) -> bool:
+        return not state.is_orphans()
+
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         palette = state.palette_data()
 
-        if palette is None:
+        if palette is None or palette.is_orphens:
             return False
         elif not palette.add("Group"):
             return False
@@ -210,6 +227,11 @@ class VIEW3D_OT_toon_palette_move(ToonPaletteOperator):
     direction_types = [("UP", "Up", ""), ("DOWN", "Down", "")]
 
     direction: EnumProperty(items=direction_types, options={"HIDDEN"})
+
+    @classmethod
+    @override
+    def _poll_impl(cls, state: ToonPaletteUIPaletteState) -> bool:
+        return not state.is_orphans()
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:

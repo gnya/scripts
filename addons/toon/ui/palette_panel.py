@@ -42,7 +42,14 @@ class VIEW3D_PT_toon_palette(Panel):
         sub_row.label(icon="COLOR" if not state.is_orphans() else "ERROR")
 
         sub_row = row.row(align=True)
-        sub_row.prop(state, "palette_name", text="")
+
+        if not state.is_orphans():
+            sub_row.prop(state, "palette_name", text="")
+        else:
+            sub_sub_row = sub_row.row(align=True)
+            sub_sub_row.enabled = False
+            sub_sub_row.prop(state, "palette_name", text="")
+
         sub_row.menu(VIEW3D_MT_toon_palette.bl_idname, text="", icon="DOWNARROW_HLT")
 
         sub_row = row.row(align=True)

@@ -63,8 +63,12 @@ class ToonPalette:
     def order(self, value: int):
         set_order(self.header, value)
 
+    @property
+    def is_orphens(self) -> bool:
+        return self.header is None
+
     def add(self, group_name: str) -> ToonPaletteGroup:
-        if self.header is None:
+        if self.is_orphens:
             raise RuntimeError("No header found in this palette.")
 
         self._renumber_order()
