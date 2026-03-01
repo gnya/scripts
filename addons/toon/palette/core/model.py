@@ -47,9 +47,6 @@ class ToonPaletteFacade:
             palette.order = index
 
     def add(self, palette_name: str) -> bool:
-        if palette_name == "":
-            return False
-
         self._renumber_order()
 
         name = build_node_tree_name(
@@ -76,6 +73,7 @@ class ToonPaletteFacade:
 
     def get(self, palette_name: str) -> ToonPalette | None:
         if palette_name == "":
+            # TODO return orphans
             return None
 
         node_trees = list(filter_node_trees(self.node_groups, palette_name))

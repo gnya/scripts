@@ -5,7 +5,12 @@ from typing import TYPE_CHECKING, Iterator
 from toon.utils import slice_itr, within
 
 from .group import ToonPaletteGroup
-from .naming import build_node_tree_name, get_palette_name, resolve_palette_name
+from .naming import (
+    build_node_tree_name,
+    get_palette_name,
+    resolve_group_name,
+    resolve_palette_name,
+)
 from .types import get_order, order_to_key, set_order
 
 if TYPE_CHECKING:
@@ -59,12 +64,12 @@ class ToonPalette:
         set_order(self.header, value)
 
     def add(self, group_name: str) -> bool:
-        if self.header is None or group_name == "":
+        if self.header is None:
             return False
 
         self._renumber_order()
 
-        name = build_node_tree_name(self.name, group_name)
+        name = build_node_tree_name(self.name, resolve_group_name(group_name))
         node_tree = self.node_groups.new(name, "ShaderNodeTree")
         node_tree.use_fake_user = True
         ToonPaletteGroup(node_tree).init()

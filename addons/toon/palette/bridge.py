@@ -4,12 +4,18 @@ from typing import TYPE_CHECKING, Any, Iterator, get_args
 
 import bpy
 
-from .color import ToonPaletteColor
-from .group import ToonPaletteGroup
-from .model import ToonPaletteFacade
-from .naming import get_palette_name, is_group, is_palette
-from .palette import ToonPalette
-from .types import ToonPaletteColorTypes, color_type_to_int, int_to_color_type
+from .core import (
+    ToonPalette,
+    ToonPaletteColor,
+    ToonPaletteColorTypes,
+    ToonPaletteFacade,
+    ToonPaletteGroup,
+    color_type_to_int,
+    get_palette_name,
+    int_to_color_type,
+    is_group,
+    is_palette,
+)
 
 if TYPE_CHECKING:
     from bpy.types import NodeTree

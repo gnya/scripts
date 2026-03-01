@@ -19,12 +19,17 @@ from .bridge import (
     set_palette_name,
     update_all_uv_pixel_snap,
 )
-from .color import ToonPaletteColor
-from .group import ToonPaletteGroup
-from .model import ToonPaletteFacade
-from .naming import get_group_name, get_palette_name
-from .palette import ToonPalette
-from .types import IToonPaletteProperty, color_type_to_int, int_to_color_type
+from .core import (
+    IToonPaletteProperty,
+    ToonPalette,
+    ToonPaletteColor,
+    ToonPaletteFacade,
+    ToonPaletteGroup,
+    color_type_to_int,
+    get_group_name,
+    get_palette_name,
+    int_to_color_type,
+)
 
 __all__ = [
     IToonPaletteProperty,
