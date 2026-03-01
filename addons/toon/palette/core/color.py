@@ -17,11 +17,11 @@ class ToonPaletteColor:
 
     @property
     def name(self) -> str:
-        return self.node_tree.outputs[self.socket_index].name
+        return self._socket_interface().name
 
     @name.setter
     def name(self, value: str):
-        self.node_tree.outputs[self.socket_index].name = value
+        self._socket_interface().name = value
 
     def _socket(self) -> NodeSocket:
         output = self.node_tree.nodes.get("Group Output")

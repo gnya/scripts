@@ -63,21 +63,21 @@ class ToonPalette:
     def order(self, value: int):
         set_order(self.header, value)
 
-    def add(self, group_name: str) -> bool:
+    def add(self, group_name: str) -> ToonPaletteGroup | None:
         if self.header is None:
-            return False
+            return None
 
         self._renumber_order()
 
         name = build_node_tree_name(self.name, resolve_group_name(group_name))
         node_tree = self.node_groups.new(name, "ShaderNodeTree")
-        node_tree.use_fake_user = True
-        ToonPaletteGroup(node_tree).init()
+        group = ToonPaletteGroup(node_tree)
+        group.init()
 
         self.node_trees.append(node_tree)
         self._renumber_order()
 
-        return True
+        return group
 
     def remove(self, group_name: str) -> bool:
         if (group := self.get(group_name)) is None:
@@ -122,3 +122,7 @@ class ToonPalette:
             group.order = index - offset
 
         return True
+
+    def init(self):
+        if self.header is not None:
+            self.header.use_fake_user = True

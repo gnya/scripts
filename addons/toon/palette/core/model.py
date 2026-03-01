@@ -46,19 +46,19 @@ class ToonPaletteFacade:
         for index, palette in enumerate(self.palettes()):
             palette.order = index
 
-    def add(self, palette_name: str) -> bool:
+    def add(self, palette_name: str) -> ToonPalette | None:
         self._renumber_order()
 
         name = build_node_tree_name(
             resolve_palette_name(self.node_groups, palette_name), ""
         )
         node_tree = self.node_groups.new(name, "ShaderNodeTree")
-        node_tree.use_fake_user = True
-        node_tree.nodes.new("NodeGroupOutput")
+        palette = ToonPalette(self.node_groups, node_tree, [])
+        palette.init()
 
         self._renumber_order()
 
-        return True
+        return palette
 
     def remove(self, palette_name: str) -> bool:
         if (palette := self.get(palette_name)) is None:

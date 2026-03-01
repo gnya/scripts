@@ -37,12 +37,12 @@ class ToonPaletteGroup:
     def order(self, value: int):
         set_order(self.node_tree, value)
 
-    def add(self, color_name: str) -> bool:
+    def add(self, color_name: str) -> ToonPaletteColor | None:
         self.node_tree.outputs.new("NodeSocketColor", color_name)
-        index = self.size() - 1
-        ToonPaletteColor(self.node_tree, index).init()
+        color = ToonPaletteColor(self.node_tree, self.size() - 1)
+        color.init()
 
-        return True
+        return color
 
     def remove(self, index: int) -> bool:
         if not within(self.size(), index):
@@ -69,4 +69,5 @@ class ToonPaletteGroup:
         return True
 
     def init(self):
+        self.node_tree.use_fake_user = True
         self.node_tree.nodes.new("NodeGroupOutput")
