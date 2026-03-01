@@ -8,7 +8,7 @@ import bpy
 from bpy.props import EnumProperty
 from bpy.types import Operator
 
-from toon.palette import decode, encode, get_facade
+from toon.palette import PaletteDecodeError, decode_palette, encode_palette, get_facade
 from toon.props import ToonPaletteSearchIndex, ToonPaletteUIState
 from toon.utils import override
 
@@ -170,7 +170,7 @@ class VIEW3D_OT_toon_palette_copy(ToonPaletteOperator):
         if palette is None:
             return False
 
-        bpy.context.window_manager.clipboard = json.dumps(encode(palette))
+        bpy.context.window_manager.clipboard = json.dumps(encode_palette(palette))
 
         return True
 
@@ -185,17 +185,20 @@ class VIEW3D_OT_toon_palette_paste(Operator):
     def execute(self, context: Context) -> set[OperatorReturnItems]:
         try:
             data = json.loads(bpy.context.window_manager.clipboard)
+            decode_palette(data, get_facade())
         except JSONDecodeError as e:
             self.report({"ERROR"}, f"Failed to decode json text. : {e.msg}")
 
             return {"CANCELLED"}
+        except PaletteDecodeError as e:
+            self.report({"ERROR"}, f"Failed to decode palette data. : {e}")
+
+            return {"CANCELLED"}
         else:
-            decode(data)
+            ToonPaletteUIState.request_update()
+            ToonPaletteSearchIndex.request_update()
 
-        ToonPaletteUIState.request_update()
-        ToonPaletteSearchIndex.request_update()
-
-        return {"FINISHED"}
+            return {"FINISHED"}
 
 
 class VIEW3D_OT_toon_palette_move(ToonPaletteOperator):

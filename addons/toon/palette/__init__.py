@@ -19,7 +19,7 @@ from .bridge import (
     set_palette_name,
     update_all_uv_pixel_snap,
 )
-from .codec import decode, encode
+from .codec import PaletteDecodeError, decode_palette, encode_palette
 from .core import (
     IToonPaletteProperty,
     ToonPalette,
@@ -33,13 +33,14 @@ from .core import (
 )
 
 __all__ = [
+    PaletteDecodeError,
     IToonPaletteProperty,
     ToonPaletteColor,
     ToonPaletteGroup,
     ToonPalette,
     ToonPaletteFacade,
-    encode,
-    decode,
+    encode_palette,
+    decode_palette,
     color_type_to_int,
     int_to_color_type,
     get_palette_name,

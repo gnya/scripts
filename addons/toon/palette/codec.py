@@ -6,18 +6,13 @@ from typing import TYPE_CHECKING, Any
 import bpy
 from bpy.path import abspath
 
-from .bridge import get_facade
+from .bridge import color_types
 
 if TYPE_CHECKING:
-    from bpy.types import Image
+    from .core import ToonPalette, ToonPaletteColor, ToonPaletteFacade, ToonPaletteGroup
 
-    from .core import ToonPalette, ToonPaletteColor, ToonPaletteGroup
-
-    ImageData = dict[str, Any]
-    ColorData = dict[str, ImageData | Any]
-    ColorsData = dict[str, ColorData]
-    GroupsData = dict[str, ColorsData]
-    PaletteData = tuple[str, GroupsData]
+    SerializedData = tuple[str, dict[str, Any]]
+    TexturePtr = tuple[Any, str]
 
 _IMAGE_DATA_PROPS = {
     "display_aspect",
@@ -40,12 +35,26 @@ _IMAGE_DATA_PROPS = {
 }
 
 
-def encode_texture(image: Image | None) -> ImageData:
-    if image is None:
-        return {}
+class PaletteDecodeError(ValueError):
+    pass
 
-    data: ImageData = {}
-    data["name"] = image.name
+
+def _parse_data(data: Any) -> SerializedData:
+    match data:
+        case (str(name), dict(body)):
+            return name, body
+        case _:
+            raise PaletteDecodeError("Invalid palette data.")
+
+
+def encode_texture(texture_ptr: TexturePtr) -> SerializedData:
+    image = getattr(*texture_ptr, None)
+
+    if image is None:
+        return "", {}
+
+    name, data = image.name, {}
+    data["name"] = name
 
     for prop in _IMAGE_DATA_PROPS:
         value = getattr(image, prop)
@@ -60,46 +69,43 @@ def encode_texture(image: Image | None) -> ImageData:
         else:
             data[prop] = value
 
-    return data
+    return name, data
 
 
-def encode_color(color: ToonPaletteColor) -> ColorData:
-    data: ColorData = {}
+def encode_color(color: ToonPaletteColor) -> SerializedData:
+    name, data = color.name, {}
     type = color.type
     data["type"] = type
 
     if type == "COLOR":
         data["color"] = list(getattr(*color.color_ptr))
     elif type == "TEXTURE":
-        data["texture"] = encode_texture(getattr(*color.texture_ptr))
+        data["texture"] = encode_texture(color.texture_ptr)
         data["uv_map"] = getattr(*color.uv_map_ptr)
     elif type == "VECTOR":
         data["vector"] = list(getattr(*color.color_ptr))
     elif type == "VALUE":
         data["value"] = getattr(*color.color_ptr)
 
-    return data
+    return name, data
 
 
-def encode_group(group: ToonPaletteGroup) -> ColorsData:
-    return {color.name: encode_color(color) for color in group.colors()}
+def encode_group(group: ToonPaletteGroup) -> SerializedData:
+    return group.name, dict([encode_color(c) for c in group.colors()])
 
 
-def encode_palette(palette: ToonPalette) -> GroupsData:
-    return {group.name: encode_group(group) for group in palette.groups()}
+def encode_palette(palette: ToonPalette) -> SerializedData:
+    return palette.name, dict([encode_group(g) for g in palette.groups()])
 
 
-def encode(palette: ToonPalette) -> PaletteData:
-    return palette.name, encode_palette(palette)
+def decode_texture(data: SerializedData, texture_ptr: TexturePtr):
+    name, body = _parse_data(data)
 
+    if name == "":
+        return
 
-def decode_texture(data: ImageData) -> Image | None:
-    if "name" not in data:
-        return None
-
-    name = data["name"]
     image = bpy.data.images.get(name)
-    filepath = data.get("filepath_raw", "")
+    filepath = body.get("filepath_raw", "")
 
     if image is None or (
         filepath and filepath != realpath(abspath(image.filepath_raw))
@@ -110,42 +116,45 @@ def decode_texture(data: ImageData) -> Image | None:
             image = bpy.data.images.new(name, 1024, 1024)
 
         for prop in _IMAGE_DATA_PROPS:
-            if prop in data:
-                setattr(image, prop, data[prop])
+            if prop in body:
+                setattr(image, prop, body[prop])
 
-    return image
+    setattr(*texture_ptr, image)
 
 
-def decode_color(data: ColorData, color: ToonPaletteColor):
-    type = data.get("type", "COLOR")
+def decode_color(data: SerializedData, group: ToonPaletteGroup):
+    name, body = _parse_data(data)
+    color = group.add(name)
+
+    type = body.get("type", "COLOR")
+
+    if type not in [t[0] for t in color_types()]:
+        raise PaletteDecodeError(f"Invalid color type. : {type}")
+
     color.type = type
 
     if type == "COLOR":
-        setattr(*color.color_ptr, data.get("color", (1.0, 1.0, 1.0, 1.0)))
+        setattr(*color.color_ptr, body.get("color", (1.0, 1.0, 1.0, 1.0)))
     elif type == "TEXTURE":
-        setattr(*color.texture_ptr, decode_texture(data.get("texture", {})))
-        setattr(*color.uv_map_ptr, data.get("uv_map", ""))
+        decode_texture(body.get("texture", {}), color.texture_ptr)
+        setattr(*color.uv_map_ptr, body.get("uv_map", ""))
     elif type == "VECTOR":
-        setattr(*color.color_ptr, data.get("vector", (0.0, 0.0, 0.0)))
+        setattr(*color.color_ptr, body.get("vector", (0.0, 0.0, 0.0)))
     elif type == "VALUE":
-        setattr(*color.color_ptr, data.get("value", 0.0))
+        setattr(*color.color_ptr, body.get("value", 0.0))
 
 
-def decode_group(data: ColorsData, group: ToonPaletteGroup):
-    for color_name, color_data in data.items():
-        decode_color(color_data, group.add(color_name))
+def decode_group(data: SerializedData, palette: ToonPalette):
+    name, body = _parse_data(data)
+    group = palette.add(name)
+
+    for color_name, color_data in body.items():
+        decode_color((color_name, color_data), group)
 
 
-def decode_palette(data: GroupsData, palette: ToonPalette):
-    for group_name, group_data in data.items():
-        decode_group(group_data, palette.add(group_name))
+def decode_palette(data: SerializedData, facade: ToonPaletteFacade):
+    name, body = _parse_data(data)
+    palette = facade.add(name)
 
-
-def decode(data: Any):
-    if (
-        isinstance(data, list)
-        and len(data) == 2
-        and isinstance(data[0], str)
-        and isinstance(data[1], dict)
-    ):
-        decode_palette(data[1], get_facade().add(data[0]))
+    for group_name, group_data in body.items():
+        decode_group((group_name, group_data), palette)
