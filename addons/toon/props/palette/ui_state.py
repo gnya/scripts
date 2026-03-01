@@ -23,7 +23,7 @@ from toon.palette import (
 
 from .node import ToonPaletteSearchIndex
 from .ui_item import ToonPaletteUIItem
-from .view import get_view_settings
+from .view import get_default_view_settings, get_view_settings
 
 if TYPE_CHECKING:
     from bpy.types import Scene
@@ -32,21 +32,25 @@ if TYPE_CHECKING:
 
 
 class ToonPaletteUIPaletteState(PropertyGroup):
-    node_tree: PointerProperty(type=NodeTree)
+    header: PointerProperty(type=NodeTree)
 
     list_items: CollectionProperty(type=ToonPaletteUIItem)
 
     def _get_palette_name(self) -> str:
-        return get_palette_name(self.node_tree)
+        return get_palette_name(self.header)
 
     def _set_palette_name(self, value: str):
-        set_palette_name(self.node_tree, value)
+        set_palette_name(self.header, value)
         ToonPaletteSearchIndex.request_update()
 
     palette_name: StringProperty(get=_get_palette_name, set=_set_palette_name)
 
     def _get_active_index(self) -> int:
-        index = get_view_settings(self.node_tree).active_index
+        if self.header is None:
+            index = get_default_view_settings().active_index
+        else:
+            index = get_view_settings(self.header).active_index
+
         index = min(index, len(self.list_items) - 1)
 
         if index < 0:
@@ -57,16 +61,24 @@ class ToonPaletteUIPaletteState(PropertyGroup):
             return index
 
     def _set_active_index(self, value: int):
-        get_view_settings(self.node_tree).active_index = value
+        if self.header is None:
+            get_default_view_settings().active_index = value
+        else:
+            get_view_settings(self.header).active_index = value
 
-    # TODO return: -1 ~ len(list_items) - 1
     active_index: IntProperty(get=_get_active_index, set=_set_active_index)
 
     def _get_show_expanded(self) -> bool:
-        return get_view_settings(self.node_tree).show_expanded
+        if self.header is None:
+            return get_default_view_settings().show_expanded
+        else:
+            return get_view_settings(self.header).show_expanded
 
     def _set_show_expanded(self, value: bool):
-        get_view_settings(self.node_tree).show_expanded = value
+        if self.header is None:
+            get_default_view_settings().show_expanded = value
+        else:
+            get_view_settings(self.header).show_expanded = value
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
@@ -78,14 +90,17 @@ class ToonPaletteUIPaletteState(PropertyGroup):
         else:
             return self.list_items[index]
 
+    def is_orphans(self) -> bool:
+        return self.header is None
+
     def palette_data(self) -> ToonPalette | None:
-        return get_palette(self.node_tree)
+        return get_palette(self.header)
 
     def groups_data(self) -> Iterator[ToonPaletteGroup]:
-        return get_groups(self.node_tree)
+        return get_groups(self.header)
 
     def init(self, palette: ToonPalette, palette_index: int):
-        self.node_tree = palette.header
+        self.header = palette.header
         self.palette_index = palette_index
         header_index = 0
 
@@ -115,10 +130,8 @@ class ToonPaletteUIState(PropertyGroup):
         self.list_states.clear()
 
         for index, palette in enumerate(get_facade().palettes()):
-            # TODO Consider orphan groups.
-            if palette.header is not None:
-                state = self.list_states.add()
-                state.init(palette, index)
+            state = self.list_states.add()
+            state.init(palette, index)
 
         self.update_requested = False
 

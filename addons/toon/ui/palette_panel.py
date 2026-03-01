@@ -39,7 +39,7 @@ class VIEW3D_PT_toon_palette(Panel):
         sub_row = row.row(align=True)
         icon = "DOWNARROW_HLT" if state.show_expanded else "RIGHTARROW"
         sub_row.prop(state, "show_expanded", text="", emboss=False, icon=icon)
-        sub_row.label(icon="COLOR")
+        sub_row.label(icon="COLOR" if not state.is_orphans() else "ERROR")
 
         sub_row = row.row(align=True)
         sub_row.prop(state, "palette_name", text="")

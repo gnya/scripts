@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import bpy
 from bpy.props import BoolProperty, IntProperty, PointerProperty
-from bpy.types import NodeTree, PropertyGroup
+from bpy.types import NodeTree, PropertyGroup, WindowManager
 
 
 class ToonPaletteViewSettings(PropertyGroup):
@@ -18,11 +19,23 @@ class ToonPaletteViewSettings(PropertyGroup):
             ToonPaletteViewSettings.PROP_NAME,
             PointerProperty(type=ToonPaletteViewSettings),
         )
+        setattr(
+            WindowManager,
+            ToonPaletteViewSettings.PROP_NAME,
+            PointerProperty(type=ToonPaletteViewSettings),
+        )
 
     @staticmethod
     def unregister():
         delattr(NodeTree, ToonPaletteViewSettings.PROP_NAME)
+        delattr(WindowManager, ToonPaletteViewSettings.PROP_NAME)
 
 
-def get_view_settings(node_tree: NodeTree) -> ToonPaletteViewSettings:
-    return getattr(node_tree, ToonPaletteViewSettings.PROP_NAME)
+def get_view_settings(id: NodeTree) -> ToonPaletteViewSettings:
+    return getattr(id, ToonPaletteViewSettings.PROP_NAME)
+
+
+def get_default_view_settings() -> ToonPaletteViewSettings:
+    id = bpy.context.window_manager
+
+    return getattr(id, ToonPaletteViewSettings.PROP_NAME)

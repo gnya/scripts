@@ -24,8 +24,8 @@ def int_to_color_type(type: int) -> ToonPaletteColorTypes:
     return get_args(ToonPaletteColorTypes)[type]
 
 
-def get_property(node_tree: NodeTree) -> IToonPaletteProperty:
-    if (prop := getattr(node_tree, IToonPaletteProperty.PROP_NAME, None)) is None:
+def get_property(id: NodeTree) -> IToonPaletteProperty:
+    if (prop := getattr(id, IToonPaletteProperty.PROP_NAME, None)) is None:
         raise NotImplementedError()
     else:
         return prop

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 _NODE_PREFIX = ".ToonPalette"
 
 
-def is_palette(node_tree: NodeTree):
+def is_palette(node_tree: NodeTree | None):
     if node_tree is None:
         return False
 
@@ -19,7 +19,7 @@ def is_palette(node_tree: NodeTree):
     return len(names) == 3 and names[0] == _NODE_PREFIX
 
 
-def is_header(node_tree: NodeTree):
+def is_header(node_tree: NodeTree | None):
     if node_tree is None:
         return False
 
@@ -28,7 +28,7 @@ def is_header(node_tree: NodeTree):
     return len(names) == 3 and names[0] == _NODE_PREFIX and not names[2]
 
 
-def is_group(node_tree: NodeTree):
+def is_group(node_tree: NodeTree | None):
     if node_tree is None:
         return False
 
