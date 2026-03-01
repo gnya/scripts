@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import json
+from json.decoder import JSONDecodeError
 from typing import TYPE_CHECKING
 
+import bpy
 from bpy.props import EnumProperty
 from bpy.types import Operator
 
-from toon.palette import get_facade
+from toon.palette import decode, encode, get_facade
 from toon.props import ToonPaletteSearchIndex, ToonPaletteUIState
 from toon.utils import override
 
@@ -164,30 +167,35 @@ class VIEW3D_OT_toon_palette_copy(ToonPaletteOperator):
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         palette = state.palette_data()
 
-        if palette is not None:
+        if palette is None:
             return False
 
-        # palette.to_json()
+        bpy.context.window_manager.clipboard = json.dumps(encode(palette))
 
         return True
 
 
-class VIEW3D_OT_toon_palette_paste(ToonPaletteOperator):
-    bl_idname = "view3d.toon_palette_copy"
+class VIEW3D_OT_toon_palette_paste(Operator):
+    bl_idname = "view3d.toon_palette_paste"
     bl_label = "Paste Palette"
     bl_description = "Paste json text on clipboard to the context palette"
     bl_options = {"REGISTER", "UNDO"}
 
     @override
-    def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
-        palette = state.palette_data()
+    def execute(self, context: Context) -> set[OperatorReturnItems]:
+        try:
+            data = json.loads(bpy.context.window_manager.clipboard)
+        except JSONDecodeError as e:
+            self.report({"ERROR"}, f"Failed to decode json text. : {e.msg}")
 
-        if palette is not None:
-            return False
+            return {"CANCELLED"}
+        else:
+            decode(data)
 
-        # palette.from_json()
+        ToonPaletteUIState.request_update()
+        ToonPaletteSearchIndex.request_update()
 
-        return True
+        return {"FINISHED"}
 
 
 class VIEW3D_OT_toon_palette_move(ToonPaletteOperator):

@@ -29,12 +29,12 @@ class VIEW3D_MT_toon_palette_add(Menu):
         layout.operator(
             VIEW3D_OT_toon_palette_add.bl_idname, text="Add Empty Palette", icon="ADD"
         )
-        # layout.operator(
-        #     VIEW3D_OT_toon_palette_add_by_clipboard.bl_idname,
-        #     text="From Clipboard",
-        #     icon="PASTEDOWN",
-        # )
-        # layout.separator()
+        layout.operator(
+            VIEW3D_OT_toon_palette_paste.bl_idname,
+            text="Paste Palette",
+            icon="PASTEDOWN",
+        )
+        layout.separator()
 
         # for node_tree in bpy.data.node_groups:
         #     if not poll_node_tree(node_tree):
@@ -61,11 +61,6 @@ class VIEW3D_MT_toon_palette(Menu):
 
         layout.operator(
             VIEW3D_OT_toon_palette_copy.bl_idname, text="Copy Palette", icon="COPYDOWN"
-        )
-        layout.operator(
-            VIEW3D_OT_toon_palette_paste.bl_idname,
-            text="Paste Palette",
-            icon="PASTEDOWN",
         )
         layout.separator()
         o = layout.operator(

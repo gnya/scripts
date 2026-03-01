@@ -37,7 +37,7 @@ class ToonPaletteGroup:
     def order(self, value: int):
         set_order(self.node_tree, value)
 
-    def add(self, color_name: str) -> ToonPaletteColor | None:
+    def add(self, color_name: str) -> ToonPaletteColor:
         self.node_tree.outputs.new("NodeSocketColor", color_name)
         color = ToonPaletteColor(self.node_tree, self.size() - 1)
         color.init()

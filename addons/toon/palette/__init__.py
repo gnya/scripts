@@ -19,6 +19,7 @@ from .bridge import (
     set_palette_name,
     update_all_uv_pixel_snap,
 )
+from .codec import decode, encode
 from .core import (
     IToonPaletteProperty,
     ToonPalette,
@@ -37,6 +38,8 @@ __all__ = [
     ToonPaletteGroup,
     ToonPalette,
     ToonPaletteFacade,
+    encode,
+    decode,
     color_type_to_int,
     int_to_color_type,
     get_palette_name,

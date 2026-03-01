@@ -46,7 +46,7 @@ class ToonPaletteFacade:
         for index, palette in enumerate(self.palettes()):
             palette.order = index
 
-    def add(self, palette_name: str) -> ToonPalette | None:
+    def add(self, palette_name: str) -> ToonPalette:
         self._renumber_order()
 
         name = build_node_tree_name(

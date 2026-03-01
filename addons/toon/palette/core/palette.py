@@ -63,9 +63,9 @@ class ToonPalette:
     def order(self, value: int):
         set_order(self.header, value)
 
-    def add(self, group_name: str) -> ToonPaletteGroup | None:
+    def add(self, group_name: str) -> ToonPaletteGroup:
         if self.header is None:
-            return None
+            raise RuntimeError("No header found in this palette.")
 
         self._renumber_order()
 
