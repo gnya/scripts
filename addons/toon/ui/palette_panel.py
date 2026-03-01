@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 from bpy.types import Panel
 
 from toon.ops import (
-    VIEW3D_OT_toon_palette_add,
     VIEW3D_OT_toon_palette_add_color,
     VIEW3D_OT_toon_palette_move_item,
     VIEW3D_OT_toon_palette_remove,
@@ -15,7 +14,11 @@ from toon.props import ToonPaletteUIState
 from toon.utils import override
 
 from .palette_list import VIEW3D_UL_toon_palette_entry
-from .palette_menu import VIEW3D_MT_toon_palette, VIEW3D_MT_toon_palette_group
+from .palette_menu import (
+    VIEW3D_MT_toon_palette,
+    VIEW3D_MT_toon_palette_add,
+    VIEW3D_MT_toon_palette_group,
+)
 
 if TYPE_CHECKING:
     from bpy.types import Context, UILayout
@@ -125,7 +128,7 @@ class VIEW3D_PT_toon_palette(Panel):
     def draw(self, context: Context):
         layout = self.layout
 
-        layout.operator(VIEW3D_OT_toon_palette_add.bl_idname, text="Add Palette")
+        layout.menu(VIEW3D_MT_toon_palette_add.bl_idname, text="Add Palette")
 
         states = ToonPaletteUIState.current()
 

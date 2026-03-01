@@ -154,6 +154,42 @@ class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
         return True
 
 
+class VIEW3D_OT_toon_palette_copy(ToonPaletteOperator):
+    bl_idname = "view3d.toon_palette_copy"
+    bl_label = "Copy Palette"
+    bl_description = "Copy the context palette to clipboard as json"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @override
+    def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        palette = state.palette_data()
+
+        if palette is not None:
+            return False
+
+        # palette.to_json()
+
+        return True
+
+
+class VIEW3D_OT_toon_palette_paste(ToonPaletteOperator):
+    bl_idname = "view3d.toon_palette_copy"
+    bl_label = "Paste Palette"
+    bl_description = "Paste json text on clipboard to the context palette"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @override
+    def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        palette = state.palette_data()
+
+        if palette is not None:
+            return False
+
+        # palette.from_json()
+
+        return True
+
+
 class VIEW3D_OT_toon_palette_move(ToonPaletteOperator):
     bl_idname = "view3d.toon_palette_move"
     bl_label = "Move Palette"
