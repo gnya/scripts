@@ -127,6 +127,8 @@ class VIEW3D_PT_toon_palette(Panel):
 
         layout.operator(VIEW3D_OT_toon_palette_add.bl_idname, text="Add Palette")
 
-        for state in ToonPaletteUIState.current_states():
+        states = ToonPaletteUIState.current()
+
+        for state in states.list_states:
             layout.context_pointer_set("palette_state", state)
             self._draw_palette(layout, state)

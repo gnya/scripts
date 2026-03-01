@@ -7,6 +7,7 @@ from .bridge import (
     get_colors,
     get_facade,
     get_group,
+    get_groups,
     get_node_tree,
     get_palette,
     get_palettes,
@@ -23,6 +24,7 @@ from .group import ToonPaletteGroup
 from .model import ToonPaletteFacade
 from .palette import ToonPalette
 from .utils import (
+    TOON_PALETTE_ORDER,
     color_type_to_int,
     get_group_name,
     get_palette_name,
@@ -30,6 +32,7 @@ from .utils import (
 )
 
 __all__ = [
+    TOON_PALETTE_ORDER,
     ToonPaletteColor,
     ToonPaletteGroup,
     ToonPalette,
@@ -46,6 +49,7 @@ __all__ = [
     get_colors,
     get_facade,
     get_group,
+    get_groups,
     get_node_tree,
     get_palette,
     get_palettes,

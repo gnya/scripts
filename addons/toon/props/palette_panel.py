@@ -21,11 +21,12 @@ from toon.palette import (
     get_color_ptr,
     get_color_type,
     get_colors,
+    get_facade,
     get_group,
     get_group_name,
+    get_groups,
     get_palette,
     get_palette_name,
-    get_palettes,
     get_texture_ptr,
     get_uv_map_ptr,
     set_color_name,
@@ -50,8 +51,6 @@ class ToonPaletteViewSettings(PropertyGroup):
     active_index: IntProperty(default=-1)
 
     show_expanded: BoolProperty(default=True)
-
-    order: IntProperty(default=-1)
 
     @staticmethod
     def instance(id: NodeTree) -> ToonPaletteViewSettings:
@@ -135,17 +134,12 @@ class ToonPaletteUIItem(PropertyGroup):
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
-    def _get_order(self) -> int:
-        return get_view_settings(self.node_tree).order
-
-    def _set_order(self, value: int):
-        get_view_settings(self.node_tree).order = value
-
-    order: IntProperty(get=_get_order, set=_set_order)
-
     header_index: IntProperty(default=-1)
 
     group_index: IntProperty(default=-1)
+
+    def palette_data(self) -> ToonPalette | None:
+        return get_palette(self.node_tree)
 
     def group_data(self) -> ToonPaletteGroup | None:
         return get_group(self.node_tree)
@@ -224,14 +218,6 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
-    def _get_order(self) -> int:
-        return get_view_settings(self.node_tree).order
-
-    def _set_order(self, value: int):
-        get_view_settings(self.node_tree).order = value
-
-    order: IntProperty(get=_get_order, set=_set_order)
-
     palette_index: IntProperty(default=-1)
 
     def active_item(self) -> ToonPaletteUIItem | None:
@@ -242,6 +228,9 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     def palette_data(self) -> ToonPalette | None:
         return get_palette(self.node_tree)
+
+    def groups_data(self) -> Iterator[ToonPaletteGroup]:
+        return get_groups(self.node_tree)
 
     def init(self, palette: ToonPalette, palette_index: int):
         self.node_tree = palette.header
@@ -273,7 +262,7 @@ class ToonPaletteUIState(PropertyGroup):
 
         self.list_states.clear()
 
-        for index, palette in enumerate(get_palettes()):
+        for index, palette in enumerate(get_facade().palettes()):
             # TODO Consider orphan groups.
             if palette.header is not None:
                 state = self.list_states.add()
@@ -282,23 +271,22 @@ class ToonPaletteUIState(PropertyGroup):
         self.update_requested = False
 
     @staticmethod
-    def _instance() -> ToonPaletteUIState:
+    def instance() -> ToonPaletteUIState:
         id = bpy.context.window_manager
 
         return getattr(id, ToonPaletteUIState.PROP_NAME)
 
     @staticmethod
     def request_update():
-        states = ToonPaletteUIState._instance()
+        states = ToonPaletteUIState.instance()
         states.update_requested = True
 
     @staticmethod
-    def current_states() -> Iterator[ToonPaletteUIPaletteState]:
-        states = ToonPaletteUIState._instance()
+    def current() -> ToonPaletteUIState:
+        states = ToonPaletteUIState.instance()
         states.update()
 
-        for state in states.list_states:
-            yield state
+        return states
 
     # TODO blend_import_post (Call it when append node trees.)
     @staticmethod

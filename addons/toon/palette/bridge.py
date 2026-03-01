@@ -140,6 +140,11 @@ def get_colors(node_tree: NodeTree) -> Iterator[ToonPaletteColor]:
         yield from group.colors()
 
 
+def get_groups(node_tree: NodeTree) -> Iterator[ToonPaletteGroup]:
+    if (palette := get_palette(node_tree)) is not None:
+        yield from palette.groups()
+
+
 def get_palettes() -> Iterator[ToonPalette]:
     yield from get_facade().palettes()
 

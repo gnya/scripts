@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from re import sub
 from typing import TYPE_CHECKING, Iterator, Literal, get_args
+
+from toon.utils import unique_name
 
 if TYPE_CHECKING:
     from bpy.types import BlendDataNodeTrees, NodeTree
 
-TOON_PALETTE_PREFIX = ".ToonPalette"
+_NODE_PREFIX = ".ToonPalette"
+TOON_PALETTE_ORDER = "toon_palette_order"
 
 ToonPaletteColorTypes = Literal["COLOR", "TEXTURE", "VECTOR", "VALUE"]
 
@@ -25,7 +27,16 @@ def is_palette(node_tree: NodeTree):
 
     names = node_tree.name.split("|")
 
-    return len(names) == 3 and names[0] == TOON_PALETTE_PREFIX
+    return len(names) == 3 and names[0] == _NODE_PREFIX
+
+
+def is_header(node_tree: NodeTree):
+    if node_tree is None:
+        return False
+
+    names = node_tree.name.split("|")
+
+    return len(names) == 3 and names[0] == _NODE_PREFIX and not names[2]
 
 
 def is_group(node_tree: NodeTree):
@@ -34,7 +45,7 @@ def is_group(node_tree: NodeTree):
 
     names = node_tree.name.split("|")
 
-    return len(names) == 3 and names[0] == TOON_PALETTE_PREFIX and names[2]
+    return len(names) == 3 and names[0] == _NODE_PREFIX and names[2]
 
 
 def get_palette_name(node_tree: NodeTree) -> str:
@@ -49,6 +60,28 @@ def get_group_name(node_tree: NodeTree) -> str:
         return node_tree.name.split("|", 2)[2]
     else:
         return ""
+
+
+def get_order(node_tree: NodeTree) -> int:
+    if is_palette(node_tree):
+        settings = getattr(node_tree, TOON_PALETTE_ORDER)
+
+        if settings is not None:
+            return settings.order
+
+    return -1
+
+
+def set_order(node_tree: NodeTree, value: int):
+    if is_palette(node_tree):
+        settings = getattr(node_tree, TOON_PALETTE_ORDER)
+
+        if settings is not None:
+            settings.order = value
+
+
+def order_to_key(order: int) -> tuple[bool, int]:
+    return order == -1, order
 
 
 def filter_node_trees(
@@ -76,24 +109,21 @@ def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
     return palette_names
 
 
-def _make_unique_name(name: str, names: list[str]) -> str:
-    base = sub(r".\d{3}$", "", name)
-    i = 1
-
-    while name in names:
-        name = f"{base}.{i:03d}"
-        i += 1
-
-    return name
+def resolve_group_name(name: str) -> str:
+    if name == "":
+        return "Group"
+    else:
+        return name.replace("|", "_")
 
 
-def build_node_tree_name(
-    palette_name: str,
-    group_name: str,
-    unique_palette_name: bool = False,
-    node_groups: BlendDataNodeTrees = None,
-) -> str:
-    if unique_palette_name and node_groups is not None:
-        palette_name = _make_unique_name(palette_name, _palette_names(node_groups))
+def resolve_palette_name(node_groups: BlendDataNodeTrees, name: str) -> str:
+    if name == "":
+        name = "Palette"
+    else:
+        name = name.replace("|", "_")
 
-    return "|".join([TOON_PALETTE_PREFIX, palette_name, group_name])
+    return unique_name(_palette_names(node_groups), name)
+
+
+def build_node_tree_name(palette_name: str, group_name: str) -> str:
+    return "|".join([_NODE_PREFIX, palette_name, group_name])
