@@ -15,8 +15,10 @@ _node_group_ptrs: list[int] = []
 object_rename_post: list[Callable[[Object, str], None]] = []
 node_group_update_post: list[Callable[[NodeTree], None]] = []
 
-# NOTE Alternative to `blend_import_post`.
 node_group_import_post: list[Callable[[NodeTree], None]] = []
+"""
+NOTE Alternative to `blend_import_post`.
+"""
 
 
 def _poll_object_rename(graph: Depsgraph) -> bool:

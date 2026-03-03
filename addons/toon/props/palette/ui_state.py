@@ -43,6 +43,8 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     list_items: CollectionProperty(type=ToonPaletteUIItem)
 
+    palette_index: IntProperty(default=-1)
+
     def _get_palette_name(self) -> str:
         return get_palette_name(self.header)
 
@@ -76,8 +78,6 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
-    palette_index: IntProperty(default=-1)
-
     def active_item(self) -> ToonPaletteUIItem | None:
         if (index := self.active_index) < 0:
             return None
@@ -101,14 +101,14 @@ class ToonPaletteUIPaletteState(PropertyGroup):
         self.palette_index = palette_index
         header_index = 0
 
-        for index, group in enumerate(palette.groups()):
+        for group_index, group in enumerate(palette.groups()):
             item = self.list_items.add()
-            item.init(group, None, header_index, index)
+            item.init(group, group_index, header_index)
             colors = list(group.colors())
 
             for color in colors:
                 item = self.list_items.add()
-                item.init(group, color, header_index, index)
+                item.init(group, group_index, header_index, color)
 
             header_index += len(colors) + 1
 

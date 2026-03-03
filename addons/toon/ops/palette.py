@@ -291,7 +291,7 @@ class VIEW3D_OT_toon_palette_move_item(ToonPaletteOperator):
             if group is None:
                 return False
 
-            index = item.socket_index
+            index = item.color_index
 
             if group.move(index, index + offset):
                 state.active_index += offset

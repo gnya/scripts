@@ -45,7 +45,12 @@ class ToonPaletteUIItem(PropertyGroup):
 
     node_tree: PointerProperty(type=NodeTree)
 
-    socket_index: IntProperty(default=-1)
+    group_index: IntProperty(default=-1)
+
+    color_index: IntProperty(default=-1)
+    """
+    NOTE If `type` is `COLOR`, this variable matches `socket_index`.
+    """
 
     def _get_group_name(self) -> str:
         return get_group_name(self.node_tree)
@@ -57,18 +62,18 @@ class ToonPaletteUIItem(PropertyGroup):
     group_name: StringProperty(get=_get_group_name, set=_set_group_name)
 
     def _get_color_name(self) -> str:
-        return get_color_name(self.node_tree, self.socket_index)
+        return get_color_name(self.node_tree, self.color_index)
 
     def _set_color_name(self, value: str):
-        set_color_name(self.node_tree, self.socket_index, value)
+        set_color_name(self.node_tree, self.color_index, value)
 
     color_name: StringProperty(get=_get_color_name, set=_set_color_name)
 
     def _get_color_type(self) -> int:
-        return get_color_type(self.node_tree, self.socket_index)
+        return get_color_type(self.node_tree, self.color_index)
 
     def _set_color_type(self, value: int):
-        set_color_type(self.node_tree, self.socket_index, value)
+        set_color_type(self.node_tree, self.color_index, value)
 
     color_type: EnumProperty(
         name="Type",
@@ -81,15 +86,15 @@ class ToonPaletteUIItem(PropertyGroup):
 
     @property
     def color_ptr(self) -> tuple[Any, str]:
-        return get_color_ptr(self.node_tree, self.socket_index)
+        return get_color_ptr(self.node_tree, self.color_index)
 
     @property
     def texture_ptr(self) -> tuple[Any, str]:
-        return get_texture_ptr(self.node_tree, self.socket_index)
+        return get_texture_ptr(self.node_tree, self.color_index)
 
     @property
     def uv_map_ptr(self) -> tuple[Any, str]:
-        return get_uv_map_ptr(self.node_tree, self.socket_index)
+        return get_uv_map_ptr(self.node_tree, self.color_index)
 
     def _get_show_expanded(self) -> bool:
         return get_show_expanded(self.node_tree)
@@ -100,8 +105,6 @@ class ToonPaletteUIItem(PropertyGroup):
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
     header_index: IntProperty(default=-1)
-
-    group_index: IntProperty(default=-1)
 
     def is_linked(self) -> bool:
         return get_library(self.node_tree) != ""
@@ -116,25 +119,25 @@ class ToonPaletteUIItem(PropertyGroup):
         return get_colors(self.node_tree)
 
     def color_data(self) -> ToonPaletteColor | None:
-        return get_color(self.node_tree, self.socket_index)
+        return get_color(self.node_tree, self.color_index)
 
     def init(
         self,
         group: ToonPaletteGroup,
-        color: ToonPaletteColor | None,
-        header_index: int,
         group_index: int,
+        header_index: int,
+        color: ToonPaletteColor | None = None,
     ):
         self.node_tree = group.node_tree
-        self.header_index = header_index
         self.group_index = group_index
+        self.header_index = header_index
 
         if color is None:
             self.type = "GROUP"
-            self.socket_index = -1
+            self.color_index = -1
         else:
             self.type = "COLOR"
-            self.socket_index = color.socket_index
+            self.color_index = color.socket_index
 
     @classmethod
     def register(cls):
