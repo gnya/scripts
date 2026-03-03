@@ -85,7 +85,7 @@ class VIEW3D_OT_toon_palette_add_group(ToonPaletteOperator):
     @classmethod
     @override
     def _poll_impl(cls, state: ToonPaletteUIPaletteState) -> bool:
-        return not state.is_orphans()
+        return not (state.is_orphans() or state.is_linked())
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
@@ -128,6 +128,11 @@ class VIEW3D_OT_toon_palette_add_color(ToonPaletteOperator):
     bl_description = "Add a color to the context palette"
     bl_options = {"REGISTER", "UNDO"}
 
+    @classmethod
+    @override
+    def _poll_impl(cls, state: ToonPaletteUIPaletteState) -> bool:
+        return not state.is_linked()
+
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
         item = state.active_item()
@@ -153,6 +158,11 @@ class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
     bl_label = "Remove Palette Color"
     bl_description = "Remove the context color from the context palette"
     bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    @override
+    def _poll_impl(cls, state: ToonPaletteUIPaletteState) -> bool:
+        return not state.is_linked()
 
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
@@ -275,7 +285,7 @@ class VIEW3D_OT_toon_palette_move_item(ToonPaletteOperator):
                 state.active_index += offset * dist
 
             return True
-        elif item.type == "COLOR":
+        elif item.type == "COLOR" and not item.is_linked():
             group = item.group_data()
 
             if group is None:

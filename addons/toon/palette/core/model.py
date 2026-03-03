@@ -23,6 +23,9 @@ class ToonPaletteFacade:
         for node_tree in filter_node_trees(self.node_groups):
             _, palette_name, group_name = node_tree.name.split("|", 2)
 
+            if node_tree.library is not None:
+                palette_name += f" [{node_tree.library.filepath}]"
+
             if palette_name not in members:
                 if group_name == "":
                     members[palette_name] = [node_tree]
@@ -58,8 +61,8 @@ class ToonPaletteFacade:
 
         return palette
 
-    def remove(self, palette_name: str) -> bool:
-        if (palette := self.get(palette_name)) is None:
+    def remove(self, palette_name: str, library: str = "") -> bool:
+        if (palette := self.get(palette_name, library)) is None:
             return False
         else:
             if not palette.is_orphens:
@@ -70,11 +73,13 @@ class ToonPaletteFacade:
 
             return True
 
-    def get(self, palette_name: str) -> ToonPalette | None:
+    def get(self, palette_name: str, library: str = "") -> ToonPalette | None:
         palettes, orphans = self._palettes()
 
         for palette in palettes:
-            if palette.name == palette_name:
+            if palette.name == palette_name and (
+                library == "" or palette.library == library
+            ):
                 return palette
 
         return orphans

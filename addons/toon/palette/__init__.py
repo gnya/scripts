@@ -28,6 +28,7 @@ from .core import (
     ToonPaletteGroup,
     color_type_to_int,
     get_group_name,
+    get_library,
     get_palette_name,
     int_to_color_type,
 )
@@ -43,6 +44,7 @@ __all__ = [
     decode_palette,
     color_type_to_int,
     int_to_color_type,
+    get_library,
     get_palette_name,
     get_group_name,
     color_types,

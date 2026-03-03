@@ -28,6 +28,18 @@ def is_group(node_tree: NodeTree | None):
     return len(names) == 3 and names[0] == _NODE_PREFIX and names[2]
 
 
+def get_library(node_tree: NodeTree | None) -> str:
+    if is_palette(node_tree):
+        assert node_tree is not None
+
+        if node_tree.library is None:
+            return ""
+        else:
+            return node_tree.library.filepath
+    else:
+        return ""
+
+
 def get_palette_name(node_tree: NodeTree | None) -> str:
     if is_palette(node_tree):
         assert node_tree is not None
@@ -37,11 +49,39 @@ def get_palette_name(node_tree: NodeTree | None) -> str:
         return ""
 
 
+def get_palette_name_full(node_tree: NodeTree | None) -> str:
+    if is_palette(node_tree):
+        assert node_tree is not None
+
+        name = node_tree.name.split("|", 2)[1]
+
+        if node_tree.library is None:
+            return name
+        else:
+            return f"{name} [{node_tree.library.filepath}]"
+    else:
+        return ""
+
+
 def get_group_name(node_tree: NodeTree | None) -> str:
     if is_group(node_tree):
         assert node_tree is not None
 
         return node_tree.name.split("|", 2)[2]
+    else:
+        return ""
+
+
+def get_group_name_full(node_tree: NodeTree | None) -> str:
+    if is_group(node_tree):
+        assert node_tree is not None
+
+        name = node_tree.name.split("|", 2)[2]
+
+        if node_tree.library is None:
+            return name
+        else:
+            return f"{name} [{node_tree.library.filepath}]"
     else:
         return ""
 
@@ -59,13 +99,6 @@ def filter_node_trees(
                 yield node_tree
 
 
-def resolve_group_name(name: str) -> str:
-    if name == "":
-        return "Group"
-    else:
-        return name.replace("|", "_")
-
-
 def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
     palette_names = []
 
@@ -78,11 +111,18 @@ def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
     return palette_names
 
 
+def resolve_group_name(name: str) -> str:
+    if name == "":
+        return "Group"
+    else:
+        return name.translate(str.maketrans("|[]", "___"))
+
+
 def resolve_palette_name(node_groups: BlendDataNodeTrees, name: str) -> str:
     if name == "":
         name = "Palette"
     else:
-        name = name.replace("|", "_")
+        name = name.translate(str.maketrans("|[]", "___"))
 
     return unique_name(_palette_names(node_groups), name)
 

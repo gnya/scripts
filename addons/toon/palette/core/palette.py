@@ -7,7 +7,9 @@ from toon.utils import slice_itr, within
 from .group import ToonPaletteGroup
 from .naming import (
     build_node_tree_name,
+    get_library,
     get_palette_name,
+    get_palette_name_full,
     resolve_group_name,
     resolve_palette_name,
 )
@@ -56,6 +58,14 @@ class ToonPalette:
             node_tree.name = node_tree.name.replace(name, new_name, 1)
 
     @property
+    def name_full(self) -> str:
+        return get_palette_name_full(self.header)
+
+    @property
+    def library(self) -> str:
+        return get_library(self.header)
+
+    @property
     def order(self) -> int:
         return get_order(self.header)
 
@@ -67,9 +77,15 @@ class ToonPalette:
     def is_orphens(self) -> bool:
         return self.header is None
 
+    @property
+    def is_linked(self) -> bool:
+        return self.library != ""
+
     def add(self, group_name: str) -> ToonPaletteGroup:
         if self.is_orphens:
             raise RuntimeError("No header found in this palette.")
+        elif self.is_linked:
+            raise RuntimeError("Linked palette is read-only.")
 
         self._renumber_order()
 
@@ -83,17 +99,17 @@ class ToonPalette:
 
         return group
 
-    def remove(self, group_name: str) -> bool:
-        if (group := self.get(group_name)) is None:
+    def remove(self, group_name: str, library: str = "") -> bool:
+        if (group := self.get(group_name, library)) is None:
             return False
         else:
             self.node_groups.remove(group.node_tree)
 
             return True
 
-    def get(self, group_name: str) -> ToonPaletteGroup | None:
+    def get(self, group_name: str, library: str = "") -> ToonPaletteGroup | None:
         for group in self._groups():
-            if group.name == group_name:
+            if group.name == group_name and (library == "" or group.library == library):
                 return group
 
         return None

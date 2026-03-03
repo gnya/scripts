@@ -16,7 +16,8 @@ if TYPE_CHECKING:
 
 
 class ToonPaletteSearchGroup(PropertyGroup):
-    pass
+    def init(self, name: str):
+        self.name = name
 
 
 class ToonPaletteSearchPalette(PropertyGroup):
@@ -27,7 +28,7 @@ class ToonPaletteSearchPalette(PropertyGroup):
 
         for group in palette.groups():
             state = self.groups.add()
-            state.name = group.name
+            state.init(group.name)
 
 
 class ToonPaletteSearchIndex(PropertyGroup):
@@ -50,7 +51,7 @@ class ToonPaletteSearchIndex(PropertyGroup):
             if palette.is_orphens:
                 for group in palette.groups():
                     state = self.orphans.add()
-                    state.name = group.name
+                    state.init(group.name)
             else:
                 state = self.palettes.add()
                 state.init(palette)

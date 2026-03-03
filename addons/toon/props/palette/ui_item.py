@@ -20,6 +20,7 @@ from toon.palette import (
     get_colors,
     get_group,
     get_group_name,
+    get_library,
     get_palette,
     get_texture_ptr,
     get_uv_map_ptr,
@@ -101,6 +102,10 @@ class ToonPaletteUIItem(PropertyGroup):
     header_index: IntProperty(default=-1)
 
     group_index: IntProperty(default=-1)
+
+    # TODO Check every time or BoolProperty
+    def is_linked(self) -> bool:
+        return get_library(self.node_tree) != ""
 
     def palette_data(self) -> ToonPalette | None:
         return get_palette(self.node_tree)

@@ -16,6 +16,7 @@ from bpy.types import NodeTree, PropertyGroup, WindowManager
 from toon.palette import (
     get_facade,
     get_groups,
+    get_library,
     get_palette,
     get_palette_name,
     set_palette_name,
@@ -79,6 +80,10 @@ class ToonPaletteUIPaletteState(PropertyGroup):
 
     def is_orphans(self) -> bool:
         return self.header is None
+
+    # TODO Check every time or BoolProperty
+    def is_linked(self) -> bool:
+        return get_library(self.header) != ""
 
     def palette_data(self) -> ToonPalette | None:
         return get_palette(self.header)

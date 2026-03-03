@@ -39,11 +39,12 @@ class VIEW3D_PT_toon_palette(Panel):
         sub_row = row.row(align=True)
         icon = "DOWNARROW_HLT" if state.show_expanded else "RIGHTARROW"
         sub_row.prop(state, "show_expanded", text="", emboss=False, icon=icon)
-        sub_row.label(icon="COLOR" if not state.is_orphans() else "ERROR")
+        icon = "COLOR" if not state.is_orphans() else "ERROR"
+        sub_row.label(icon=icon if not state.is_linked() else "LINKED")
 
         sub_row = row.row(align=True)
 
-        if not state.is_orphans():
+        if not state.is_orphans() and not state.is_linked():
             sub_row.prop(state, "palette_name", text="")
         else:
             sub_sub_row = sub_row.row(align=True)
@@ -102,6 +103,7 @@ class VIEW3D_PT_toon_palette(Panel):
             return
 
         row = layout.row()
+        row.enabled = not item.is_linked()
         row.prop(item, "color_type", text="")
 
         col = layout.column()
