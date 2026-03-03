@@ -12,7 +12,7 @@ _NODE_PREFIX = ".ToonPalette"
 
 
 def is_palette(node_tree: NodeTree | None):
-    if node_tree is None:
+    if node_tree is None or node_tree.type != "SHADER":
         return False
 
     names = node_tree.name.split("|")
@@ -21,7 +21,7 @@ def is_palette(node_tree: NodeTree | None):
 
 
 def is_group(node_tree: NodeTree | None):
-    if node_tree is None:
+    if node_tree is None or node_tree.type != "SHADER":
         return False
 
     names = node_tree.name.split("|")
