@@ -73,7 +73,8 @@ def encode_texture(texture_ptr: TexturePtr) -> SerializedData:
 
 
 def encode_color(color: ToonPaletteColor) -> SerializedData:
-    name, data = color.name, {}
+    index, data = str(color.socket_index), {}
+    data["name"] = color.name
     type = color.type
     data["type"] = type
 
@@ -87,7 +88,7 @@ def encode_color(color: ToonPaletteColor) -> SerializedData:
     elif type == "VALUE":
         data["value"] = getattr(*color.color_ptr)
 
-    return name, data
+    return index, data
 
 
 def encode_group(group: ToonPaletteGroup) -> SerializedData:
@@ -123,9 +124,8 @@ def decode_texture(data: SerializedData, texture_ptr: TexturePtr):
 
 
 def decode_color(data: SerializedData, group: ToonPaletteGroup):
-    name, body = _parse_data(data)
-    color = group.add(name)
-
+    _, body = _parse_data(data)
+    color = group.add(body.get("name", "Color"))
     type = body.get("type", "COLOR")
 
     if type not in [t[0] for t in color_types()]:
