@@ -5,10 +5,18 @@ from json.decoder import JSONDecodeError
 from typing import TYPE_CHECKING
 
 import bpy
-from bpy.props import EnumProperty
+from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Operator
 
-from toon.palette import PaletteDecodeError, decode_palette, encode_palette, get_facade
+from toon.palette import (
+    PaletteDecodeError,
+    decode_palette,
+    encode_palette,
+    get_facade,
+    merge_group,
+    merge_palette,
+    parse_name_full,
+)
 from toon.props import ToonPaletteSearchIndex, ToonPaletteUIState
 from toon.utils import override
 
@@ -190,8 +198,24 @@ class VIEW3D_OT_toon_palette_merge(ToonPaletteOperator):
     bl_description = "Merge active palette to selected"
     bl_options = {"REGISTER", "UNDO"}
 
+    palette_name_full: StringProperty(options={"HIDDEN"})
+
+    overwrite: BoolProperty(default=False, options={"HIDDEN"})
+
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        src_palette = state.palette_data()
+        dst_palette = get_facade().get(*parse_name_full(self.palette_name_full))
+
+        if src_palette is None or dst_palette is None:
+            return False
+        elif not merge_palette(src_palette, dst_palette, self.overwrite):
+            self.report({"ERROR"}, "Failed to merge.")
+
+            return False
+
+        get_facade().remove(src_palette.name, src_palette.library)
+
         return True
 
 
@@ -201,8 +225,32 @@ class VIEW3D_OT_toon_palette_merge_group(ToonPaletteOperator):
     bl_description = "Merge active group to selected"
     bl_options = {"REGISTER", "UNDO"}
 
+    palette_name_full: StringProperty(options={"HIDDEN"})
+
+    group_name_full: StringProperty(options={"HIDDEN"})
+
+    overwrite: BoolProperty(default=False, options={"HIDDEN"})
+
     @override
     def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        src_palette = state.palette_data()
+        dst_palette = get_facade().get(*parse_name_full(self.palette_name_full))
+
+        if src_palette is None or dst_palette is None:
+            return False
+
+        src_group = state.active_group_data()
+        dst_group = dst_palette.get(*parse_name_full(self.group_name_full))
+
+        if src_group is None or dst_group is None:
+            return False
+        elif not merge_group(src_group, dst_group, self.overwrite):
+            self.report({"ERROR"}, "Failed to merge.")
+
+            return False
+
+        src_palette.remove(src_group.name, src_group.library)
+
         return True
 
 

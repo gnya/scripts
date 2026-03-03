@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator
+
+from .bridge import get_facade
 
 if TYPE_CHECKING:
     from .core import ToonPalette, ToonPaletteColor, ToonPaletteGroup
@@ -11,14 +13,14 @@ def merge_color(src: ToonPaletteColor, dst: ToonPaletteColor) -> bool:
     dst.type = type
 
     if type == "COLOR":
-        setattr(*src.color_ptr, getattr(*dst.color_ptr))
+        setattr(*dst.color_ptr, getattr(*src.color_ptr))
     elif type == "TEXTURE":
-        setattr(*src.texture_ptr, getattr(*dst.texture_ptr))
-        setattr(*src.uv_map_ptr, getattr(*dst.uv_map_ptr))
+        setattr(*dst.texture_ptr, getattr(*src.texture_ptr))
+        setattr(*dst.uv_map_ptr, getattr(*src.uv_map_ptr))
     elif type == "VECTOR":
-        setattr(*src.color_ptr, getattr(*dst.color_ptr))
+        setattr(*dst.color_ptr, getattr(*src.color_ptr))
     elif type == "VALUE":
-        setattr(*src.color_ptr, getattr(*dst.color_ptr))
+        setattr(*dst.color_ptr, getattr(*src.color_ptr))
 
     return True
 
@@ -26,7 +28,7 @@ def merge_color(src: ToonPaletteColor, dst: ToonPaletteColor) -> bool:
 def merge_group(
     src: ToonPaletteGroup, dst: ToonPaletteGroup, overwrite: bool = False
 ) -> bool:
-    if src.is_linked or dst.is_linked:
+    if dst.is_linked:
         return False
 
     for src_color in src.colors():
@@ -44,7 +46,7 @@ def merge_group(
 
 
 def merge_palette(src: ToonPalette, dst: ToonPalette, overwrite: bool = False) -> bool:
-    if src.is_linked or dst.is_linked:
+    if dst.is_linked:
         return False
 
     for src_group in src.groups():
@@ -59,3 +61,30 @@ def merge_palette(src: ToonPalette, dst: ToonPalette, overwrite: bool = False) -
         merge_group(src_group, dst_group, overwrite)
 
     return True
+
+
+def mergable_palettes(src_palette: ToonPalette) -> Iterator[ToonPalette]:
+    for dst_palette in get_facade().palettes():
+        if not (
+            dst_palette.is_orphens
+            or dst_palette.is_linked
+            or dst_palette.name == src_palette.name_full
+        ):
+            yield dst_palette
+
+
+def mergable_groups(
+    src_palette: ToonPalette, src_group: ToonPaletteGroup
+) -> Iterator[tuple[ToonPalette, ToonPaletteGroup]]:
+    for dst_palette in get_facade().palettes():
+        if dst_palette.is_linked:
+            continue
+
+        if dst_palette.name == src_palette.name_full:
+            for dst_group in dst_palette.groups():
+                if not (dst_group.is_linked or dst_group.name == src_group.name_full):
+                    yield dst_palette, dst_group
+        else:
+            for dst_group in dst_palette.groups():
+                if not dst_group.is_linked:
+                    yield dst_palette, dst_group

@@ -96,6 +96,12 @@ class ToonPaletteUIPaletteState(PropertyGroup):
     def groups_data(self) -> Iterator[ToonPaletteGroup]:
         return get_groups(self.header)
 
+    def active_group_data(self) -> ToonPaletteGroup | None:
+        if (item := self.active_item()) is None:
+            return None
+        else:
+            return item.group_data()
+
     def init(self, palette: ToonPalette, palette_index: int):
         self.header = palette.header
         self.palette_index = palette_index

@@ -35,6 +35,7 @@ from .core import (
     int_to_color_type,
     parse_name_full,
 )
+from .merge import mergable_groups, mergable_palettes, merge_group, merge_palette
 
 __all__ = [
     PaletteDecodeError,
@@ -72,4 +73,8 @@ __all__ = [
     set_group_name,
     set_palette_name,
     update_all_uv_pixel_snap,
+    mergable_groups,
+    mergable_palettes,
+    merge_group,
+    merge_palette,
 ]

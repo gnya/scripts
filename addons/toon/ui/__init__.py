@@ -5,6 +5,10 @@ from .palette_menu import (
     VIEW3D_MT_toon_palette,
     VIEW3D_MT_toon_palette_add,
     VIEW3D_MT_toon_palette_group,
+    VIEW3D_MT_toon_palette_merge,
+    VIEW3D_MT_toon_palette_merge_group,
+    VIEW3D_MT_toon_palette_merge_group_overwrite,
+    VIEW3D_MT_toon_palette_merge_overwrite,
 )
 from .palette_panel import VIEW3D_PT_toon_palette
 
@@ -17,6 +21,10 @@ classes = (
     VIEW3D_MT_toon_palette,
     VIEW3D_MT_toon_palette_add,
     VIEW3D_MT_toon_palette_group,
+    VIEW3D_MT_toon_palette_merge,
+    VIEW3D_MT_toon_palette_merge_overwrite,
+    VIEW3D_MT_toon_palette_merge_group,
+    VIEW3D_MT_toon_palette_merge_group_overwrite,
     VIEW3D_PT_toon_palette,
 )
 
