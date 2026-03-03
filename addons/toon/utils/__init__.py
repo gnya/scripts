@@ -11,6 +11,7 @@ from .node import (
 )
 from .range import slice_itr, within
 from .socket import NodeLinkRebinder, change_socket_type
+from .time import Stopwatch, time_start, timeit
 from .typing import override
 
 __all__ = [
@@ -28,10 +29,13 @@ __all__ = [
     slice_itr,
     within,
     unique_name,
+    timeit,
+    time_start,
     object_rename_post,
     node_group_update_post,
     node_group_import_post,
     NodeLinkRebinder,
+    Stopwatch,
 ]
 
 
