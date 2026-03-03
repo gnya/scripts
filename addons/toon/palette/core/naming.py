@@ -98,17 +98,10 @@ def get_group_name_full(node_tree: NodeTree | None) -> str:
         return ""
 
 
-def filter_node_trees(
-    node_groups: BlendDataNodeTrees, palette_name: str = ""
-) -> Iterator[NodeTree]:
-    if palette_name == "":
-        for node_tree in node_groups:
-            if is_palette(node_tree):
-                yield node_tree
-    else:
-        for node_tree in node_groups:
-            if get_palette_name(node_tree) == palette_name:
-                yield node_tree
+def filter_node_trees(node_groups: BlendDataNodeTrees) -> Iterator[NodeTree]:
+    for node_tree in node_groups:
+        if node_tree.type == "SHADER" and is_palette(node_tree):
+            yield node_tree
 
 
 def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
