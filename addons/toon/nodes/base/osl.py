@@ -1,22 +1,26 @@
-from toon.utils import override
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import bpy
 
-from bpy.types import Node, NodeTree
-
 from toon.shaders import shader_filepath
+from toon.utils import override
 
-from .node import ToonNodeGroup
+from .node import ToonNode
+
+if TYPE_CHECKING:
+    from bpy.types import Node, NodeTree
 
 
-class ToonNodeOSL(ToonNodeGroup):
-    osl_name = ''
+class ToonNodeOSL(ToonNode):
+    osl_name = ""
 
     def _try_load_osl(self, node: Node | None) -> bool:
         if node is None:
             return False
 
-        node.mode = 'EXTERNAL'
+        node.mode = "EXTERNAL"
         node.filepath = shader_filepath(self.osl_name)
 
         return len(node.inputs) > 0 or len(node.outputs) > 0
@@ -29,8 +33,8 @@ class ToonNodeOSL(ToonNodeGroup):
 
     @override
     def new_node_tree(self, name: str) -> tuple[NodeTree, bool]:
-        node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
-        script = node_tree.nodes.new('ShaderNodeScript')
+        node_tree = bpy.data.node_groups.new(name, "ShaderNodeTree")
+        script = node_tree.nodes.new("ShaderNodeScript")
 
         self.init_sockets(node_tree)
 
@@ -48,7 +52,7 @@ class ToonNodeOSL(ToonNodeGroup):
         if node_tree is None:
             return
 
-        script = node_tree.nodes.get('Script')
+        script = node_tree.nodes.get("Script")
 
         if not self._try_load_osl(script):
             self.node_ready = False

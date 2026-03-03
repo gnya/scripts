@@ -1,14 +1,18 @@
-from toon.utils import override
+from __future__ import annotations
+
+import re
+from typing import TYPE_CHECKING
 
 import bpy
-import re
-
-from bpy.types import Context, Node, NodeTree, Object, UILayout
 from bpy.props import PointerProperty, StringProperty
+from bpy.types import Object
 
-from toon.utils import object_rename_post, NodeLinkRebinder
+from toon.utils import NodeLinkRebinder, object_rename_post, override
 
 from .osl import ToonNodeOSL
+
+if TYPE_CHECKING:
+    from bpy.types import Context, Node, NodeTree, UILayout
 
 
 class ToonNodeOSLLight(ToonNodeOSL):
@@ -16,7 +20,7 @@ class ToonNodeOSLLight(ToonNodeOSL):
         if object.library is not None:
             return False
 
-        return object.type in {'LIGHT', 'EMPTY'}
+        return object.type in {"LIGHT", "EMPTY"}
 
     def _update_object(self, context: Context):
         with NodeLinkRebinder(self):
@@ -24,20 +28,19 @@ class ToonNodeOSLLight(ToonNodeOSL):
             self.init(context)
 
         if self.object is None:
-            self.last_object_name = ''
+            self.last_object_name = ""
         else:
             self.last_object_name = self.object.name
 
-    last_object_name: StringProperty(default='')
+    last_object_name: StringProperty(default="")
 
     object: PointerProperty(
-        name='Object', type=Object,
-        poll=_poll_object, update=_update_object
+        name="Object", type=Object, poll=_poll_object, update=_update_object
     )
 
     def _attr_prefix(self):
         if self.object is None:
-            return ''
+            return ""
 
         return f'objects["{self.object.name}"]'
 
@@ -49,7 +52,7 @@ class ToonNodeOSLLight(ToonNodeOSL):
                 continue
 
             for node in node_tree.nodes:
-                if node.type != 'ATTRIBUTE':
+                if node.bl_idname != "ShaderNodeAttribute":
                     continue
 
                 attr = node.attribute_name
@@ -76,7 +79,7 @@ class ToonNodeOSLLight(ToonNodeOSL):
             return
 
         for node in node_tree.nodes:
-            if node.type != 'ATTRIBUTE':
+            if node.bl_idname != "ShaderNodeAttribute":
                 continue
 
             prefix = self._attr_prefix()
@@ -99,7 +102,7 @@ class ToonNodeOSLLight(ToonNodeOSL):
                 node._update_attr_nodes(obj)
 
         for node_tree in bpy.data.node_groups:
-            if node_tree.name[0] == '.':
+            if node_tree.name[0] == ".":
                 continue
 
             for node in node_tree.nodes:
@@ -110,11 +113,11 @@ class ToonNodeOSLLight(ToonNodeOSL):
 
     def new_attr_node(self, node_tree: NodeTree, attr: str) -> Node:
         prefix = self._attr_prefix()
-        attribute_name = f'{prefix}.{attr}' if prefix else ''
+        attribute_name = f"{prefix}.{attr}" if prefix else ""
 
-        node = node_tree.nodes.new('ShaderNodeAttribute')
-        node.name = 'Attribute Rotation'
-        node.attribute_type = 'VIEW_LAYER'
+        node = node_tree.nodes.new("ShaderNodeAttribute")
+        node.name = "Attribute Rotation"
+        node.attribute_type = "VIEW_LAYER"
         node.attribute_name = attribute_name
 
         return node
@@ -137,7 +140,7 @@ class ToonNodeOSLLight(ToonNodeOSL):
     def draw_buttons(self, context: Context, layout: UILayout):
         super().draw_buttons(context, layout)
 
-        layout.prop(self, 'object', text='Object')
+        layout.prop(self, "object", text="Object")
 
     @classmethod
     def register(cls):

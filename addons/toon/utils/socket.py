@@ -1,13 +1,15 @@
-from typing import Any, Iterator, Literal
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Iterator, Literal
 
 from bpy.types import bpy_prop_array
-from bpy.types import Node, NodeSocket, NodeTree
 
-from toon.utils import node_itr, all_node_users_itr
+from .node import all_node_users_itr, node_itr
 
+if TYPE_CHECKING:
+    from bpy.types import Node, NodeSocket, NodeTree
 
-SocketValue = int | float | list[int | float]
-SocketBinder = dict[str, tuple[SocketValue, list[NodeSocket]]]
+    _SocketBinder = dict[str, tuple[int | float | list[int | float], list[NodeSocket]]]
 
 
 def _rebind_inputs(node_tree: NodeTree, node: Node, old_id: int, new_id: int):
@@ -27,10 +29,9 @@ def _rebind_outputs(node_tree: NodeTree, node: Node, old_id: int, new_id: int):
 
 
 def change_socket_type(
-    node_tree: NodeTree, socket_id: int,
-    type: str, in_out: Literal['IN'] | Literal['OUT']
+    node_tree: NodeTree, socket_id: int, type: str, in_out: Literal["IN", "OUT"]
 ):
-    if in_out == 'IN':
+    if in_out == "IN":
         sockets = node_tree.inputs
     else:
         sockets = node_tree.outputs
@@ -45,12 +46,12 @@ def change_socket_type(
     sockets.new(type, old_interface.name)
     new_id = len(sockets) - 1
 
-    if in_out == 'IN':
-        inner_node_type = 'NodeGroupInput'
+    if in_out == "IN":
+        inner_node_type = "NodeGroupInput"
         inner_rebinder = _rebind_outputs
         outer_rebinder = _rebind_inputs
     else:
-        inner_node_type = 'NodeGroupOutput'
+        inner_node_type = "NodeGroupOutput"
         inner_rebinder = _rebind_inputs
         outer_rebinder = _rebind_outputs
 
@@ -66,17 +67,14 @@ def change_socket_type(
     sockets.move(new_id, old_id)
     sockets.remove(old_interface)
 
-    # Update nodes.
-    for node in all_node_users_itr(node_tree):
-        node.update()
-
 
 def _bind_sockets(
-    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: SocketBinder
+    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: _SocketBinder
 ):
+
     for socket in sockets:
         if socket.enabled:
-            value = getattr(socket, 'default_value', None)
+            value = getattr(socket, "default_value", None)
 
             if isinstance(value, bpy_prop_array):
                 value = list(value)
@@ -97,14 +95,14 @@ def _bind_sockets(
 
 
 def _rebind_sockets(
-    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: SocketBinder
+    node_tree: NodeTree, sockets: Iterator[NodeSocket], binder: _SocketBinder
 ):
     for socket in sockets:
         if socket.enabled and socket.name in binder:
             value, binded_sockets = binder[socket.name]
 
             try:
-                setattr(socket, 'default_value', value)
+                setattr(socket, "default_value", value)
             except TypeError:
                 pass
             except AttributeError:
@@ -118,11 +116,11 @@ def _rebind_sockets(
                     node_tree.links.new(s, socket)
 
 
-class NodeLinkRebinder():
+class NodeLinkRebinder:
     def __init__(self, node: Node):
         self.node = node
-        self.inputs: SocketBinder = {}
-        self.outputs: SocketBinder = {}
+        self.inputs: _SocketBinder = {}
+        self.outputs: _SocketBinder = {}
 
     def __enter__(self):
         node_tree = self.node.id_data

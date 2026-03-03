@@ -1,52 +1,71 @@
-from typing import Any
-from toon.utils import override
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from bpy.props import StringProperty
-from bpy.types import Context, UILayout, UIList
+from bpy.types import UIList
 
-from toon.props import Palette, PalettePointer, PaletteSlot
+from toon.utils import override
+
+if TYPE_CHECKING:
+    from bpy.types import Context, UILayout
+
+    from toon.props import ToonPaletteUIItem, ToonPaletteUIPaletteState
 
 
 class VIEW3D_UL_toon_palette_entry(UIList):
-    bl_idname = 'VIEW3D_UL_toon_palette_entry'
+    bl_idname = "VIEW3D_UL_toon_palette_entry"
 
     filter_name: StringProperty(
-        name='Filter by Name', default='', options={'TEXTEDIT_UPDATE'}
+        name="Filter by Name", default="", options={"TEXTEDIT_UPDATE"}
     )
 
     @override
     def draw_item(
-            self, context: Context, layout: UILayout, data: Palette | None,
-            item: PaletteSlot | None, icon: int | None, active_data: Any,
-            active_property: str | None, index: int | None = 0, flt_flag: int | None = 0
+        self,
+        context: Context,
+        layout: UILayout,
+        data: ToonPaletteUIPaletteState | None,
+        item: ToonPaletteUIItem | None,
+        icon: int | None,
+        active_data: Any,
+        active_property: str | None,
+        index: int | None = 0,
+        flt_flag: int | None = 0,
     ):
         if data is None or item is None:
             return
 
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            pointer = data.get_pointer(item)
+        if self.layout_type in {"DEFAULT", "COMPACT"}:
             row = layout.row(align=True)
 
-            if pointer is None:
-                return
-            elif pointer.entry is None:
-                i = 'DOWNARROW_HLT' if pointer.group.show_expanded else 'RIGHTARROW'
-                row.prop(pointer.group, 'show_expanded', text='', emboss=False, icon=i)
-                row.prop(pointer.group, 'name', text='', emboss=False)
-            else:
+            if item.type == "GROUP":
+                i = "DOWNARROW_HLT" if item.show_expanded else "RIGHTARROW"
+                row.prop(item, "show_expanded", text="", emboss=False, icon=i)
+
+                if not item.is_linked():
+                    row.prop(item, "group_name", text="", emboss=False)
+                else:
+                    sub_row = row.row(align=True)
+                    sub_row.enabled = False
+                    sub_row.prop(item, "group_name", text="", emboss=False)
+            elif item.type == "COLOR":
                 row.separator(factor=3.0)
+                row.enabled = not item.is_linked()
+                left = row.row()
+                left.ui_units_x = 8.0
 
-                if pointer.entry.type == 'COLOR':
-                    row.row().prop(pointer.entry, 'color', text='')
-                elif pointer.entry.type == 'TEXTURE':
-                    row.row().prop(pointer.entry.node(), 'image', text='')
-                elif pointer.entry.type == 'VALUE':
-                    row.row().prop(pointer.entry, 'value', text='', slider=True)
-                elif pointer.entry.type == 'MIX':
-                    row.row().prop(pointer.entry, 'mix_factor', text='', slider=True)
+                if item.color_type == "COLOR":
+                    left.prop(*item.color_ptr, text="")
+                elif item.color_type == "TEXTURE":
+                    left.prop(*item.texture_ptr, text="")
+                elif item.color_type == "VECTOR":
+                    left.prop(*item.color_ptr, text="", slider=True)
+                elif item.color_type == "VALUE":
+                    left.prop(*item.color_ptr, text="", slider=True)
 
-                row.prop(pointer.entry, 'name', text='', emboss=False)
-        elif self.layout_type in {'GRID'}:
+                row.prop(item, "color_name", text="", emboss=False)
+        elif self.layout_type in {"GRID"}:
             pass
 
     def _filter_name(self, name: str, filter_name: str):
@@ -55,40 +74,38 @@ class VIEW3D_UL_toon_palette_entry(UIList):
         else:
             return filter_name.lower() not in name.lower()
 
-    def _filter_item(self, pointer: PalettePointer | None) -> bool:
-        if pointer is None:
-            return False
-        elif pointer.entry is not None:
-            if not self.filter_name:
-                return pointer.group.show_expanded
-
-            if self._filter_name(pointer.entry.name, self.filter_name):
-                return pointer.group.show_expanded
-        else:
+    def _filter_item(self, item: ToonPaletteUIItem) -> bool:
+        if item.type == "GROUP":
             if not self.filter_name:
                 return True
 
-            if self._filter_name(pointer.group.name, self.filter_name):
+            if self._filter_name(item.group_name, self.filter_name):
                 return True
 
-            for child in pointer.group.entries:
-                if self._filter_name(child.name, self.filter_name):
+            for color in item.colors_data():
+                if self._filter_name(color.name, self.filter_name):
                     return True
+        elif item.type == "COLOR":
+            if not self.filter_name:
+                return item.show_expanded
+
+            if self._filter_name(item.color_name, self.filter_name):
+                return item.show_expanded
 
         return False
 
     @override
     def filter_items(
-            self, context: Context, data: Palette | None, property: str
+        self, context: Context, data: ToonPaletteUIPaletteState | None, property: str
     ) -> tuple[list[int], list[int]]:
         if data is None:
             return [], []
 
-        slots = getattr(data, property)
-        filter_flags = [self.bitflag_filter_item] * len(slots)
+        items = data.list_items
+        filter_flags = [self.bitflag_filter_item] * len(items)
 
-        for i, slot in enumerate(slots):
-            flag = self._filter_item(data.get_pointer(slot))
+        for i, item in enumerate(items):
+            flag = self._filter_item(item)
 
             if not (flag ^ self.use_filter_invert):
                 filter_flags[i] = ~self.bitflag_filter_item

@@ -1,33 +1,41 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from bpy.types import Menu, Node
+
+from toon.nodes import (
+    ToonNodeHSVJitter,
+    ToonNodeLambert,
+    ToonNodeLightArea,
+    ToonNodeLightPoint,
+    ToonNodeLightSpot,
+    ToonNodeLightSun,
+    ToonNodeMatCap,
+    ToonNodeMaterial,
+    ToonNodeOutput,
+    ToonNodePalette,
+    ToonNodeUVPixelSnap,
+    ToonNodeVisualize,
+)
 from toon.utils import override
 
-from bpy.types import Context, Menu, Node, UILayout
-
-from toon.nodes import ToonNodePalette
-from toon.nodes import ToonNodeMatCap
-from toon.nodes import ToonNodeVisualize
-from toon.nodes import ToonNodeHSVJitter
-from toon.nodes import ToonNodeUVPixelSnap
-from toon.nodes import ToonNodeLambert
-from toon.nodes import ToonNodeMaterial
-from toon.nodes import ToonNodeLightArea
-from toon.nodes import ToonNodeLightPoint
-from toon.nodes import ToonNodeLightSpot
-from toon.nodes import ToonNodeLightSun
-from toon.nodes import ToonNodeOutput
+if TYPE_CHECKING:
+    from bpy.types import Context, UILayout
 
 
 class NODE_MT_toon_node_category(Menu):
-    bl_idname = 'NODE_MT_category_toon'
-    bl_label = 'Toon'
-    bl_space_type = 'NODE_EDITOR'
+    bl_idname = "NODE_MT_category_toon"
+    bl_label = "Toon"
+    bl_space_type = "NODE_EDITOR"
 
     @classmethod
     @override
     def poll(cls, context: Context) -> bool:
         return (
-            context.space_data.type == 'NODE_EDITOR' and
-            context.space_data.tree_type == 'ShaderNodeTree' and
-            context.material is not None
+            context.space_data.type == "NODE_EDITOR"
+            and context.space_data.tree_type == "ShaderNodeTree"
+            and context.material is not None
         )
 
     def _draw_node(self, layout: UILayout, type: type):
@@ -36,9 +44,9 @@ class NODE_MT_toon_node_category(Menu):
         if bl_rna is not None:
             label = bl_rna.name
         else:
-            label = 'Unknown'
+            label = "Unknown"
 
-        o = layout.operator('node.add_node', text=label)
+        o = layout.operator("node.add_node", text=label)
         o.type = type.__name__
         o.use_transform = True
 
@@ -55,8 +63,8 @@ class NODE_MT_toon_node_category(Menu):
         col.separator()
 
         if (
-            context.scene.render.engine == 'CYCLES' and
-            context.scene.cycles.shading_system
+            context.scene.render.engine == "CYCLES"
+            and context.scene.cycles.shading_system
         ):
             self._draw_node(col, ToonNodeLightArea)
             self._draw_node(col, ToonNodeLightPoint)
@@ -69,7 +77,7 @@ class NODE_MT_toon_node_category(Menu):
             col.separator()
             self._draw_node(col, ToonNodeOutput)
         else:
-            col.label(text='Enable Cycles OSL', icon='INFO')
+            col.label(text="Enable Cycles OSL", icon="INFO")
 
     @classmethod
     def register(cls):
@@ -81,10 +89,10 @@ class NODE_MT_toon_node_category(Menu):
             if cls.poll(context):
                 layout.menu(cls.bl_idname)
 
-        _node_categories['SHADER_TOON'] = ([], _draw, [cls])
+        _node_categories["SHADER_TOON"] = ([], _draw, [cls])
 
     @staticmethod
     def unregister():
         from nodeitems_utils import _node_categories
 
-        del _node_categories['SHADER_TOON']
+        del _node_categories["SHADER_TOON"]

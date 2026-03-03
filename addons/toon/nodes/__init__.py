@@ -1,20 +1,15 @@
-from .palette import ToonNodePalette
-
-from .matcap import ToonNodeMatCap
-from .visualize import ToonNodeVisualize
-
-from .hsv_jitter import ToonNodeHSVJitter
-from .uv_pixel_snap import ToonNodeUVPixelSnap
-from .lambert import ToonNodeLambert
-from .material import ToonNodeMaterial
-
 from .area_light import ToonNodeLightArea
+from .hsv_jitter import ToonNodeHSVJitter
+from .lambert import ToonNodeLambert
+from .matcap import ToonNodeMatCap
+from .material import ToonNodeMaterial
+from .output import ToonNodeOutput
+from .palette import ToonNodePalette
 from .point_light import ToonNodeLightPoint
 from .spot_light import ToonNodeLightSpot
 from .sun_light import ToonNodeLightSun
-
-from .output import ToonNodeOutput
-
+from .uv_pixel_snap import ToonNodeUVPixelSnap
+from .visualize import ToonNodeVisualize
 
 classes = (
     ToonNodePalette,
@@ -28,7 +23,7 @@ classes = (
     ToonNodeLightPoint,
     ToonNodeLightSpot,
     ToonNodeLightSun,
-    ToonNodeOutput
+    ToonNodeOutput,
 )
 
 

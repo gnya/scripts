@@ -1,145 +1,146 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from bpy.types import Panel
+
+from toon.ops import (
+    VIEW3D_OT_toon_palette_add_color,
+    VIEW3D_OT_toon_palette_move_item,
+    VIEW3D_OT_toon_palette_remove,
+    VIEW3D_OT_toon_palette_remove_color,
+)
+from toon.props import ToonPaletteUIState
 from toon.utils import override
 
-from bpy.types import Context, Panel, UILayout
-
-from toon.manager import PaletteManager
-from toon.ops import VIEW3D_OT_toon_palette_add_entry
-from toon.ops import VIEW3D_OT_toon_palette_remove
-from toon.ops import VIEW3D_OT_toon_palette_remove_entry
-from toon.ops import VIEW3D_OT_toon_palette_move_slot
-from toon.props import Palette
-
 from .palette_list import VIEW3D_UL_toon_palette_entry
-from .palette_menu import VIEW3D_MT_toon_palette_add
-from .palette_menu import VIEW3D_MT_toon_palette
-from .palette_menu import VIEW3D_MT_toon_palette_group
+from .palette_menu import (
+    VIEW3D_MT_toon_palette,
+    VIEW3D_MT_toon_palette_add,
+    VIEW3D_MT_toon_palette_group,
+)
+
+if TYPE_CHECKING:
+    from bpy.types import Context, UILayout
+
+    from toon.props import ToonPaletteUIPaletteState
 
 
 class VIEW3D_PT_toon_palette(Panel):
-    bl_idname = 'VIEW3D_PT_toon_palette'
-    bl_label = 'Palette'
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Toon'
+    bl_idname = "VIEW3D_PT_toon_palette"
+    bl_label = "Palette"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Toon"
 
-    def _draw_palette_list(self, layout: UILayout, palette: Palette):
+    def _draw_palette_header(self, layout: UILayout, state: ToonPaletteUIPaletteState):
+        row = layout.row()
+
+        sub_row = row.row(align=True)
+        icon = "DOWNARROW_HLT" if state.show_expanded else "RIGHTARROW"
+        sub_row.prop(state, "show_expanded", text="", emboss=False, icon=icon)
+        icon = "COLOR" if not state.is_orphans() else "ERROR"
+        sub_row.label(icon=icon if not state.is_linked() else "LINKED")
+
+        sub_row = row.row(align=True)
+
+        if not state.is_orphans() and not state.is_linked():
+            sub_row.prop(state, "palette_name", text="")
+        else:
+            sub_sub_row = sub_row.row(align=True)
+            sub_sub_row.enabled = False
+            sub_sub_row.prop(state, "palette_name", text="")
+
+        sub_row.menu(VIEW3D_MT_toon_palette.bl_idname, text="", icon="DOWNARROW_HLT")
+
+        sub_row = row.row(align=True)
+        sub_row.operator(
+            VIEW3D_OT_toon_palette_remove.bl_idname, text="", emboss=False, icon="X"
+        )
+
+    def _draw_palette_list(self, layout: UILayout, state: ToonPaletteUIPaletteState):
         row = layout.row()
 
         row.template_list(
             VIEW3D_UL_toon_palette_entry.bl_idname,
-            palette.name,
-            palette, 'slots', palette, 'active_slot_id',
-            rows=12, sort_lock=True
+            state.palette_name,
+            state,
+            "list_items",
+            state,
+            "active_index",
+            rows=12,
+            sort_lock=True,
         )
 
         col = row.column()
         sub_col = col.column(align=True)
         sub_col.operator(
-            VIEW3D_OT_toon_palette_add_entry.bl_idname,
-            text='', icon='ADD'
+            VIEW3D_OT_toon_palette_add_color.bl_idname, text="", icon="ADD"
         )
         sub_col.operator(
-            VIEW3D_OT_toon_palette_remove_entry.bl_idname,
-            text='', icon='REMOVE'
+            VIEW3D_OT_toon_palette_remove_color.bl_idname, text="", icon="REMOVE"
         )
         sub_col.separator()
         sub_col.menu(
-            VIEW3D_MT_toon_palette_group.bl_idname,
-            text='', icon='DOWNARROW_HLT'
+            VIEW3D_MT_toon_palette_group.bl_idname, text="", icon="DOWNARROW_HLT"
         )
 
-        if len(palette.slots) > 1:
+        if len(state.list_items) > 1:
             sub_col.separator()
             o = sub_col.operator(
-                VIEW3D_OT_toon_palette_move_slot.bl_idname,
-                text='', icon='TRIA_UP'
+                VIEW3D_OT_toon_palette_move_item.bl_idname, text="", icon="TRIA_UP"
             )
-            o.direction = 'UP'
+            o.direction = "UP"
             o = sub_col.operator(
-                VIEW3D_OT_toon_palette_move_slot.bl_idname,
-                text='', icon='TRIA_DOWN'
+                VIEW3D_OT_toon_palette_move_item.bl_idname, text="", icon="TRIA_DOWN"
             )
-            o.direction = 'DOWN'
+            o.direction = "DOWN"
 
-    def _draw_palette_header(self, layout: UILayout, palette: Palette):
+    def _draw_palette_props(self, layout: UILayout, state: ToonPaletteUIPaletteState):
+        item = state.active_item()
+
+        if item is None or item.type == "GROUP":
+            return
+
         row = layout.row()
+        row.enabled = not item.is_linked()
+        row.prop(item, "color_type", text="")
 
-        sub_row = row.row(align=True)
-        icon = 'DOWNARROW_HLT' if palette.show_expanded else 'RIGHTARROW'
-        sub_row.prop(palette, 'show_expanded', text='', emboss=False, icon=icon)
-        sub_row.label(icon='COLOR')
+        col = layout.column()
+        col.use_property_split = True
+        col.use_property_decorate = False
 
-        sub_row = row.row(align=True)
-        sub_row.prop(palette, 'name', text='')
-        sub_row.menu(
-            VIEW3D_MT_toon_palette.bl_idname,
-            text='', icon='DOWNARROW_HLT'
-        )
+        if item.color_type == "COLOR":
+            col.prop(*item.color_ptr, text="Color")
+        elif item.color_type == "TEXTURE":
+            col.template_ID(*item.texture_ptr, new="image.new", open="image.open")
+            col.prop(*item.uv_map_ptr, text="UV Map")
+        elif item.color_type == "VECTOR":
+            col.prop(*item.color_ptr, text="Vector", slider=True)
+        elif item.color_type == "VALUE":
+            col.prop(*item.color_ptr, text="Value", slider=True)
 
-        sub_row = row.row(align=True)
-        sub_row.operator(
-            VIEW3D_OT_toon_palette_remove.bl_idname,
-            text='', emboss=False, icon='X'
-        )
+        col.separator()
 
-    def _draw_palette_props(self, layout: UILayout, palette: Palette):
-        pointer = palette.active_pointer()
-
-        if pointer is not None and pointer.entry is not None:
-            row = layout.row()
-            row.prop(pointer.entry, 'type', text='')
-
-            col = layout.column()
-            col.use_property_split = True
-            col.use_property_decorate = False
-
-            if pointer.entry.type == 'COLOR':
-                col.prop(pointer.entry, 'color', text='Color')
-            elif pointer.entry.type == 'TEXTURE':
-                col.template_ID(
-                    pointer.entry.node(), 'image',
-                    new='image.new', open='image.open'
-                )
-                col.prop(pointer.entry, 'texture_uv_map', text='UV Map')
-            elif pointer.entry.type == 'VALUE':
-                col.prop(pointer.entry, 'value', text='Value', slider=True)
-            elif pointer.entry.type == 'MIX':
-                col.prop(pointer.entry, 'mix_factor', text='Factor', slider=True)
-                col.prop_search(
-                    pointer.entry, 'mix_source_a',
-                    pointer.group, 'entries',
-                    text='Source A'
-                )
-                col.prop_search(
-                    pointer.entry, 'mix_source_b',
-                    pointer.group, 'entries',
-                    text='Source B'
-                )
-
-            col.separator()
-
-    def _draw_palette(self, layout: UILayout, palette: Palette):
+    def _draw_palette(self, layout: UILayout, state: ToonPaletteUIPaletteState):
         col = layout.column(align=True)
 
         box = col.box()
-        self._draw_palette_header(box, palette)
+        self._draw_palette_header(box, state)
 
-        if palette.show_expanded:
+        if state.show_expanded:
             box = col.box()
-            self._draw_palette_list(box, palette)
-            self._draw_palette_props(box, palette)
+            self._draw_palette_list(box, state)
+            self._draw_palette_props(box, state)
 
     @override
     def draw(self, context: Context):
         layout = self.layout
 
-        layout.menu(
-            VIEW3D_MT_toon_palette_add.bl_idname,
-            text='Add Palette'
-        )
+        layout.menu(VIEW3D_MT_toon_palette_add.bl_idname, text="Add Palette")
 
-        manager = PaletteManager.instance()
+        states = ToonPaletteUIState.current()
 
-        for palette in manager.palettes():
-            layout.context_pointer_set('palette', palette)
-            self._draw_palette(layout, palette)
+        for state in states.list_states:
+            layout.context_pointer_set("palette_state", state)
+            self._draw_palette(layout, state)

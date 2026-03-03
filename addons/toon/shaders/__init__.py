@@ -1,14 +1,11 @@
-from .shaders import shader_filepath
-from .shaders import compile_all_shaders
-from .shaders import register_shaders
-from .shaders import unregister_shaders
-
-__all__ = [
-    shader_filepath,
+from .shaders import (
     compile_all_shaders,
     register_shaders,
-    unregister_shaders
-]
+    shader_filepath,
+    unregister_shaders,
+)
+
+__all__ = [shader_filepath, compile_all_shaders, register_shaders, unregister_shaders]
 
 
 def register():
@@ -21,7 +18,7 @@ def register():
 
 
 def unregister():
-    from toon.utils import unregister_pid, list_pids
+    from toon.utils import list_pids, unregister_pid
 
     from .shaders import SHADER_PREFIX
 
