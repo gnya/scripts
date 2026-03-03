@@ -21,6 +21,7 @@ from toon.palette import (
     get_palette_name,
     set_palette_name,
 )
+from toon.utils import node_group_import_post
 
 from .node import ToonPaletteSearchIndex
 from .ui_item import ToonPaletteUIItem
@@ -145,7 +146,6 @@ class ToonPaletteUIState(PropertyGroup):
 
         return states
 
-    # TODO blend_import_post (Call it when append node trees.)
     @staticmethod
     @persistent
     def _sync_state(object: Scene):
@@ -161,6 +161,7 @@ class ToonPaletteUIState(PropertyGroup):
 
         redo_post.append(ToonPaletteUIState._sync_state)
         undo_post.append(ToonPaletteUIState._sync_state)
+        node_group_import_post.append(ToonPaletteUIState._sync_state)
 
     @staticmethod
     def unregister():
@@ -168,3 +169,4 @@ class ToonPaletteUIState(PropertyGroup):
 
         redo_post.remove(ToonPaletteUIState._sync_state)
         undo_post.remove(ToonPaletteUIState._sync_state)
+        node_group_import_post.remove(ToonPaletteUIState._sync_state)

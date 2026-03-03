@@ -8,6 +8,7 @@ from bpy.props import BoolProperty, CollectionProperty, PointerProperty
 from bpy.types import PropertyGroup, WindowManager
 
 from toon.palette import get_palettes
+from toon.utils import node_group_import_post
 
 if TYPE_CHECKING:
     from bpy.types import Scene
@@ -76,7 +77,6 @@ class ToonPaletteSearchIndex(PropertyGroup):
 
         return states
 
-    # TODO blend_import_post (Call it when append node trees.)
     @staticmethod
     @persistent
     def _sync_state(object: Scene):
@@ -92,6 +92,7 @@ class ToonPaletteSearchIndex(PropertyGroup):
 
         redo_post.append(ToonPaletteSearchIndex._sync_state)
         undo_post.append(ToonPaletteSearchIndex._sync_state)
+        node_group_import_post.append(ToonPaletteSearchIndex._sync_state)
 
     @staticmethod
     def unregister():
@@ -99,3 +100,4 @@ class ToonPaletteSearchIndex(PropertyGroup):
 
         redo_post.remove(ToonPaletteSearchIndex._sync_state)
         undo_post.remove(ToonPaletteSearchIndex._sync_state)
+        node_group_import_post.remove(ToonPaletteSearchIndex._sync_state)
