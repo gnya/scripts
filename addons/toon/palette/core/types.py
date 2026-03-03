@@ -31,14 +31,14 @@ def get_property(id: NodeTree) -> IToonPaletteProperty:
         return prop
 
 
-def get_order(node_tree: NodeTree) -> int:
+def get_order(node_tree: NodeTree | None) -> int:
     if is_palette(node_tree):
         return get_property(node_tree).order
     else:
         return -1
 
 
-def set_order(node_tree: NodeTree, value: int):
+def set_order(node_tree: NodeTree | None, value: int):
     if is_palette(node_tree):
         get_property(node_tree).order = value
 

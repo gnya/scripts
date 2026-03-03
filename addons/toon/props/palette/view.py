@@ -31,8 +31,26 @@ class ToonPaletteViewSettings(PropertyGroup):
         delattr(WindowManager, ToonPaletteViewSettings.PROP_NAME)
 
 
-def get_view_settings(id: NodeTree | WindowManager | None) -> ToonPaletteViewSettings:
+def get_view_settings(id: NodeTree | None) -> ToonPaletteViewSettings:
     if id is None:
-        id = bpy.context.window_manager
+        default_id = bpy.context.window_manager
 
-    return getattr(id, ToonPaletteViewSettings.PROP_NAME)
+        return getattr(default_id, ToonPaletteViewSettings.PROP_NAME)
+    else:
+        return getattr(id, ToonPaletteViewSettings.PROP_NAME)
+
+
+def get_active_index(node_tree: NodeTree | None) -> int:
+    return get_view_settings(node_tree).active_index
+
+
+def set_active_index(node_tree: NodeTree | None, value: int):
+    get_view_settings(node_tree).active_index = value
+
+
+def get_show_expanded(node_tree: NodeTree | None) -> bool:
+    return get_view_settings(node_tree).show_expanded
+
+
+def set_show_expanded(node_tree: NodeTree | None, value: bool):
+    get_view_settings(node_tree).show_expanded = value

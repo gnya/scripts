@@ -32,7 +32,7 @@ from toon.palette import (
 from toon.utils import node_group_update_post
 
 from .node import ToonPaletteSearchIndex
-from .view import get_view_settings
+from .view import get_show_expanded, set_show_expanded
 
 if TYPE_CHECKING:
     from toon.palette import ToonPalette, ToonPaletteColor, ToonPaletteGroup
@@ -92,10 +92,10 @@ class ToonPaletteUIItem(PropertyGroup):
         return get_uv_map_ptr(self.node_tree, self.socket_index)
 
     def _get_show_expanded(self) -> bool:
-        return get_view_settings(self.node_tree).show_expanded
+        return get_show_expanded(self.node_tree)
 
     def _set_show_expanded(self, value: bool):
-        get_view_settings(self.node_tree).show_expanded = value
+        set_show_expanded(self.node_tree, value)
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
@@ -103,7 +103,6 @@ class ToonPaletteUIItem(PropertyGroup):
 
     group_index: IntProperty(default=-1)
 
-    # TODO Check every time or BoolProperty
     def is_linked(self) -> bool:
         return get_library(self.node_tree) != ""
 

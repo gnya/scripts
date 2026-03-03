@@ -25,7 +25,12 @@ from toon.utils import node_group_import_post
 
 from .node import ToonPaletteSearchIndex
 from .ui_item import ToonPaletteUIItem
-from .view import get_view_settings
+from .view import (
+    get_active_index,
+    get_show_expanded,
+    set_active_index,
+    set_show_expanded,
+)
 
 if TYPE_CHECKING:
     from bpy.types import Scene
@@ -48,7 +53,7 @@ class ToonPaletteUIPaletteState(PropertyGroup):
     palette_name: StringProperty(get=_get_palette_name, set=_set_palette_name)
 
     def _get_active_index(self) -> int:
-        index = get_view_settings(self.header).active_index
+        index = get_active_index(self.header)
         index = min(index, len(self.list_items) - 1)
 
         if index < 0:
@@ -59,15 +64,15 @@ class ToonPaletteUIPaletteState(PropertyGroup):
             return index
 
     def _set_active_index(self, value: int):
-        get_view_settings(self.header).active_index = value
+        set_active_index(self.header, value)
 
     active_index: IntProperty(get=_get_active_index, set=_set_active_index)
 
     def _get_show_expanded(self) -> bool:
-        return get_view_settings(self.header).show_expanded
+        return get_show_expanded(self.header)
 
     def _set_show_expanded(self, value: bool):
-        get_view_settings(self.header).show_expanded = value
+        set_show_expanded(self.header, value)
 
     show_expanded: BoolProperty(get=_get_show_expanded, set=_set_show_expanded)
 
@@ -82,7 +87,6 @@ class ToonPaletteUIPaletteState(PropertyGroup):
     def is_orphans(self) -> bool:
         return self.header is None
 
-    # TODO Check every time or BoolProperty
     def is_linked(self) -> bool:
         return get_library(self.header) != ""
 
