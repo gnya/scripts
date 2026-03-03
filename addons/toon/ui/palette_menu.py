@@ -8,6 +8,8 @@ from toon.ops import (
     VIEW3D_OT_toon_palette_add,
     VIEW3D_OT_toon_palette_add_group,
     VIEW3D_OT_toon_palette_copy,
+    VIEW3D_OT_toon_palette_merge,
+    VIEW3D_OT_toon_palette_merge_group,
     VIEW3D_OT_toon_palette_move,
     VIEW3D_OT_toon_palette_paste,
     VIEW3D_OT_toon_palette_remove_group,
@@ -63,6 +65,8 @@ class VIEW3D_MT_toon_palette(Menu):
             VIEW3D_OT_toon_palette_copy.bl_idname, text="Copy Palette", icon="COPYDOWN"
         )
         layout.separator()
+        layout.operator(VIEW3D_OT_toon_palette_merge.bl_idname, text="Merge Palette")
+        layout.separator()
         o = layout.operator(
             VIEW3D_OT_toon_palette_move.bl_idname, text="Move Palette", icon="TRIA_UP"
         )
@@ -88,4 +92,8 @@ class VIEW3D_MT_toon_palette_group(Menu):
             VIEW3D_OT_toon_palette_remove_group.bl_idname,
             text="Remove Group",
             icon="REMOVE",
+        )
+        layout.separator()
+        layout.operator(
+            VIEW3D_OT_toon_palette_merge_group.bl_idname, text="Merge Group"
         )

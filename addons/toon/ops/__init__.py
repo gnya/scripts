@@ -8,6 +8,8 @@ from .palette import (
     VIEW3D_OT_toon_palette_add_color,
     VIEW3D_OT_toon_palette_add_group,
     VIEW3D_OT_toon_palette_copy,
+    VIEW3D_OT_toon_palette_merge,
+    VIEW3D_OT_toon_palette_merge_group,
     VIEW3D_OT_toon_palette_move,
     VIEW3D_OT_toon_palette_move_item,
     VIEW3D_OT_toon_palette_paste,
@@ -30,6 +32,8 @@ classes = (
     VIEW3D_OT_toon_palette_paste,
     VIEW3D_OT_toon_palette_move,
     VIEW3D_OT_toon_palette_move_item,
+    VIEW3D_OT_toon_palette_merge,
+    VIEW3D_OT_toon_palette_merge_group,
 )
 
 

@@ -184,6 +184,28 @@ class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
         return True
 
 
+class VIEW3D_OT_toon_palette_merge(ToonPaletteOperator):
+    bl_idname = "view3d.toon_palette_merge"
+    bl_label = "Merge Palette"
+    bl_description = "Merge active palette to selected"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @override
+    def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        return True
+
+
+class VIEW3D_OT_toon_palette_merge_group(ToonPaletteOperator):
+    bl_idname = "view3d.toon_palette_merge_group"
+    bl_label = "Merge Group"
+    bl_description = "Merge active group to selected"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @override
+    def _execute_impl(self, state: ToonPaletteUIPaletteState) -> bool:
+        return True
+
+
 class VIEW3D_OT_toon_palette_copy(ToonPaletteOperator):
     bl_idname = "view3d.toon_palette_copy"
     bl_label = "Copy Palette"
