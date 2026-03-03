@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING, Iterator
 from toon.utils import within
 
 from .color import ToonPaletteColor
-from .naming import get_group_name, get_group_name_full, get_library, resolve_group_name
+from .naming import (
+    get_group_name,
+    get_group_name_full,
+    get_library,
+    resolve_color_name,
+    resolve_group_name,
+)
 from .types import get_order, set_order
 
 if TYPE_CHECKING:
@@ -53,22 +59,29 @@ class ToonPaletteGroup:
         if self.is_linked:
             raise RuntimeError("Linked palette is read-only.")
 
+        color_name = resolve_color_name(self.node_tree, color_name)
         self.node_tree.outputs.new("NodeSocketColor", color_name)
         color = ToonPaletteColor(self.node_tree, self.size() - 1)
         color.init()
 
         return color
 
-    def remove(self, index: int) -> bool:
-        if not within(self.size(), index):
-            return False
-        elif self.is_linked:
+    def remove(self, color_name: str) -> bool:
+        if self.is_linked:
             raise RuntimeError("Linked palette is read-only.")
+        elif (color := self.get(color_name)) is None:
+            return False
+        else:
+            socket = self.node_tree.outputs[color.socket_index]
+            self.node_tree.outputs.remove(socket)
 
-        socket = self.node_tree.outputs[index]
-        self.node_tree.outputs.remove(socket)
+            return True
 
-        return True
+    def get(self, color_name: str) -> ToonPaletteColor | None:
+        if (index := self.node_tree.outputs.find(color_name)) < 0:
+            return None
+        else:
+            return ToonPaletteColor(self.node_tree, index)
 
     def colors(self) -> Iterator[ToonPaletteColor]:
         for index in range(self.size()):

@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Any
 
 from toon.utils import change_socket_type, remove_nodes, search_node
 
+from .naming import resolve_color_name
+
 if TYPE_CHECKING:
     from bpy.types import NodeSocket, NodeSocketInterface, NodeTree
 
@@ -21,7 +23,10 @@ class ToonPaletteColor:
 
     @name.setter
     def name(self, value: str):
-        self._socket_interface().name = value
+        if value == self.name:
+            return
+
+        self._socket_interface().name = resolve_color_name(self.node_tree, value)
 
     def _socket(self) -> NodeSocket:
         output = self.node_tree.nodes.get("Group Output")

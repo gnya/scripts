@@ -116,13 +116,6 @@ def _palette_names(node_groups: BlendDataNodeTrees) -> list[str]:
     return palette_names
 
 
-def resolve_group_name(name: str) -> str:
-    if name == "":
-        return "Group"
-    else:
-        return name.translate(str.maketrans("|[]", "___"))
-
-
 def resolve_palette_name(node_groups: BlendDataNodeTrees, name: str) -> str:
     if name == "":
         name = "Palette"
@@ -130,6 +123,22 @@ def resolve_palette_name(node_groups: BlendDataNodeTrees, name: str) -> str:
         name = name.translate(str.maketrans("|[]", "___"))
 
     return unique_name(_palette_names(node_groups), name)
+
+
+def resolve_group_name(name: str) -> str:
+    if name == "":
+        return "Group"
+    else:
+        return name.translate(str.maketrans("|[]", "___"))
+
+
+def resolve_color_name(node_tree: NodeTree, name: str) -> str:
+    if name == "":
+        name = "Color"
+    else:
+        name = name.translate(str.maketrans("|[]", "___"))
+
+    return unique_name(node_tree.outputs.keys(), name)
 
 
 def build_node_tree_name(palette_name: str, group_name: str) -> str:

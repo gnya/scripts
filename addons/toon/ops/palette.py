@@ -175,7 +175,7 @@ class VIEW3D_OT_toon_palette_remove_color(ToonPaletteOperator):
 
         if group is None:
             return False
-        elif not group.remove(item.socket_index):
+        elif not group.remove(item.color_name):
             return False
 
         max_index = item.header_index + len(list(group.colors()))
