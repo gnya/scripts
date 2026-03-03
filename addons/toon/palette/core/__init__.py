@@ -9,6 +9,7 @@ from .naming import (
     get_palette_name_full,
     is_group,
     is_palette,
+    parse_name_full,
 )
 from .palette import ToonPalette
 from .types import (
@@ -28,6 +29,7 @@ __all__ = [
     color_type_to_int,
     int_to_color_type,
     get_library,
+    parse_name_full,
     get_palette_name,
     get_palette_name_full,
     get_group_name,

@@ -11,6 +11,7 @@ from .core import (
     ToonPaletteFacade,
     ToonPaletteGroup,
     color_type_to_int,
+    get_library,
     get_palette_name,
     int_to_color_type,
     is_group,
@@ -24,12 +25,15 @@ def get_facade() -> ToonPaletteFacade:
     return ToonPaletteFacade(bpy.data.node_groups)
 
 
-def _get_palette_by_name(name: str) -> ToonPalette | None:
-    return get_facade().get(name)
+def _get_palette_by_name(name: str, library: str = "") -> ToonPalette | None:
+    return get_facade().get(name, library)
 
 
 def get_palette(node_tree: NodeTree | None) -> ToonPalette | None:
-    return _get_palette_by_name(get_palette_name(node_tree))
+    library = get_library(node_tree)
+    name = get_palette_name(node_tree)
+
+    return _get_palette_by_name(name, library)
 
 
 def set_palette_name(node_tree: NodeTree | None, value: str):
@@ -145,10 +149,12 @@ def get_palettes() -> Iterator[ToonPalette]:
     yield from get_facade().palettes()
 
 
-def get_node_tree(palette_name: str, group_name: str = "") -> NodeTree | None:
-    if (palette := _get_palette_by_name(palette_name)) is None:
+def get_node_tree(
+    palette_name: str, group_name: str = "", library: str = ""
+) -> NodeTree | None:
+    if (palette := _get_palette_by_name(palette_name, library)) is None:
         return None
-    elif (group := palette.get(group_name)) is None:
+    elif (group := palette.get(group_name, library)) is None:
         return palette.header
     else:
         return group.node_tree

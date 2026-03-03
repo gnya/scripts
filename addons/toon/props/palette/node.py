@@ -16,19 +16,19 @@ if TYPE_CHECKING:
 
 
 class ToonPaletteSearchGroup(PropertyGroup):
-    def init(self, name: str):
-        self.name = name
+    def init(self, name_full: str):
+        self.name = name_full
 
 
 class ToonPaletteSearchPalette(PropertyGroup):
     groups: CollectionProperty(type=ToonPaletteSearchGroup)
 
     def init(self, palette: ToonPalette):
-        self.name = palette.name
+        self.name = palette.name_full
 
         for group in palette.groups():
             state = self.groups.add()
-            state.init(group.name)
+            state.init(group.name_full)
 
 
 class ToonPaletteSearchIndex(PropertyGroup):
@@ -51,7 +51,7 @@ class ToonPaletteSearchIndex(PropertyGroup):
             if palette.is_orphens:
                 for group in palette.groups():
                     state = self.orphans.add()
-                    state.init(group.name)
+                    state.init(group.name_full)
             else:
                 state = self.palettes.add()
                 state.init(palette)

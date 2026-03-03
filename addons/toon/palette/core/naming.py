@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Iterator
 
 from toon.utils import unique_name
@@ -38,6 +39,17 @@ def get_library(node_tree: NodeTree | None) -> str:
             return node_tree.library.filepath
     else:
         return ""
+
+
+def parse_name_full(name_full: str) -> tuple[str, str]:
+    names = re.split(r"[\[\]]", name_full)
+
+    if len(names) == 0:
+        return "", ""
+    elif len(names) == 1:
+        return names[0], ""
+    else:
+        return names[0].strip(), names[1]
 
 
 def get_palette_name(node_tree: NodeTree | None) -> str:

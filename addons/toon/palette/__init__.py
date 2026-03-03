@@ -28,9 +28,12 @@ from .core import (
     ToonPaletteGroup,
     color_type_to_int,
     get_group_name,
+    get_group_name_full,
     get_library,
     get_palette_name,
+    get_palette_name_full,
     int_to_color_type,
+    parse_name_full,
 )
 
 __all__ = [
@@ -45,8 +48,11 @@ __all__ = [
     color_type_to_int,
     int_to_color_type,
     get_library,
+    parse_name_full,
     get_palette_name,
+    get_palette_name_full,
     get_group_name,
+    get_group_name_full,
     color_types,
     get_color,
     get_color_name,
