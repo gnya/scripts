@@ -1,6 +1,4 @@
-from . import ik_fk
-from . import props
-from . import tools
+from . import ik_fk, props, tools
 
 
 def register():

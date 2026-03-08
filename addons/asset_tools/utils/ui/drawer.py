@@ -1,10 +1,10 @@
-import bpy
-
-from bpy.types import UILayout
 from typing import Any
 
+import bpy
+from bpy.types import UILayout
+
 from .parser import parse_contents
-from .property import parse_path, get_data, get_value
+from .property import get_data, get_value, parse_path
 
 
 class OperatorNotFoundError(Exception):
@@ -24,15 +24,21 @@ def _exists_operator(path: str) -> bool:
     return True
 
 
-def draw_operator(layout: UILayout, content: tuple, **kwargs):
-    path, (text, icon, order, width), enum_arg, args = content
-    icon = icon if icon else 'NONE'
+def draw_operator(
+    layout: UILayout,
+    content: tuple[str, tuple[str, str, int, float], str, dict[str, Any]],
+    **kwargs: Any,
+):
+    path, (text, icon, _, _), enum_arg, args = content
+    icon = icon if icon else "NONE"
 
     if not _exists_operator(path):
         raise OperatorNotFoundError(f'"{path}" wasn\'t found.')
 
     if enum_arg:
-        op = layout.operator_menu_enum(path, enum_arg, text=text, icon=icon, translate=False)
+        op = layout.operator_menu_enum(
+            path, enum_arg, text=text, icon=icon, translate=False
+        )
     else:
         op = layout.operator(path, text=text, icon=icon, translate=False)
 
@@ -45,8 +51,12 @@ def draw_operator(layout: UILayout, content: tuple, **kwargs):
             setattr(op, key, value)
 
 
-def draw_property(layout: UILayout, content: tuple, data: Any | None = None):
-    path, (text, icon, order, width) = content
+def draw_property(
+    layout: UILayout,
+    content: tuple[str, tuple[str, str, int, float]],
+    data: Any | None = None,
+):
+    path, (text, icon, _, _) = content
     data_path, prop, index = parse_path(path)
 
     try:
@@ -57,12 +67,19 @@ def draw_property(layout: UILayout, content: tuple, data: Any | None = None):
 
     text = text(value) if callable(text) else text
     icon = icon(value) if callable(icon) else icon
-    icon = icon if icon else 'NONE'
+    icon = icon if icon else "NONE"
 
-    layout.prop(data, prop, index=index, text=text, icon=icon, translate=False, toggle=1)
+    layout.prop(
+        data, prop, index=index, text=text, icon=icon, translate=False, toggle=1
+    )
 
 
-def draw_group(layout: UILayout, contents: dict | tuple[dict], data: Any | None = None, **kwargs):
+def draw_group(
+    layout: UILayout,
+    contents: dict[str, Any] | tuple[dict[str, Any]],
+    data: Any | None = None,
+    **kwargs: Any,
+):
     content_list = parse_contents(contents)
     content_list = sorted(content_list, key=lambda c: c[1][2])
 
@@ -88,7 +105,7 @@ def draw_group(layout: UILayout, contents: dict | tuple[dict], data: Any | None 
             width_scale = width_scale / (1.0 - width_factor)
 
 
-def _marge_groups(contents: tuple[dict]) -> dict:
+def _marge_groups(contents: tuple[dict[str, Any]]) -> dict[str, Any]:
     marged = {}
 
     for content_dict in contents:
@@ -101,7 +118,12 @@ def _marge_groups(contents: tuple[dict]) -> dict:
     return marged
 
 
-def draw(layout: UILayout, contents: dict | tuple[dict], data: Any | None = None, **kwargs):
+def draw(
+    layout: UILayout,
+    contents: dict[str, Any] | tuple[dict[str, Any]],
+    data: Any | None = None,
+    **kwargs: Any,
+):
     if isinstance(contents, tuple):
         contents = _marge_groups(contents)
 

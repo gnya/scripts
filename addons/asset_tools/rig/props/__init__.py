@@ -1,9 +1,6 @@
 from .panels import VIEW3D_PT_rig_props
 
-
-classes = (
-    VIEW3D_PT_rig_props,
-)
+classes = (VIEW3D_PT_rig_props,)
 
 
 def register():

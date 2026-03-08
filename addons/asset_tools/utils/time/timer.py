@@ -1,10 +1,11 @@
 import time
-
 from functools import wraps
+from types import TracebackType
+from typing import Any, Callable
 
 
 class StopWatch:
-    def __init__(self, name: str, logger: callable = print):
+    def __init__(self, name: str, logger: Callable[[str], None] = print):
         self.name = name
         self.logger = logger
 
@@ -15,19 +16,26 @@ class StopWatch:
         self.time_end = time.perf_counter()
         micros = (self.time_end - self.time_start) * 1000 * 1000
 
-        self.logger(f'{self.name}: {round(micros, 1)} us')
+        self.logger(f"{self.name}: {round(micros, 1)} us")
 
     def __enter__(self):
         self.start()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(
+        self,
+        type: type[BaseException] | None,
+        value: BaseException | None,
+        traceback: TracebackType | None,
+    ):
         self.stop()
 
 
-def stopwatch(loops: int = 1, logger: callable = print) -> callable:
-    def stopwatch_wrapper(func: callable) -> callable:
+def stopwatch(
+    loops: int = 1, logger: Callable[[str], None] = print
+) -> Callable[..., Any]:
+    def stopwatch_wrapper(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        def wrapper(*args, **kwargs) -> callable:
+        def wrapper(*args: Any, **kwargs: Any) -> Callable[..., Any]:
             with StopWatch(func.__name__, logger):
                 if loops > 1:
                     for _ in range(loops - 1):
@@ -40,7 +48,7 @@ def stopwatch(loops: int = 1, logger: callable = print) -> callable:
     return stopwatch_wrapper
 
 
-def start_stopwatch(name: str, logger: callable = print) -> StopWatch:
+def start_stopwatch(name: str, logger: Callable[[str], None] = print) -> StopWatch:
     timer = StopWatch(name, logger)
     timer.start()
 

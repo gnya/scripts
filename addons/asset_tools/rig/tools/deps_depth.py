@@ -1,7 +1,9 @@
 import re
 
+from bpy.types import Constraint, FCurve, Object
 
-def _calc_depth(deps, bone_depth):
+
+def _calc_depth(deps: set[str], bone_depth: dict[str, int]) -> int:
     if len(deps) == 0:
         return 0
 
@@ -18,71 +20,73 @@ def _calc_depth(deps, bone_depth):
 
 
 # ref: formatter/rules/utils/bone_utils.py
-def _bones_used_in_constraint(constraint, armature):
+def _bones_used_in_constraint(constraint: Constraint, armature: Object) -> set[str]:
     used_bones = set()
 
-    if constraint.owner_space == 'CUSTOM' or constraint.target_space == 'CUSTOM':
+    if constraint.owner_space == "CUSTOM" or constraint.target_space == "CUSTOM":
         if constraint.space_object == armature and constraint.space_subtarget:
             used_bones.add(constraint.space_subtarget)
 
     match constraint.type:
-        case 'ARMATURE':
+        case "ARMATURE":
             for t in constraint.targets:
                 if t.target == armature and t.subtarget:
                     used_bones.add(t.subtarget)
-        case 'COPY_LOCATION':
+        case "COPY_LOCATION":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'COPY_ROTATION':
+        case "COPY_ROTATION":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'COPY_SCALE':
+        case "COPY_SCALE":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'COPY_TRANSFORMS':
+        case "COPY_TRANSFORMS":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'DAMPED_TRACK':
+        case "DAMPED_TRACK":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'IK':
+        case "IK":
             if constraint.pole_target == armature and constraint.pole_subtarget:
                 used_bones.add(constraint.pole_subtarget)
 
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'LOCKED_TRACK':
+        case "LOCKED_TRACK":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'LIMIT_DISTANCE':
+        case "LIMIT_DISTANCE":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'LIMIT_LOCATION':
+        case "LIMIT_LOCATION":
             pass
-        case 'LIMIT_SCALE':
+        case "LIMIT_SCALE":
             pass
-        case 'LIMIT_ROTATION':
+        case "LIMIT_ROTATION":
             pass
-        case 'PIVOT':
+        case "PIVOT":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'SHRINKWRAP':
+        case "SHRINKWRAP":
             pass
-        case 'STRETCH_TO':
+        case "STRETCH_TO":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'TRACK_TO':
+        case "TRACK_TO":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
-        case 'TRANSFORM':
+        case "TRANSFORM":
             if constraint.target == armature and constraint.subtarget:
                 used_bones.add(constraint.subtarget)
+        case _:
+            pass
 
     return used_bones
 
 
 # ref: formatter/rules/utils/bone_utils.py (only check "PoseBone")
-def _bones_used_in_driver(driver, armature):
+def _bones_used_in_driver(driver: FCurve, armature: Object) -> set[str]:
     used_bones = set()
 
     for v in driver.driver.variables:
@@ -101,10 +105,10 @@ def _bones_used_in_driver(driver, armature):
     return used_bones
 
 
-def calc_dependency_depth(armature):
+def calc_dependency_depth(armature: Object) -> dict[str, int]:
     # Enumerate other bones on which the bone depends.
     bones = armature.pose.bones
-    deps = {}
+    deps: dict[str, set[str]] = {}
 
     for b in bones:
         deps[b.name] = set()
@@ -121,7 +125,7 @@ def calc_dependency_depth(armature):
                 deps[m.group(1)] |= _bones_used_in_driver(d, armature)
 
     # Calculate the depth of dependence of the bone.
-    bone_depth = {}
+    bone_depth: dict[str, int] = {}
     last_length = len(deps)
 
     while deps:

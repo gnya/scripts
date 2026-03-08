@@ -1,14 +1,11 @@
-from .ops_pose import VIEW3D_OT_rig_copy_pose
-from .ops_pose import VIEW3D_OT_rig_paste_pose
-
-from .ops_show_bones import VIEW3D_OT_rig_show_animated_bones
-from .ops_show_bones import VIEW3D_OT_rig_show_overrided_bones
-from .ops_show_bones import VIEW3D_OT_rig_show_prefix_bones
-
 from .ops_asset import VIEW3D_OT_rig_update_asset
-
+from .ops_pose import VIEW3D_OT_rig_copy_pose, VIEW3D_OT_rig_paste_pose
+from .ops_show_bones import (
+    VIEW3D_OT_rig_show_animated_bones,
+    VIEW3D_OT_rig_show_overrided_bones,
+    VIEW3D_OT_rig_show_prefix_bones,
+)
 from .panels import VIEW3D_PT_rig_tools
-
 
 classes = (
     VIEW3D_OT_rig_copy_pose,
@@ -17,7 +14,7 @@ classes = (
     VIEW3D_OT_rig_show_overrided_bones,
     VIEW3D_OT_rig_show_prefix_bones,
     VIEW3D_OT_rig_update_asset,
-    VIEW3D_PT_rig_tools
+    VIEW3D_PT_rig_tools,
 )
 
 

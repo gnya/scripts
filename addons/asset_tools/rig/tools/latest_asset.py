@@ -3,7 +3,7 @@ import os
 import re
 
 
-def _cmp_version(a, b):
+def _cmp_version(a: list[int], b: list[int]):
     for i in range(max(len(a), len(b))):
         v_a = a[i] if i < len(a) else 0
         v_b = b[i] if i < len(b) else 0
@@ -17,20 +17,20 @@ def _cmp_version(a, b):
     return 0
 
 
-def find_latest_asset(blend_dir):
-    files = []
+def find_latest_asset(blend_dir: str) -> tuple[str, str]:
+    files: list[tuple[str, list[int]]] = []
 
     for f in os.listdir(blend_dir):
-        if re.match(r'^[A-Z]+_(?!.*test).*\.blend$', f):
+        if re.match(r"^[A-Z]+_(?!.*test).*\.blend$", f):
             version = []
 
-            for s in f.split('_'):
-                if m := re.search(r'[vt]?(\d+)', s):
+            for s in f.split("_"):
+                if m := re.search(r"[vt]?(\d+)", s):
                     version.append(int(m.group(1)))
 
             files.append((f, version))
 
-    key = functools.cmp_to_key(lambda a, b: _cmp_version(a[1], b[1]))
+    key = functools.cmp_to_key(lambda a, b: _cmp_version(a[1], b[1]))  # type: ignore
     files = sorted(files, key=key)
 
     return os.path.join(blend_dir, files[-1][0]), files[-1][0]

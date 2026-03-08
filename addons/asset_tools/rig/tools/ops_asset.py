@@ -1,20 +1,28 @@
-import bpy
+from __future__ import annotations
+
 import os
+from typing import TYPE_CHECKING
+
+import bpy
+from bpy.types import Context, Event
 
 from .latest_asset import find_latest_asset
 
+if TYPE_CHECKING:
+    from bpy._typing.rna_enums import OperatorReturnItems
+
 
 class VIEW3D_OT_rig_update_asset(bpy.types.Operator):
-    bl_idname = 'view3d.rig_update_asset'
-    bl_label = 'Update Asset'
-    bl_description = 'Update asset data'
-    bl_options = {'UNDO'}
+    bl_idname = "view3d.rig_update_asset"
+    bl_label = "Update Asset"
+    bl_description = "Update asset data"
+    bl_options = {"UNDO"}
 
-    latest_path: bpy.props.StringProperty(default='')
-    latest_file: bpy.props.StringProperty(default='')
+    latest_path: bpy.props.StringProperty(default="")
+    latest_file: bpy.props.StringProperty(default="")
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls, context: Context):
         obj = context.active_object
 
         if not obj or not obj.override_library:
@@ -22,18 +30,25 @@ class VIEW3D_OT_rig_update_asset(bpy.types.Operator):
 
         return True
 
-    def execute(self, context):
+    def execute(self, context: Context) -> set[OperatorReturnItems]:
         obj = context.active_object
+
+        if obj is None:
+            return {"CANCELLED"}
+
         lib = obj.override_library.reference.library
 
         lib.filepath = bpy.path.relpath(self.latest_path)
         lib.reload()
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
-    def invoke(self, context, event):
+    def invoke(self, context: Context, event: Event) -> set[OperatorReturnItems]:
         obj = context.active_object
         wm = context.window_manager
+
+        if obj is None:
+            return {"CANCELLED"}
 
         lib = obj.override_library.reference.library
         blend_path = bpy.path.abspath(lib.filepath)
@@ -46,6 +61,6 @@ class VIEW3D_OT_rig_update_asset(bpy.types.Operator):
         if blend_file != self.latest_file:
             return wm.invoke_confirm(self, event)
         else:
-            self.report({'INFO'}, 'This asset is the latest.')
+            self.report({"INFO"}, "This asset is the latest.")
 
-            return {'CANCELLED'}
+            return {"CANCELLED"}
