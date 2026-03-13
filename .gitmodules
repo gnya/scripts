@@ -1,3 +1,6 @@
 [submodule "addons/toon"]
 	path = addons/toon
 	url = git@github.com:gnya/toon.git
+[submodule "addons/broom"]
+	path = addons/broom
+	url = git@github.com:gnya/broom.git
