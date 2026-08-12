@@ -1,7 +1,7 @@
-import bpy
-
 from re import match, split
 from typing import Any
+
+import bpy
 
 
 class ParseDataPathError(Exception):
@@ -11,7 +11,7 @@ class ParseDataPathError(Exception):
 def parse_path(path: str) -> tuple[str, str, int]:
     prop_path, index = path, -1
 
-    if m := match(r'^(.+)\[(\d+)\]$', prop_path):
+    if m := match(r"^(.+)\[(\d+)\]$", prop_path):
         prop_path = m.group(1)
         index = int(m.group(2))
 
@@ -20,25 +20,25 @@ def parse_path(path: str) -> tuple[str, str, int]:
 
     data_path = m.group(1)
     prop = m.group(2)
-    prop = prop[1:] if prop.startswith('.') else prop
+    prop = prop[1:] if prop.startswith(".") else prop
 
     return data_path, prop, index
 
 
 def get_data(path: str, data: Any | None = None) -> Any:
-    if not data and path.startswith('bpy'):
+    if not data and path.startswith("bpy"):
         data = bpy
         path = path[4:]
 
-    for path_or_key in split(r'[\[\]]+', path):
+    for path_or_key in split(r"[\[\]]+", path):
         if not path_or_key:
             continue
         elif path_or_key.isdecimal():
-            data = data[int(path_or_key)]
-        elif path_or_key.startswith(('\'', '"')):
-            data = data[path_or_key[1:-1]]
+            data = data[int(path_or_key)]  # type: ignore
+        elif path_or_key.startswith(("'", '"')):
+            data = data[path_or_key[1:-1]]  # type: ignore
         else:
-            for prop in path_or_key.split('.'):
+            for prop in path_or_key.split("."):
                 if not prop:
                     continue
 
@@ -48,7 +48,7 @@ def get_data(path: str, data: Any | None = None) -> Any:
 
 
 def get_value(prop: str, index: int, data: Any) -> Any:
-    if prop.startswith('['):
+    if prop.startswith("["):
         value = data[prop[2:-2]]
     else:
         value = getattr(data, prop)

@@ -1,6 +1,3 @@
-from .timer import stopwatch, start_stopwatch
+from .timer import start_stopwatch, stopwatch
 
-__all__ = [
-    stopwatch,
-    start_stopwatch
-]
+__all__ = [stopwatch, start_stopwatch]

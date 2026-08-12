@@ -1,101 +1,101 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import bpy
+from bpy.types import Context
 
 from .bones import ik_fk_bones
+from .snap import snap_arm_fk2ik, snap_arm_ik2fk, snap_leg_fk2ik, snap_leg_ik2fk
 
-from .snap import snap_arm_ik2fk
-from .snap import snap_arm_fk2ik
-from .snap import snap_leg_ik2fk
-from .snap import snap_leg_fk2ik
+if TYPE_CHECKING:
+    from bpy._typing.rna_enums import OperatorReturnItems
 
 
 class VIEW3D_OT_rig_snap_ik_to_fk(bpy.types.Operator):
-    bl_idname = 'view3d.rig_snap_ik_to_fk'
-    bl_label = 'IK → FK'
-    bl_description = 'Snap IK to FK'
-    bl_options = {'UNDO'}
+    bl_idname = "view3d.rig_snap_ik_to_fk"
+    bl_label = "IK → FK"
+    bl_description = "Snap IK to FK"
+    bl_options = {"UNDO"}
 
-    bone_group: bpy.props.StringProperty(default='')
-    bone_lr: bpy.props.StringProperty(default='')
+    bone_group: bpy.props.StringProperty(default="")
+    bone_lr: bpy.props.StringProperty(default="")
 
-    def execute(self, context):
+    def execute(self, context: Context) -> set[OperatorReturnItems]:
         bones, missing = ik_fk_bones(context.snap_target, self.bone_group, self.bone_lr)
 
         if not bones:
-            self.report({'ERROR'}, 'Required ik/fk bones not found.')
+            self.report({"ERROR"}, "Required ik/fk bones not found.")
 
-            return {'CANCELLED'}
+            return {"CANCELLED"}
         elif missing:
-            self.report({'ERROR'}, f'Required ik/fk bones are missing. : {missing}')
+            self.report({"ERROR"}, f"Required ik/fk bones are missing. : {missing}")
 
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
-        if self.bone_group == 'arm':
+        if self.bone_group == "arm":
             snap_arm_ik2fk(bones)
-        elif self.bone_group == 'leg':
+        elif self.bone_group == "leg":
             snap_leg_ik2fk(bones)
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class VIEW3D_OT_rig_snap_fk_to_ik(bpy.types.Operator):
-    bl_idname = 'view3d.rig_snap_fk_to_ik'
-    bl_label = 'FK → IK'
-    bl_description = 'Snap FK to IK'
-    bl_options = {'UNDO'}
+    bl_idname = "view3d.rig_snap_fk_to_ik"
+    bl_label = "FK → IK"
+    bl_description = "Snap FK to IK"
+    bl_options = {"UNDO"}
 
-    bone_group: bpy.props.StringProperty(default='')
-    bone_lr: bpy.props.StringProperty(default='')
+    bone_group: bpy.props.StringProperty(default="")
+    bone_lr: bpy.props.StringProperty(default="")
 
-    def execute(self, context):
+    def execute(self, context: Context) -> set[OperatorReturnItems]:
         bones, missing = ik_fk_bones(context.snap_target, self.bone_group, self.bone_lr)
 
         if not bones:
-            self.report({'ERROR'}, 'Required ik/fk bones not found.')
+            self.report({"ERROR"}, "Required ik/fk bones not found.")
 
-            return {'CANCELLED'}
+            return {"CANCELLED"}
         elif missing:
-            self.report({'ERROR'}, f'Required ik/fk bones are missing. : {missing}')
+            self.report({"ERROR"}, f"Required ik/fk bones are missing. : {missing}")
 
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
-        if self.bone_group == 'arm':
+        if self.bone_group == "arm":
             snap_arm_fk2ik(bones)
-        elif self.bone_group == 'leg':
+        elif self.bone_group == "leg":
             snap_leg_fk2ik(bones)
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class VIEW3D_OT_rig_set_ik_parent(bpy.types.Operator):
-    bl_idname = 'view3d.rig_set_ik_parent'
-    bl_label = 'IK Parent'
-    bl_description = 'Set IK Controller\'s parent'
-    bl_options = {'UNDO'}
+    bl_idname = "view3d.rig_set_ik_parent"
+    bl_label = "IK Parent"
+    bl_description = "Set IK Controller's parent"
+    bl_options = {"UNDO"}
 
-    bone_group: bpy.props.StringProperty(default='')
-    bone_lr: bpy.props.StringProperty(default='')
+    bone_group: bpy.props.StringProperty(default="")
+    bone_lr: bpy.props.StringProperty(default="")
 
     type: bpy.props.EnumProperty(
-        items=[
-            ('0', 'Root', ''),
-            ('1', 'Torso', ''),
-            ('2', 'Chest', '')
-        ],
-        translation_context='Operator'
+        items=[("0", "Root", ""), ("1", "Torso", ""), ("2", "Chest", "")],
+        translation_context="Operator",
     )
 
-    def execute(self, context):
+    def execute(self, context: Context) -> set[OperatorReturnItems]:
         if not context.props_body:
-            self.report({'ERROR'}, 'Required bone is missing.')
+            self.report({"ERROR"}, "Required bone is missing.")
 
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
-        prop = f'ik_{self.bone_group}_parent.{self.bone_lr}'
+        prop = f"ik_{self.bone_group}_parent.{self.bone_lr}"
 
         if prop not in context.props_body:
-            self.report({'ERROR'}, f'Required custom property is missing. : {prop}')
+            self.report({"ERROR"}, f"Required custom property is missing. : {prop}")
 
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
         context.props_body[prop] = int(self.type)
 
@@ -103,4 +103,4 @@ class VIEW3D_OT_rig_set_ik_parent(bpy.types.Operator):
         context.props_body.id_data.update_tag()
         context.area.tag_redraw()
 
-        return {'FINISHED'}
+        return {"FINISHED"}
